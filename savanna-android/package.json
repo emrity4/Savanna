@@ -1,0 +1,10 @@
+{
+  "name": "savanna-browser",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build:debug": "cd android && ./gradlew assembleDebug",
+    "build:release": "cd android && ./gradlew assembleRelease",
+    "build:bundle": "cd android && ./gradlew bundleRelease"
+  }
+}

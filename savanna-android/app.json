@@ -1,0 +1,12 @@
+{
+  "expo": {
+    "name": "Savanna",
+    "slug": "savanna-browser",
+    "version": "1.0.0",
+    "platforms": ["android"],
+    "android": {
+      "package": "com.savanna.browser",
+      "versionCode": 1
+    }
+  }
+}
