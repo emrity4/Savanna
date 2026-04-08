@@ -5,21 +5,20 @@
   },
   "build": {
     "development": {
+      "config": ".eas/build/android-debug.yml",
       "android": {
-        "gradleCommand": ":app:assembleDebug",
-        "buildType": "apk",
-        "withoutCredentials": true
+        "buildType": "apk"
       }
     },
     "preview": {
+      "config": ".eas/build/android-preview.yml",
       "android": {
-        "gradleCommand": ":app:assembleRelease",
         "buildType": "apk"
       }
     },
     "production": {
+      "config": ".eas/build/android-production.yml",
       "android": {
-        "gradleCommand": ":app:bundleRelease",
         "buildType": "app-bundle"
       }
     }
