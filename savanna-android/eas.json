@@ -5,22 +5,13 @@
   },
   "build": {
     "development": {
-      "config": ".eas/build/android-debug.yml",
-      "android": {
-        "buildType": "apk"
-      }
+      "config": ".eas/build/android-debug.yml"
     },
     "preview": {
-      "config": ".eas/build/android-preview.yml",
-      "android": {
-        "buildType": "apk"
-      }
+      "config": ".eas/build/android-preview.yml"
     },
     "production": {
-      "config": ".eas/build/android-production.yml",
-      "android": {
-        "buildType": "app-bundle"
-      }
+      "config": ".eas/build/android-production.yml"
     }
   }
 }
