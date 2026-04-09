@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>New Tab</title>
+<style>
+*, *::before, *::after {
+  margin: 0; padding: 0; box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-user-select: none;
+}
+
+:root {
+  --glass-bg:        rgba(255,255,255,0.065);
+  --glass-border:    rgba(255,255,255,0.18);
+  --glass-highlight: rgba(255,255,255,0.13);
+  --text-primary:    #FFFFFF;
+  --text-dim:        rgba(255,255,255,0.55);
+  --text-faint:      rgba(255,255,255,0.28);
+  --bg: #000000;
+  --radius-card: 20px;
+  --radius-icon: 16px;
+}
+
+html {
+  background: var(--bg);
+  height: 100%;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text-primary);
+  font-family: -apple-system, 'SF Pro Display', 'SF Pro Text', Helvetica, Arial, sans-serif;
+  min-height: 100%;
+  padding: 0 20px 140px;
+  overflow-x: hidden;
+}
+
+/* ── FADE-IN ENTRANCE ── */
+@keyframes pageEnter {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+body { animation: pageEnter 0.45s cubic-bezier(0.22, 1, 0.36, 1) both; }
+
+/* ═══════════════════════════════════════
+   LIQUID GLASS  —  iOS 26 material system
+   ═══════════════════════════════════════
+   Layers (bottom → top):
+   1. Dark translucent base
+   2. Specular gradient (diagonal white → transparent)
+   3. Content
+   4. Top-edge highlight line (::before)
+   5. Border via outline/box-shadow
+*/
+.glass {
+  position: relative;
+  background: var(--glass-bg);
+  backdrop-filter: blur(48px) saturate(180%) brightness(1.1);
+  -webkit-backdrop-filter: blur(48px) saturate(180%) brightness(1.1);
+  border: 0.5px solid var(--glass-border);
+  border-radius: var(--radius-card);
+  overflow: hidden;
+  isolation: isolate;
+}
+
+/* Specular diagonal sweep — the "liquid light refraction" */
+.glass::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    148deg,
+    rgba(255,255,255,0.16) 0%,
+    rgba(255,255,255,0.06) 35%,
+    transparent 55%
+  );
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Top specular edge line */
+.glass::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 8%; right: 8%;
+  height: 0.5px;
+  background: linear-gradient(90deg,
+    transparent 0%,
+    rgba(255,255,255,0.5) 50%,
+    transparent 100%
+  );
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* ── HERO SECTION ── */
+.hero {
+  padding-top: 52px;
+  padding-bottom: 36px;
+  text-align: center;
+}
+
+.brand-mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  margin-bottom: 18px;
+}
+
+.brand-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 9px;
+  background: linear-gradient(145deg, #B6A8FF 0%, #8B7FF0 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.4),
+    0 4px 16px rgba(182,168,255,0.35);
+  position: relative;
+  overflow: hidden;
+}
+.brand-icon::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 50%;
+  background: rgba(255,255,255,0.2);
+  border-radius: 9px 9px 0 0;
+}
+.brand-icon svg {
+  position: relative; z-index: 1;
+}
+
+.brand-name {
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: rgba(255,255,255,0.85);
+}
+
+.greeting {
+  font-size: 38px;
+  font-weight: 700;
+  letter-spacing: -0.8px;
+  line-height: 1.08;
+  color: var(--text-primary);
+}
+
+.date-line {
+  margin-top: 8px;
+  font-size: 15px;
+  color: var(--text-dim);
+  font-weight: 400;
+}
+
+/* ── SEARCH BAR ── */
+.search-wrap {
+  margin-bottom: 32px;
+}
+
+.search-bar {
+  padding: 14px 18px;
+  border-radius: 18px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1),
+              opacity 0.15s ease;
+}
+.search-bar:active {
+  transform: scale(0.975);
+  opacity: 0.9;
+}
+.search-hint {
+  font-size: 15.5px;
+  color: rgba(255,255,255,0.35);
+  flex: 1;
+  font-weight: 400;
+}
+
+/* ── SECTION LABEL ── */
+.section-label {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.3);
+  margin-bottom: 14px;
+  padding-left: 4px;
+}
+
+/* ── SITES GRID ── */
+.sites-wrap { margin-bottom: 28px; }
+
+.sites-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px 12px;
+}
+
+/* ── SITE ICON ── */
+@keyframes popIn {
+  0%   { opacity: 0; transform: scale(0.65); }
+  70%  { transform: scale(1.06); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+.site-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 7px;
+  cursor: pointer;
+  opacity: 0;
+  animation: popIn 0.38s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.site-icon {
+  width: 60px;
+  height: 60px;
+  border-radius: var(--radius-icon);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 26px;
+  font-weight: 700;
+  color: #fff;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  border: 0.5px solid rgba(255,255,255,0.2);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.28),
+    0 6px 18px rgba(0,0,0,0.55);
+}
+/* Inner specular on icon */
+.site-icon::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 50%;
+  background: linear-gradient(180deg, rgba(255,255,255,0.22) 0%, transparent 100%);
+  border-radius: var(--radius-icon) var(--radius-icon) 0 0;
+  pointer-events: none;
+  z-index: 1;
+}
+.site-icon span { position: relative; z-index: 2; }
+
+.site-item:active .site-icon {
+  transform: scale(0.87);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+}
+
+.site-name {
+  font-size: 11px;
+  color: rgba(255,255,255,0.65);
+  text-align: center;
+  max-width: 64px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 400;
+  line-height: 1.2;
+}
+
+/* ── RECENTLY VISITED (list style) ── */
+.recents-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  border-radius: var(--radius-card);
+  overflow: hidden;
+}
+
+.recent-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  cursor: pointer;
+  transition: background 0.12s ease;
+  position: relative;
+  background: var(--glass-bg);
+  backdrop-filter: blur(40px);
+  -webkit-backdrop-filter: blur(40px);
+  border: 0.5px solid var(--glass-border);
+  border-radius: 14px;
+  overflow: hidden;
+  animation: slideIn 0.3s ease both;
+}
+@keyframes slideIn {
+  from { opacity: 0; transform: translateX(-10px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+.recent-row:active { background: rgba(255,255,255,0.12); }
+
+.recent-favicon {
+  width: 32px; height: 32px;
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px;
+  font-weight: 700;
+  color: #fff;
+  flex-shrink: 0;
+  border: 0.5px solid rgba(255,255,255,0.15);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.2);
+  position: relative; overflow: hidden;
+}
+.recent-favicon::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(160deg, rgba(255,255,255,0.18) 0%, transparent 55%);
+  pointer-events: none;
+}
+
+.recent-info { flex: 1; min-width: 0; }
+.recent-title {
+  font-size: 14px; font-weight: 500;
+  color: var(--text-primary);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.recent-url {
+  font-size: 12px; color: var(--text-dim);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  margin-top: 1px;
+}
+
+.recent-arrow {
+  opacity: 0.25;
+  flex-shrink: 0;
+}
+
+/* ── PRIVACY BADGE ── */
+.privacy-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin: 24px auto 0;
+  padding: 9px 18px;
+  border-radius: 100px;
+  width: fit-content;
+  font-size: 12px;
+  font-weight: 500;
+  color: rgba(255,255,255,0.35);
+}
+</style>
+</head>
+<body>
+
+<!-- Hero -->
+<div class="hero">
+  <div class="brand-mark">
+    <div class="brand-icon">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10"/>
+        <path d="M19 5l-7 7"/>
+        <path d="M15 5h4v4"/>
+      </svg>
+    </div>
+    <span class="brand-name">Savanna</span>
+  </div>
+  <div class="greeting" id="greeting">Good Morning</div>
+  <div class="date-line" id="dateLine"></div>
+</div>
+
+<!-- Search bar -->
+<div class="search-wrap">
+  <div class="glass search-bar" onclick="Android.focusUrlBar()">
+    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="2" stroke-linecap="round">
+      <circle cx="10.5" cy="10.5" r="6.5"/><line x1="15.5" y1="15.5" x2="20" y2="20"/>
+    </svg>
+    <span class="search-hint">Search or enter address…</span>
+  </div>
+</div>
+
+<!-- Favorites -->
+<div class="sites-wrap" id="favWrap">
+  <div class="section-label">Favorites</div>
+  <div class="sites-grid" id="favGrid"></div>
+</div>
+
+<!-- Recently Visited -->
+<div class="sites-wrap" id="recentWrap" style="display:none">
+  <div class="section-label">Recently Visited</div>
+  <div id="recentList"></div>
+</div>
+
+<!-- Privacy badge -->
+<div class="glass privacy-badge">
+  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.5)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M12 2L4 6v6c0 5.5 3.8 10.7 9 12 5.2-1.3 9-6.5 9-12V6z"/>
+  </svg>
+  Trackers blocked · Private browsing
+</div>
+
+<script>
+// ── COLORS ──
+const PALETTE = [
+  '#FF453A','#FF9F0A','#30D158','#0A84FF',
+  '#5E5CE6','#BF5AF2','#FF375F','#64D2FF',
+  '#FFD60A','#32D74B','#FF6961','#5AC8FA',
+  '#FF6B35','#34C759','#007AFF','#AF52DE',
+];
+function domainColor(d) {
+  let h = 0;
+  for (let i = 0; i < d.length; i++) h = d.charCodeAt(i) + ((h << 5) - h);
+  return PALETTE[Math.abs(h) % PALETTE.length];
+}
+function getDomain(url) {
+  try { return new URL(url).hostname.replace(/^www\./, ''); } catch { return url; }
+}
+function getInitial(title, url) {
+  const s = (title || getDomain(url) || '?');
+  return s[0].toUpperCase();
+}
+function getLabel(title, url) {
+  const dom = getDomain(url).split('.')[0];
+  if (title && title.length < 22 && title !== url) {
+    const words = title.split(' ');
+    return words.length > 2 ? words.slice(0,2).join(' ') : title;
+  }
+  return dom.charAt(0).toUpperCase() + dom.slice(1);
+}
+
+// ── NAVIGATE ──
+function navigate(url) {
+  try { Android.navigate(url); } catch(e) { window.location.href = url; }
+}
+
+// ── DEFAULT FAVORITES ──
+const DEFAULTS = [
+  {url:'https://google.com',    title:'Google'},
+  {url:'https://youtube.com',   title:'YouTube'},
+  {url:'https://reddit.com',    title:'Reddit'},
+  {url:'https://x.com',         title:'X'},
+  {url:'https://github.com',    title:'GitHub'},
+  {url:'https://wikipedia.org', title:'Wikipedia'},
+  {url:'https://amazon.com',    title:'Amazon'},
+  {url:'https://netflix.com',   title:'Netflix'},
+];
+
+function buildIcon(site, delay) {
+  const dom   = getDomain(site.url);
+  const color = domainColor(dom);
+  const init  = getInitial(site.title, site.url);
+  const label = getLabel(site.title, site.url);
+  const el = document.createElement('div');
+  el.className = 'site-item';
+  el.style.animationDelay = delay + 's';
+  el.innerHTML = `
+    <div class="site-icon" style="background:${color}"><span>${init}</span></div>
+    <span class="site-name">${label}</span>`;
+  el.addEventListener('click', () => navigate(site.url));
+  return el;
+}
+
+function buildRecentRow(item, delay) {
+  const dom   = getDomain(item.url);
+  const color = domainColor(dom);
+  const init  = getInitial(item.title, item.url);
+  const label = getLabel(item.title, item.url);
+  const el = document.createElement('div');
+  el.className = 'recent-row';
+  el.style.animationDelay = delay + 's';
+  el.innerHTML = `
+    <div class="recent-favicon" style="background:${color}"><span style="position:relative;z-index:2">${init}</span></div>
+    <div class="recent-info">
+      <div class="recent-title">${label}</div>
+      <div class="recent-url">${dom}</div>
+    </div>
+    <svg class="recent-arrow" width="8" height="14" viewBox="0 0 8 14" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round"><path d="M1 1l6 6-6 6"/></svg>`;
+  el.addEventListener('click', () => navigate(item.url));
+  return el;
+}
+
+// ── MAIN INIT ──
+function init(histJson) {
+  const favGrid = document.getElementById('favGrid');
+  DEFAULTS.forEach((s,i) => favGrid.appendChild(buildIcon(s, i * 0.04)));
+
+  try {
+    const hist = JSON.parse(histJson || '[]');
+    if (!hist.length) return;
+
+    const seen = new Set();
+    const unique = [];
+    for (const item of hist) {
+      const dom = getDomain(item.url);
+      if (!seen.has(dom) && item.url && item.url !== 'about:blank') {
+        seen.add(dom);
+        unique.push(item);
+        if (unique.length >= 8) break;
+      }
+    }
+    if (unique.length < 2) return;
+
+    const wrap  = document.getElementById('recentWrap');
+    const list  = document.getElementById('recentList');
+    wrap.style.display = 'block';
+    unique.forEach((item, i) => list.appendChild(buildRecentRow(item, i * 0.05)));
+  } catch(e) {}
+}
+
+// ── GREETING ──
+(function() {
+  const h = new Date().getHours();
+  const greet = h < 5 ? 'Good Night'
+    : h < 12 ? 'Good Morning'
+    : h < 17 ? 'Good Afternoon'
+    : h < 21 ? 'Good Evening'
+    : 'Good Night';
+  document.getElementById('greeting').textContent = greet;
+  document.getElementById('dateLine').textContent =
+    new Date().toLocaleDateString('en-US', {weekday:'long', month:'long', day:'numeric'});
+})();
+
+// ── BOOT ──
+(function() {
+  try {
+    const h = typeof Android !== 'undefined' ? Android.getRecentHistory() : '[]';
+    init(h);
+  } catch(e) { init('[]'); }
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Liquid Glass URL bar background (iOS 26 style)
+  Layers:
+  1. Dark translucent base
+  2. White frosted tint (simulates blur reveal)
+  3. Top specular highlight (inner gradient)
+  4. White border stroke
+-->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- 1. Dark glass base -->
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="#D9000000" />
+            <corners android:radius="12dp" />
+        </shape>
+    </item>
+
+    <!-- 2. White frosted overlay -->
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="#12FFFFFF" />
+            <corners android:radius="12dp" />
+        </shape>
+    </item>
+
+    <!-- 3. Top specular gradient (simulates light refraction) -->
+    <item android:bottom="50%">
+        <shape android:shape="rectangle">
+            <gradient
+                android:type="linear"
+                android:angle="270"
+                android:startColor="#18FFFFFF"
+                android:endColor="#00FFFFFF" />
+            <corners
+                android:topLeftRadius="12dp"
+                android:topRightRadius="12dp" />
+        </shape>
+    </item>
+
+    <!-- 4. Glass border -->
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="#00000000" />
+            <stroke android:width="0.5dp" android:color="#33FFFFFF" />
+            <corners android:radius="12dp" />
+        </shape>
+    </item>
+
+</layer-list>

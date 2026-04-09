@@ -1,8 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
-<shape xmlns:android="http://schemas.android.com/apk/res/android"
-    android:shape="rectangle">
-    <solid android:color="#14141F" />
-    <corners
-        android:topLeftRadius="24dp"
-        android:topRightRadius="24dp" />
-</shape>
+<!-- Liquid Glass overlay sheet — bottom drawer style -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Dark glass base -->
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="#F0000000" />
+            <corners android:topLeftRadius="28dp" android:topRightRadius="28dp" />
+        </shape>
+    </item>
+    <!-- White frosted tint -->
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="#0AFFFFFF" />
+            <corners android:topLeftRadius="28dp" android:topRightRadius="28dp" />
+        </shape>
+    </item>
+    <!-- Top specular sweep -->
+    <item android:bottom="90%">
+        <shape android:shape="rectangle">
+            <gradient android:type="linear" android:angle="270"
+                android:startColor="#1CFFFFFF" android:endColor="#00FFFFFF" />
+            <corners android:topLeftRadius="28dp" android:topRightRadius="28dp" />
+        </shape>
+    </item>
+    <!-- Top edge highlight -->
+    <item android:bottom="98.5%">
+        <shape android:shape="rectangle">
+            <solid android:color="#30FFFFFF" />
+            <corners android:topLeftRadius="28dp" android:topRightRadius="28dp" />
+        </shape>
+    </item>
+</layer-list>
