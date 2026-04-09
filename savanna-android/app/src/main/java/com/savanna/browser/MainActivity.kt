@@ -2,6 +2,7 @@ package com.savanna.browser
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.FragmentManager
 import com.savanna.browser.fragment.*
 import com.savanna.browser.manager.*
 
@@ -31,101 +32,68 @@ class MainActivity : AppCompatActivity() {
         showBrowserForTab(tab.id, initialUrl)
     }
 
+    // FIX: use replace() only for the base browser — overlays use add() so the
+    // BrowserFragment (and its WebView) are never destroyed when navigating back.
     private fun showBrowserForTab(tabId: String, url: String = "") {
+        // Clear any open overlays first so the container is clean
+        if (supportFragmentManager.backStackEntryCount > 0) {
+            supportFragmentManager.popBackStackImmediate(null, FragmentManager.POP_BACK_STACK_INCLUSIVE)
+        }
+
         val fragment = BrowserFragment.newInstance(tabId, url)
         currentBrowserFragment = fragment
         isOverlayShowing = false
 
         supportFragmentManager.beginTransaction()
             .setCustomAnimations(R.anim.fade_in, R.anim.fade_out)
-            .replace(R.id.fragment_container, fragment, "browser_$tabId")
+            .replace(R.id.fragment_container, fragment, "browser")
             .commit()
     }
 
-    fun showTabSwitcher() {
+    // FIX: add() instead of replace() — BrowserFragment stays alive beneath overlay
+    private fun showOverlayFragment(fragment: androidx.fragment.app.Fragment, tag: String,
+                                     enterAnim: Int = R.anim.slide_in_bottom,
+                                     exitAnim: Int = R.anim.slide_out_bottom) {
+        if (isOverlayShowing) return
         isOverlayShowing = true
         supportFragmentManager.beginTransaction()
-            .setCustomAnimations(R.anim.slide_in_bottom, R.anim.fade_out,
-                R.anim.fade_in, R.anim.slide_out_bottom)
-            .replace(R.id.fragment_container, TabSwitcherFragment(), "tab_switcher")
-            .addToBackStack("tab_switcher")
+            .setCustomAnimations(enterAnim, R.anim.fade_out, R.anim.fade_in, exitAnim)
+            .add(R.id.fragment_container, fragment, tag)
+            .addToBackStack(tag)
             .commit()
     }
 
-    fun showHistory() {
-        isOverlayShowing = true
-        supportFragmentManager.beginTransaction()
-            .setCustomAnimations(R.anim.slide_in_bottom, R.anim.fade_out,
-                R.anim.fade_in, R.anim.slide_out_bottom)
-            .replace(R.id.fragment_container, HistoryFragment(), "history")
-            .addToBackStack("history")
-            .commit()
-    }
-
-    fun showBookmarks() {
-        isOverlayShowing = true
-        supportFragmentManager.beginTransaction()
-            .setCustomAnimations(R.anim.slide_in_bottom, R.anim.fade_out,
-                R.anim.fade_in, R.anim.slide_out_bottom)
-            .replace(R.id.fragment_container, BookmarksFragment(), "bookmarks")
-            .addToBackStack("bookmarks")
-            .commit()
-    }
-
-    fun showSettings() {
-        isOverlayShowing = true
-        supportFragmentManager.beginTransaction()
-            .setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left,
-                R.anim.slide_in_right, R.anim.slide_out_left)
-            .replace(R.id.fragment_container, SettingsFragment(), "settings")
-            .addToBackStack("settings")
-            .commit()
-    }
-
-    fun showPrivacyReport() {
-        isOverlayShowing = true
-        supportFragmentManager.beginTransaction()
-            .setCustomAnimations(R.anim.slide_in_bottom, R.anim.fade_out,
-                R.anim.fade_in, R.anim.slide_out_bottom)
-            .replace(R.id.fragment_container, PrivacyReportFragment(), "privacy_report")
-            .addToBackStack("privacy_report")
-            .commit()
-    }
+    fun showTabSwitcher() = showOverlayFragment(TabSwitcherFragment(), "tab_switcher")
+    fun showHistory()     = showOverlayFragment(HistoryFragment(),     "history")
+    fun showBookmarks()   = showOverlayFragment(BookmarksFragment(),   "bookmarks")
+    fun showPrivacyReport() = showOverlayFragment(PrivacyReportFragment(), "privacy_report")
+    fun showSettings()    = showOverlayFragment(SettingsFragment(),    "settings",
+                                R.anim.slide_in_right, R.anim.slide_out_left)
 
     fun closeOverlay() {
         isOverlayShowing = false
-        supportFragmentManager.popBackStack()
+        if (supportFragmentManager.backStackEntryCount > 0) {
+            supportFragmentManager.popBackStackImmediate()
+        }
     }
 
     fun switchToTab(tabId: String) {
         tabManager.switchToTab(tabId)
-        val tab = tabManager.getTabById(tabId)
-        if (isOverlayShowing) {
-            supportFragmentManager.popBackStack()
-        }
-        showBrowserForTab(tabId, tab?.url ?: "")
+        val tab = tabManager.getTabById(tabId) ?: return
+        showBrowserForTab(tabId, tab.url)
     }
 
     fun closeTab(tabId: String) {
         val resultTab = tabManager.closeTab(tabId)
-        resultTab?.let {
-            if (isOverlayShowing) return
-            showBrowserForTab(it.id, it.url)
-        }
+        resultTab?.let { showBrowserForTab(it.id, it.url) }
     }
 
-    fun createNewTab(url: String = "", title: String = "New Tab") {
-        val tab = tabManager.createTab(url = url, title = title)
-        if (isOverlayShowing) {
-            supportFragmentManager.popBackStack()
-        }
+    fun createNewTab(url: String = "") {
+        val tab = tabManager.createTab(url = url, title = "New Tab")
         showBrowserForTab(tab.id, url)
     }
 
     fun navigateToUrl(url: String) {
-        if (isOverlayShowing) {
-            supportFragmentManager.popBackStack()
-        }
         val activeTab = tabManager.getActiveTab()
         if (activeTab != null) {
             showBrowserForTab(activeTab.id, url)
@@ -140,13 +108,11 @@ class MainActivity : AppCompatActivity() {
             closeOverlay()
             return
         }
-
         val browserFragment = currentBrowserFragment
         if (browserFragment != null && browserFragment.canGoBack()) {
             browserFragment.goBack()
             return
         }
-
         super.onBackPressed()
     }
 

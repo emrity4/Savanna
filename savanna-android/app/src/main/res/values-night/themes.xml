@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <style name="Theme.Savanna" parent="Theme.Material3.Dark.NoActionBar">
-        <item name="colorPrimary">@color/purple_primary</item>
-        <item name="colorPrimaryDark">@color/purple_dark</item>
-        <item name="colorAccent">@color/purple_accent</item>
-        <item name="colorOnPrimary">@color/bg_primary</item>
-        <item name="colorSecondary">@color/purple_accent</item>
-        <item name="colorOnSecondary">@color/bg_primary</item>
-        <item name="colorSurface">@color/bg_secondary</item>
-        <item name="colorOnSurface">@color/text_primary</item>
-        <item name="android:colorBackground">@color/bg_primary</item>
-        <item name="android:windowBackground">@color/bg_primary</item>
-        <item name="android:statusBarColor">@color/bg_primary</item>
-        <item name="android:navigationBarColor">@color/bg_primary</item>
+        <item name="colorPrimary">#FFFFFFFF</item>
+        <item name="colorPrimaryDark">#FF000000</item>
+        <item name="colorAccent">#FFFFFFFF</item>
+        <item name="colorOnPrimary">#FF000000</item>
+        <item name="colorSecondary">#FF8E8E93</item>
+        <item name="colorOnSecondary">#FF000000</item>
+        <item name="colorSurface">#FF0A0A0A</item>
+        <item name="colorOnSurface">#FFFFFFFF</item>
+        <item name="android:colorBackground">#FF000000</item>
+        <item name="android:windowBackground">#FF000000</item>
+        <item name="android:statusBarColor">#FF000000</item>
+        <item name="android:navigationBarColor">#FF000000</item>
         <item name="android:windowLightStatusBar">false</item>
     </style>
 </resources>

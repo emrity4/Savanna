@@ -17,9 +17,10 @@ class TabAdapter(
 ) : RecyclerView.Adapter<TabAdapter.ViewHolder>() {
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val card: View = view.findViewById(R.id.tab_card)
-        val title: TextView = view.findViewById(R.id.tab_title)
-        val url: TextView = view.findViewById(R.id.tab_url)
+        // Root card view — now has id "tabs_mode_b" (user's exact container)
+        val card: View       = view.findViewById(R.id.tabs_mode_b)
+        val title: TextView  = view.findViewById(R.id.tab_title)
+        val url: TextView    = view.findViewById(R.id.tab_url)
         val closeBtn: ImageView = view.findViewById(R.id.btn_close_tab)
     }
 
@@ -32,13 +33,13 @@ class TabAdapter(
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val tab = tabs[position]
         holder.title.text = tab.title.ifBlank { "New Tab" }
-        holder.url.text = if (tab.url.isNotBlank()) UrlUtils.formatUrl(tab.url) else "about:blank"
+        holder.url.text   = if (tab.url.isNotBlank()) UrlUtils.formatUrl(tab.url) else ""
 
-        holder.card.setBackgroundResource(
-            if (tab.isActive) R.drawable.tab_card_active else R.drawable.tab_card_background
-        )
+        // Card background is already set in the layout via @drawable/tabs_mode_b
+        // Active tab gets a slightly elevated alpha — no background override needed.
+        holder.card.alpha = if (tab.isActive) 1.0f else 0.8f
 
-        holder.card.setOnClickListener { onTabClick(tab) }
+        holder.card.setOnClickListener    { onTabClick(tab) }
         holder.closeBtn.setOnClickListener { onCloseClick(tab) }
     }
 

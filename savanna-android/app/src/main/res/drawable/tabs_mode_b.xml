@@ -12,6 +12,6 @@
             android:pathData="M5 0H357C359.761 0 362 2.23858 362 5V247C362 249.761 359.761 252 357 252H5C2.23858 252 0 249.761 0 247V5C0 2.23858 2.23858 0 5 0Z"
             android:strokeWidth="2"
             android:strokeColor="#B6A8FF"
-            android:fillColor="#1E1E30" />
+            android:fillColor="#000000" />
     </group>
 </vector>

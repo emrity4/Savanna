@@ -6,11 +6,12 @@
     android:orientation="vertical"
     android:background="@color/bg_primary">
 
+    <!-- Header -->
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="56dp"
         android:paddingStart="20dp"
-        android:paddingEnd="20dp">
+        android:paddingEnd="12dp">
 
         <TextView
             android:layout_width="wrap_content"
@@ -47,20 +48,22 @@
                 android:background="@drawable/button_background"
                 android:padding="8dp"
                 android:scaleType="centerInside"
-                android:layout_marginStart="8dp"
+                android:layout_marginStart="4dp"
                 android:contentDescription="@string/done" />
         </LinearLayout>
     </RelativeLayout>
 
+    <!-- iOS hairline separator -->
     <View
         android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="@color/border_glass" />
+        android:layout_height="0.5dp"
+        android:background="@color/separator" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/tabs_recycler"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:padding="12dp"
+        android:paddingTop="16dp"
+        android:paddingBottom="16dp"
         android:clipToPadding="false" />
 </LinearLayout>

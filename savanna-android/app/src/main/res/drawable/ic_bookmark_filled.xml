@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- bookmark.fill — iOS SF Symbol filled (active bookmark) -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="24dp"
     android:height="24dp"
     android:viewportWidth="24"
     android:viewportHeight="24">
     <path
-        android:fillColor="#B6A8FF"
-        android:pathData="M17,3H7c-1.1,0 -1.99,0.9 -1.99,2L5,21l7,-3 7,3V5c0,-1.1 -0.9,-2 -2,-2z" />
+        android:pathData="M6,4 L6,21 L12,17 L18,21 L18,4 C18,3.4 17.6,3 17,3 L7,3 C6.4,3 6,3.4 6,4 Z"
+        android:fillColor="#FFFFFFFF" />
 </vector>

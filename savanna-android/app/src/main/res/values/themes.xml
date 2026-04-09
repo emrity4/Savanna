@@ -1,19 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <style name="Theme.Savanna" parent="Theme.Material3.Dark.NoActionBar">
-        <item name="colorPrimary">@color/purple_primary</item>
-        <item name="colorPrimaryDark">@color/purple_dark</item>
-        <item name="colorAccent">@color/purple_accent</item>
-        <item name="colorOnPrimary">@color/bg_primary</item>
-        <item name="colorSecondary">@color/purple_accent</item>
-        <item name="colorOnSecondary">@color/bg_primary</item>
-        <item name="colorSurface">@color/bg_secondary</item>
-        <item name="colorOnSurface">@color/text_primary</item>
-        <item name="android:colorBackground">@color/bg_primary</item>
-        <item name="android:windowBackground">@color/bg_primary</item>
-        <item name="android:statusBarColor">@color/bg_primary</item>
-        <item name="android:navigationBarColor">@color/bg_primary</item>
+        <!-- OLED black everywhere -->
+        <item name="colorPrimary">#FFFFFFFF</item>
+        <item name="colorPrimaryDark">#FF000000</item>
+        <item name="colorAccent">#FFFFFFFF</item>
+        <item name="colorOnPrimary">#FF000000</item>
+        <item name="colorSecondary">#FF8E8E93</item>
+        <item name="colorOnSecondary">#FF000000</item>
+        <item name="colorSurface">#FF0A0A0A</item>
+        <item name="colorOnSurface">#FFFFFFFF</item>
+        <item name="android:colorBackground">#FF000000</item>
+        <item name="android:windowBackground">#FF000000</item>
+        <item name="android:statusBarColor">#FF000000</item>
+        <item name="android:navigationBarColor">#FF000000</item>
         <item name="android:windowLightStatusBar">false</item>
+        <!-- SF Pro: place SF-Pro-Text-Regular.ttf etc in res/font/ and
+             set android:fontFamily="@font/sf_pro" to activate system-wide -->
     </style>
 
     <style name="GlassCard">
@@ -26,10 +29,10 @@
         <item name="android:textColor">@color/text_primary</item>
         <item name="android:textColorHint">@color/text_tertiary</item>
         <item name="android:textSize">15sp</item>
-        <item name="android:paddingStart">16dp</item>
-        <item name="android:paddingEnd">16dp</item>
-        <item name="android:paddingTop">12dp</item>
-        <item name="android:paddingBottom">12dp</item>
+        <item name="android:paddingStart">12dp</item>
+        <item name="android:paddingEnd">12dp</item>
+        <item name="android:paddingTop">10dp</item>
+        <item name="android:paddingBottom">10dp</item>
         <item name="android:maxLines">1</item>
         <item name="android:singleLine">true</item>
         <item name="android:imeOptions">actionGo</item>
@@ -38,15 +41,15 @@
 
     <style name="NavButton">
         <item name="android:background">@drawable/button_background</item>
-        <item name="android:padding">10dp</item>
-        <item name="android:layout_width">42dp</item>
-        <item name="android:layout_height">42dp</item>
+        <item name="android:padding">9dp</item>
+        <item name="android:layout_width">40dp</item>
+        <item name="android:layout_height">40dp</item>
         <item name="android:scaleType">centerInside</item>
     </style>
 
     <style name="SectionTitle">
         <item name="android:textColor">@color/text_primary</item>
-        <item name="android:textSize">20sp</item>
+        <item name="android:textSize">22sp</item>
         <item name="android:textStyle">bold</item>
         <item name="android:paddingStart">20dp</item>
         <item name="android:paddingEnd">20dp</item>

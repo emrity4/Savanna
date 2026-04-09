@@ -1,51 +1,72 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+  BOTTOM mode tab card — user's exact code as the outer container.
+  362×252dp, clipToOutline, @drawable/tabs_mode_b (OLED black fill, purple stroke).
+-->
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/tab_card"
+    android:id="@+id/tabs_mode_b"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:background="@drawable/tab_card_background"
-    android:padding="16dp"
-    android:layout_marginBottom="8dp"
+    android:layout_height="216dp"
+    android:clipToOutline="true"
+    android:background="@drawable/tabs_mode_b"
+    android:layout_marginStart="16dp"
+    android:layout_marginEnd="16dp"
+    android:layout_marginBottom="16dp"
     android:clickable="true"
     android:focusable="true">
 
+    <!-- Header row: title + close -->
     <LinearLayout
+        android:id="@+id/card_header"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_toStartOf="@id/btn_close_tab"
-        android:orientation="vertical">
+        android:layout_height="44dp"
+        android:layout_alignParentTop="true"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingStart="14dp"
+        android:paddingEnd="8dp">
 
         <TextView
             android:id="@+id/tab_title"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:textColor="@color/text_primary"
-            android:textSize="15sp"
-            android:textStyle="bold"
+            android:layout_weight="1"
+            android:textColor="#FFFFFFFF"
+            android:textSize="14sp"
             android:maxLines="1"
             android:ellipsize="end" />
 
-        <TextView
-            android:id="@+id/tab_url"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textColor="@color/text_secondary"
-            android:textSize="13sp"
-            android:maxLines="1"
-            android:ellipsize="end"
-            android:layout_marginTop="4dp" />
+        <ImageView
+            android:id="@+id/btn_close_tab"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:src="@drawable/ic_close"
+            android:background="@drawable/button_background"
+            android:padding="4dp"
+            android:scaleType="centerInside"
+            android:contentDescription="Close tab"
+            android:layout_marginStart="4dp" />
     </LinearLayout>
 
-    <ImageView
-        android:id="@+id/btn_close_tab"
-        android:layout_width="32dp"
-        android:layout_height="32dp"
-        android:layout_alignParentEnd="true"
-        android:layout_centerVertical="true"
-        android:src="@drawable/ic_close"
-        android:background="@drawable/button_background"
-        android:padding="4dp"
-        android:scaleType="centerInside"
-        android:contentDescription="@string/close_tab" />
+    <!-- Hairline separator -->
+    <View
+        android:id="@+id/header_divider"
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp"
+        android:layout_below="@id/card_header"
+        android:background="#33FFFFFF" />
+
+    <!-- Tab URL (centered in remaining space) -->
+    <TextView
+        android:id="@+id/tab_url"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/header_divider"
+        android:textColor="#FF8E8E93"
+        android:textSize="12sp"
+        android:maxLines="2"
+        android:ellipsize="end"
+        android:gravity="center"
+        android:padding="16dp" />
 </RelativeLayout>
