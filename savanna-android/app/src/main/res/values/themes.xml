@@ -19,6 +19,23 @@
              set android:fontFamily="@font/sf_pro" to activate system-wide -->
     </style>
 
+    <!--
+      Glass BottomSheet theme — TabSwitcherFragment (BottomSheetDialogFragment)
+      Transparent sheet background so our glass drawable shows through.
+      Light dim because blur-behind handles the visual depth on API 31+.
+    -->
+    <style name="GlassBottomSheetDialog" parent="Theme.Material3.BottomSheetDialog">
+        <item name="android:backgroundDimAmount">0.28</item>
+        <item name="bottomSheetStyle">@style/GlassBottomSheetStyle</item>
+        <item name="android:windowIsFloating">false</item>
+    </style>
+
+    <style name="GlassBottomSheetStyle" parent="Widget.Material3.BottomSheet.Modal">
+        <item name="android:background">@android:color/transparent</item>
+        <item name="backgroundTint">@android:color/transparent</item>
+        <item name="android:elevation">0dp</item>
+    </style>
+
     <style name="GlassCard">
         <item name="android:background">@drawable/glass_background</item>
         <item name="android:padding">16dp</item>

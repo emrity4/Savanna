@@ -17,7 +17,7 @@ class MainActivity : AppCompatActivity() {
     lateinit var themeManager: ThemeManager
 
     private var currentBrowserFragment: BrowserFragment? = null
-    private var isOverlayShowing = false
+    var isOverlayShowing = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -67,7 +67,11 @@ class MainActivity : AppCompatActivity() {
             .commit()
     }
 
-    fun showTabSwitcher()   = showOverlayFragment(TabSwitcherFragment(),   "tab_switcher")
+    fun showTabSwitcher() {
+        if (isOverlayShowing) return
+        isOverlayShowing = true
+        TabSwitcherFragment().show(supportFragmentManager, "tab_switcher")
+    }
     fun showHistory()       = showOverlayFragment(HistoryFragment(),        "history")
     fun showBookmarks()     = showOverlayFragment(BookmarksFragment(),      "bookmarks")
     fun showPrivacyReport() = showOverlayFragment(PrivacyReportFragment(),  "privacy_report")

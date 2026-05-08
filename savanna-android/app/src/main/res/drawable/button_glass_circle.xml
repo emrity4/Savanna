@@ -1,13 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  Safari iOS 26 style — individual glass circle button background.
-  Each toolbar icon sits on a subtle frosted glass pill.
+  iOS 26 Liquid Glass circle button.
+  Oval with frosted tint + top-half specular gradient + bright inner border.
+  Used for back, forward, reload, share in the top bar.
 -->
 <ripple xmlns:android="http://schemas.android.com/apk/res/android"
-    android:color="#44FFFFFF">
+    android:color="#55FFFFFF">
     <item>
-        <shape android:shape="oval">
-            <solid android:color="#1AFFFFFF" />
-        </shape>
+        <layer-list>
+            <!-- Frosted glass oval -->
+            <item>
+                <shape android:shape="oval">
+                    <solid android:color="#25FFFFFF" />
+                </shape>
+            </item>
+            <!-- Top-half specular gradient -->
+            <item android:bottom="50%">
+                <shape android:shape="oval">
+                    <gradient android:type="linear" android:angle="270"
+                        android:startColor="#40FFFFFF" android:endColor="#00FFFFFF" />
+                </shape>
+            </item>
+            <!-- Glass border -->
+            <item>
+                <shape android:shape="oval">
+                    <solid android:color="#00000000" />
+                    <stroke android:width="0.75dp" android:color="#40FFFFFF" />
+                </shape>
+            </item>
+        </layer-list>
     </item>
 </ripple>

@@ -1,31 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  BOTTOM mode tab card — user's exact code as the outer container.
-  362×252dp, clipToOutline, @drawable/tabs_mode_b (OLED black fill, purple stroke).
+  Tab card — iOS 26 Liquid Glass aesthetic.
+  Uses glass_tab_card drawable: dark frosted base + white specular + purple accent border.
 -->
-<RelativeLayout
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/tabs_mode_b"
     android:layout_width="match_parent"
-    android:layout_height="216dp"
-    android:clipToOutline="true"
-    android:background="@drawable/tabs_mode_b"
+    android:layout_height="186dp"
+    android:orientation="vertical"
+    android:background="@drawable/glass_tab_card"
     android:layout_marginStart="16dp"
     android:layout_marginEnd="16dp"
-    android:layout_marginBottom="16dp"
+    android:layout_marginBottom="14dp"
     android:clickable="true"
-    android:focusable="true">
+    android:focusable="true"
+    android:clipToOutline="true"
+    android:elevation="4dp">
 
-    <!-- Header row: title + close -->
+    <!-- Card header: favicon area · title · close button -->
     <LinearLayout
         android:id="@+id/card_header"
         android:layout_width="match_parent"
-        android:layout_height="44dp"
-        android:layout_alignParentTop="true"
+        android:layout_height="46dp"
         android:orientation="horizontal"
         android:gravity="center_vertical"
         android:paddingStart="14dp"
-        android:paddingEnd="8dp">
+        android:paddingEnd="8dp"
+        android:background="#14FFFFFF">
 
         <TextView
             android:id="@+id/tab_title"
@@ -33,7 +35,8 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:textColor="#FFFFFFFF"
-            android:textSize="14sp"
+            android:textSize="13sp"
+            android:textStyle="bold"
             android:maxLines="1"
             android:ellipsize="end" />
 
@@ -42,31 +45,30 @@
             android:layout_width="30dp"
             android:layout_height="30dp"
             android:src="@drawable/ic_close"
-            android:background="@drawable/button_background"
-            android:padding="4dp"
+            android:background="@drawable/button_glass_circle"
+            android:padding="6dp"
             android:scaleType="centerInside"
             android:contentDescription="Close tab"
-            android:layout_marginStart="4dp" />
+            android:layout_marginStart="6dp" />
     </LinearLayout>
 
-    <!-- Hairline separator -->
+    <!-- Hairline divider below header -->
     <View
-        android:id="@+id/header_divider"
         android:layout_width="match_parent"
         android:layout_height="0.5dp"
-        android:layout_below="@id/card_header"
-        android:background="#33FFFFFF" />
+        android:background="#40B6A8FF" />
 
-    <!-- Tab URL (centered in remaining space) -->
+    <!-- URL / body — centered in remaining card space -->
     <TextView
         android:id="@+id/tab_url"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@id/header_divider"
-        android:textColor="#FF8E8E93"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:textColor="#99FFFFFF"
         android:textSize="12sp"
-        android:maxLines="2"
+        android:maxLines="3"
         android:ellipsize="end"
         android:gravity="center"
         android:padding="16dp" />
-</RelativeLayout>
+
+</LinearLayout>

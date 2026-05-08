@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  iOS 26 Liquid Glass tab card.
+  Dark glass base with purple accent specular — the active page "behind glass".
+-->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- 1. Deep dark base -->
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="#C8000000" />
+            <corners android:radius="18dp" />
+        </shape>
+    </item>
+
+    <!-- 2. Frosted white tint -->
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="#18FFFFFF" />
+            <corners android:radius="18dp" />
+        </shape>
+    </item>
+
+    <!-- 3. Broad specular sweep — top 40% -->
+    <item android:bottom="60%">
+        <shape android:shape="rectangle">
+            <gradient android:type="linear" android:angle="270"
+                android:startColor="#38FFFFFF" android:endColor="#00FFFFFF" />
+            <corners android:topLeftRadius="18dp" android:topRightRadius="18dp" />
+        </shape>
+    </item>
+
+    <!-- 4. Hot specular peak — top 18% -->
+    <item android:bottom="82%">
+        <shape android:shape="rectangle">
+            <gradient android:type="linear" android:angle="270"
+                android:startColor="#50FFFFFF" android:endColor="#00FFFFFF" />
+            <corners android:topLeftRadius="18dp" android:topRightRadius="18dp" />
+        </shape>
+    </item>
+
+    <!-- 5. Purple accent border (iOS 26 purple tint on tab cards) -->
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="#00000000" />
+            <stroke android:width="1.5dp" android:color="#60B6A8FF" />
+            <corners android:radius="18dp" />
+        </shape>
+    </item>
+
+    <!-- 6. Top-edge specular line with purple tint -->
+    <item android:bottom="96%">
+        <shape android:shape="rectangle">
+            <solid android:color="#70B6A8FF" />
+            <corners android:topLeftRadius="18dp" android:topRightRadius="18dp" />
+        </shape>
+    </item>
+
+</layer-list>

@@ -1,33 +1,51 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Liquid Glass bottom bar — floating dock style -->
+<!--
+  iOS 26 Liquid Glass bottom dock.
+  Very dark base (near-opaque) + strong frosted tint + intense specular
+  at the top rounded edge — the "table edge" catching overhead light.
+-->
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
-    <!-- Dark base -->
+
+    <!-- 1. Near-opaque dark base -->
     <item>
         <shape android:shape="rectangle">
-            <solid android:color="#C8000000" />
-            <corners android:topLeftRadius="20dp" android:topRightRadius="20dp" />
+            <solid android:color="#D8000000" />
+            <corners android:topLeftRadius="24dp" android:topRightRadius="24dp" />
         </shape>
     </item>
-    <!-- White frosted overlay -->
+
+    <!-- 2. Frosted white overlay (simulate blur reveal) -->
     <item>
         <shape android:shape="rectangle">
-            <solid android:color="#0DFFFFFF" />
-            <corners android:topLeftRadius="20dp" android:topRightRadius="20dp" />
+            <solid android:color="#1EFFFFFF" />
+            <corners android:topLeftRadius="24dp" android:topRightRadius="24dp" />
         </shape>
     </item>
-    <!-- Top specular gradient -->
-    <item android:bottom="80%">
+
+    <!-- 3. Broad specular sweep — top 35% of bar -->
+    <item android:bottom="65%">
         <shape android:shape="rectangle">
             <gradient android:type="linear" android:angle="270"
-                android:startColor="#20FFFFFF" android:endColor="#00FFFFFF" />
-            <corners android:topLeftRadius="20dp" android:topRightRadius="20dp" />
+                android:startColor="#48FFFFFF" android:endColor="#00FFFFFF" />
+            <corners android:topLeftRadius="24dp" android:topRightRadius="24dp" />
         </shape>
     </item>
-    <!-- Top edge highlight line -->
+
+    <!-- 4. Hot specular peak — top 15% -->
+    <item android:bottom="85%">
+        <shape android:shape="rectangle">
+            <gradient android:type="linear" android:angle="270"
+                android:startColor="#60FFFFFF" android:endColor="#00FFFFFF" />
+            <corners android:topLeftRadius="24dp" android:topRightRadius="24dp" />
+        </shape>
+    </item>
+
+    <!-- 5. Bright top-edge specular line -->
     <item android:bottom="97%">
         <shape android:shape="rectangle">
-            <solid android:color="#28FFFFFF" />
-            <corners android:topLeftRadius="20dp" android:topRightRadius="20dp" />
+            <solid android:color="#75FFFFFF" />
+            <corners android:topLeftRadius="24dp" android:topRightRadius="24dp" />
         </shape>
     </item>
+
 </layer-list>

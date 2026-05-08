@@ -1,34 +1,65 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Liquid Glass card background -->
+<!--
+  iOS 26 Liquid Glass card surface.
+  Layers (bottom to top):
+  1. Rich dark base   — deep opaque black so the frosted tint reads clearly
+  2. Frosted white tint — simulates what you see through blurred glass
+  3. Broad specular sweep — top 45% gradient, catches the "light source above"
+  4. Hot specular peak  — top 20%, very bright, simulates glass refraction spike
+  5. Bright border      — inner glow line, glass edge catching light
+  6. Top-edge line      — single bright row, the sharpest specular point
+-->
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
-    <!-- Dark base -->
+
+    <!-- 1. Dark glass base -->
     <item>
         <shape android:shape="rectangle">
-            <solid android:color="#B8000000" />
+            <solid android:color="#C8000000" />
             <corners android:radius="16dp" />
         </shape>
     </item>
-    <!-- White frosted overlay -->
+
+    <!-- 2. Frosted white tint (stronger than before) -->
     <item>
         <shape android:shape="rectangle">
-            <solid android:color="#10FFFFFF" />
+            <solid android:color="#20FFFFFF" />
             <corners android:radius="16dp" />
         </shape>
     </item>
-    <!-- Specular diagonal -->
+
+    <!-- 3. Broad specular sweep — top 45% -->
     <item android:bottom="55%">
         <shape android:shape="rectangle">
             <gradient android:type="linear" android:angle="270"
-                android:startColor="#18FFFFFF" android:endColor="#00FFFFFF" />
+                android:startColor="#42FFFFFF" android:endColor="#00FFFFFF" />
             <corners android:topLeftRadius="16dp" android:topRightRadius="16dp" />
         </shape>
     </item>
-    <!-- Border -->
+
+    <!-- 4. Hot specular peak — top 20% -->
+    <item android:bottom="80%">
+        <shape android:shape="rectangle">
+            <gradient android:type="linear" android:angle="270"
+                android:startColor="#55FFFFFF" android:endColor="#00FFFFFF" />
+            <corners android:topLeftRadius="16dp" android:topRightRadius="16dp" />
+        </shape>
+    </item>
+
+    <!-- 5. Bright border (glass edge inner glow) -->
     <item>
         <shape android:shape="rectangle">
             <solid android:color="#00000000" />
-            <stroke android:width="0.5dp" android:color="#25FFFFFF" />
+            <stroke android:width="1dp" android:color="#45FFFFFF" />
             <corners android:radius="16dp" />
         </shape>
     </item>
+
+    <!-- 6. Single-pixel top-edge specular line -->
+    <item android:bottom="97%">
+        <shape android:shape="rectangle">
+            <solid android:color="#70FFFFFF" />
+            <corners android:topLeftRadius="16dp" android:topRightRadius="16dp" />
+        </shape>
+    </item>
+
 </layer-list>
