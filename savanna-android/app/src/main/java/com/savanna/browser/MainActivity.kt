@@ -13,6 +13,7 @@ class MainActivity : AppCompatActivity() {
     lateinit var bookmarkManager: BookmarkManager
     lateinit var settingsManager: SettingsManager
     lateinit var trackerBlocker: TrackerBlocker
+    lateinit var downloadManager: AppDownloadManager
 
     private var currentBrowserFragment: BrowserFragment? = null
     private var isOverlayShowing = false
@@ -21,25 +22,22 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        tabManager = TabManager()
-        historyManager = HistoryManager(this)
+        tabManager      = TabManager()
+        historyManager  = HistoryManager(this)
         bookmarkManager = BookmarkManager(this)
         settingsManager = SettingsManager(this)
-        trackerBlocker = TrackerBlocker(this)
+        trackerBlocker  = TrackerBlocker(this)
+        downloadManager = AppDownloadManager(this)
 
         val initialUrl = intent?.data?.toString() ?: ""
         val tab = tabManager.createTab(url = initialUrl, title = "New Tab")
         showBrowserForTab(tab.id, initialUrl)
     }
 
-    // FIX: use replace() only for the base browser — overlays use add() so the
-    // BrowserFragment (and its WebView) are never destroyed when navigating back.
     private fun showBrowserForTab(tabId: String, url: String = "") {
-        // Clear any open overlays first so the container is clean
         if (supportFragmentManager.backStackEntryCount > 0) {
             supportFragmentManager.popBackStackImmediate(null, FragmentManager.POP_BACK_STACK_INCLUSIVE)
         }
-
         val fragment = BrowserFragment.newInstance(tabId, url)
         currentBrowserFragment = fragment
         isOverlayShowing = false
@@ -50,10 +48,11 @@ class MainActivity : AppCompatActivity() {
             .commit()
     }
 
-    // FIX: add() instead of replace() — BrowserFragment stays alive beneath overlay
-    private fun showOverlayFragment(fragment: androidx.fragment.app.Fragment, tag: String,
-                                     enterAnim: Int = R.anim.slide_in_bottom,
-                                     exitAnim: Int = R.anim.slide_out_bottom) {
+    private fun showOverlayFragment(
+        fragment: androidx.fragment.app.Fragment, tag: String,
+        enterAnim: Int = R.anim.slide_in_bottom,
+        exitAnim: Int  = R.anim.slide_out_bottom
+    ) {
         if (isOverlayShowing) return
         isOverlayShowing = true
         supportFragmentManager.beginTransaction()
@@ -63,12 +62,13 @@ class MainActivity : AppCompatActivity() {
             .commit()
     }
 
-    fun showTabSwitcher() = showOverlayFragment(TabSwitcherFragment(), "tab_switcher")
-    fun showHistory()     = showOverlayFragment(HistoryFragment(),     "history")
-    fun showBookmarks()   = showOverlayFragment(BookmarksFragment(),   "bookmarks")
-    fun showPrivacyReport() = showOverlayFragment(PrivacyReportFragment(), "privacy_report")
-    fun showSettings()    = showOverlayFragment(SettingsFragment(),    "settings",
-                                R.anim.slide_in_right, R.anim.slide_out_left)
+    fun showTabSwitcher()   = showOverlayFragment(TabSwitcherFragment(),   "tab_switcher")
+    fun showHistory()       = showOverlayFragment(HistoryFragment(),        "history")
+    fun showBookmarks()     = showOverlayFragment(BookmarksFragment(),      "bookmarks")
+    fun showPrivacyReport() = showOverlayFragment(PrivacyReportFragment(),  "privacy_report")
+    fun showDownloads()     = showOverlayFragment(DownloadsFragment(),      "downloads")
+    fun showSettings()      = showOverlayFragment(SettingsFragment(),       "settings",
+                                  R.anim.slide_in_right, R.anim.slide_out_left)
 
     fun closeOverlay() {
         isOverlayShowing = false
@@ -95,23 +95,16 @@ class MainActivity : AppCompatActivity() {
 
     fun navigateToUrl(url: String) {
         val activeTab = tabManager.getActiveTab()
-        if (activeTab != null) {
-            showBrowserForTab(activeTab.id, url)
-        } else {
-            createNewTab(url = url)
-        }
+        if (activeTab != null) showBrowserForTab(activeTab.id, url)
+        else createNewTab(url = url)
     }
 
     @Deprecated("Deprecated in Java")
     override fun onBackPressed() {
-        if (isOverlayShowing) {
-            closeOverlay()
-            return
-        }
+        if (isOverlayShowing) { closeOverlay(); return }
         val browserFragment = currentBrowserFragment
         if (browserFragment != null && browserFragment.canGoBack()) {
-            browserFragment.goBack()
-            return
+            browserFragment.goBack(); return
         }
         super.onBackPressed()
     }

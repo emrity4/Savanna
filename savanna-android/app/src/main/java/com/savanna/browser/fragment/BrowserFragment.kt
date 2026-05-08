@@ -17,6 +17,7 @@ import android.widget.EditText
 import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.savanna.browser.MainActivity
 import com.savanna.browser.NewTabBridge
@@ -31,10 +32,11 @@ class BrowserFragment : Fragment() {
     private lateinit var btnBack: ImageView
     private lateinit var btnForward: ImageView
     private lateinit var btnReload: ImageView
-    private lateinit var btnMenu: ImageView
+    private lateinit var btnShare: ImageView
     private lateinit var btnBookmark: ImageView
     private lateinit var btnHistory: ImageView
     private lateinit var btnTabs: ImageView
+    private lateinit var btnDownloads: ImageView
     private lateinit var btnPrivacy: ImageView
     private lateinit var btnSettings: ImageView
     private lateinit var tabCountBadge: TextView
@@ -43,10 +45,16 @@ class BrowserFragment : Fragment() {
     private val webView get() = _webView!!
     private var isNewTabPage = false
 
+    // ── Chrome for Android UA — avoids Google suspicious-activity detection ──
+    private val CHROME_UA =
+        "Mozilla/5.0 (Linux; Android 14; Pixel 8 Pro) " +
+        "AppleWebKit/537.36 (KHTML, like Gecko) " +
+        "Chrome/124.0.0.0 Mobile Safari/537.36"
+
     companion object {
         private const val ARG_TAB_ID = "tab_id"
         private const val ARG_URL    = "url"
-        private const val NEW_TAB_URL = "file:///android_asset/new_tab.html"
+        const val NEW_TAB_URL        = "file:///android_asset/new_tab.html"
 
         fun newInstance(tabId: String, url: String = "") = BrowserFragment().apply {
             arguments = Bundle().apply {
@@ -73,10 +81,11 @@ class BrowserFragment : Fragment() {
         btnBack       = view.findViewById(R.id.btn_back)
         btnForward    = view.findViewById(R.id.btn_forward)
         btnReload     = view.findViewById(R.id.btn_reload)
-        btnMenu       = view.findViewById(R.id.btn_menu)
+        btnShare      = view.findViewById(R.id.btn_share)
         btnBookmark   = view.findViewById(R.id.btn_bookmark)
         btnHistory    = view.findViewById(R.id.btn_history)
         btnTabs       = view.findViewById(R.id.btn_tabs)
+        btnDownloads  = view.findViewById(R.id.btn_downloads)
         btnPrivacy    = view.findViewById(R.id.btn_privacy)
         btnSettings   = view.findViewById(R.id.btn_settings)
         tabCountBadge = view.findViewById(R.id.tab_count_badge)
@@ -97,40 +106,50 @@ class BrowserFragment : Fragment() {
         val activity = requireActivity() as MainActivity
         val settings = activity.settingsManager
 
-        val safariUA = "Mozilla/5.0 (iPhone; CPU iPhone OS 17_4 like Mac OS X) " +
-                "AppleWebKit/605.1.15 (KHTML, like Gecko) " +
-                "Version/17.4 Mobile/15E148 Safari/604.1"
-
         webView.settings.apply {
-            javaScriptEnabled         = true          // needed for new tab page + normal sites
+            javaScriptEnabled         = true
             domStorageEnabled         = true
             loadWithOverviewMode      = true
             useWideViewPort           = true
             builtInZoomControls       = true
             displayZoomControls       = false
             setSupportZoom(true)
-            allowFileAccess           = true          // needed to load assets
+            allowFileAccess           = true
             allowContentAccess        = true
             setSupportMultipleWindows(false)
             cacheMode                 = WebSettings.LOAD_DEFAULT
             mixedContentMode          = WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE
-            userAgentString           = safariUA
             mediaPlaybackRequiresUserGesture = true
+            databaseEnabled           = true
+            // ── Chrome UA — prevents Google suspicious-activity challenge ──
+            userAgentString           = CHROME_UA
         }
 
-        // JavaScript bridge for the new tab page
+        // JS bridge for the new tab home page
         webView.addJavascriptInterface(
             NewTabBridge(
                 historyManager = activity.historyManager,
-                onNavigate     = { url ->
-                    requireActivity().runOnUiThread { loadUrl(url) }
-                },
-                onFocusUrlBar  = {
-                    requireActivity().runOnUiThread { focusUrlBar() }
-                }
+                onNavigate     = { url -> requireActivity().runOnUiThread { loadUrl(url) } },
+                onFocusUrlBar  = { requireActivity().runOnUiThread { focusUrlBar() } }
             ),
             "Android"
         )
+
+        // ── Download listener ──
+        webView.setDownloadListener { url, userAgent, contentDisposition, mimetype, _ ->
+            try {
+                val id = activity.downloadManager.enqueue(url, CHROME_UA, contentDisposition, mimetype)
+                Toast.makeText(requireContext(), "Download started", Toast.LENGTH_SHORT).show()
+            } catch (e: Exception) {
+                // Fallback: open in external browser / system handler
+                try {
+                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+                    startActivity(intent)
+                } catch (_: Exception) {
+                    Toast.makeText(requireContext(), "Cannot download this file", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
 
         webView.webViewClient = object : WebViewClient() {
 
@@ -138,9 +157,9 @@ class BrowserFragment : Fragment() {
                 super.onPageStarted(view, url, favicon)
                 isNewTabPage = (url == NEW_TAB_URL)
                 url?.let {
-                    if (!urlEditText.isFocused && !isNewTabPage) {
+                    if (!urlEditText.isFocused && !isNewTabPage)
                         urlEditText.setText(UrlUtils.formatUrl(it))
-                    } else if (isNewTabPage) {
+                    else if (isNewTabPage) {
                         urlEditText.setText("")
                         urlEditText.hint = "Search or enter address"
                     }
@@ -168,31 +187,26 @@ class BrowserFragment : Fragment() {
                         activity.historyManager.addEntry(it, title)
                         updateBookmarkIcon()
                     } else {
-                        activity.tabManager.updateTab(tabId, title = "New Tab",
-                            isLoading = false, url = "")
+                        activity.tabManager.updateTab(tabId, title = "New Tab", isLoading = false, url = "")
                     }
                 }
                 updateNavState()
             }
 
-            override fun shouldOverrideUrlLoading(
-                view: WebView?, request: WebResourceRequest?
-            ): Boolean {
+            override fun shouldOverrideUrlLoading(view: WebView?, request: WebResourceRequest?): Boolean {
                 val url = request?.url?.toString() ?: return false
                 if (url.startsWith("http://") || url.startsWith("https://") ||
                     url.startsWith("file://")) return false
                 return try {
-                    startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
-                    true
+                    startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url))); true
                 } catch (_: Exception) { false }
             }
 
-            override fun shouldInterceptRequest(
-                view: WebView?, request: WebResourceRequest?
-            ): WebResourceResponse? {
+            override fun shouldInterceptRequest(view: WebView?, request: WebResourceRequest?): WebResourceResponse? {
                 val url = request?.url?.toString() ?: return null
-                if (url.startsWith("file://")) return null  // always allow assets
-                return if (settings.blockTrackers && activity.trackerBlocker.shouldBlockUrl(url))
+                if (url.startsWith("file://")) return null
+                return if (activity.settingsManager.blockTrackers &&
+                    activity.trackerBlocker.shouldBlockUrl(url))
                     WebResourceResponse("text/plain", "UTF-8", null)
                 else null
             }
@@ -201,8 +215,7 @@ class BrowserFragment : Fragment() {
         webView.webChromeClient = object : WebChromeClient() {
             override fun onProgressChanged(view: WebView?, newProgress: Int) {
                 progressBar.progress = newProgress
-                progressBar.visibility = if (newProgress < 100 && !isNewTabPage) View.VISIBLE
-                                         else View.GONE
+                progressBar.visibility = if (newProgress < 100 && !isNewTabPage) View.VISIBLE else View.GONE
                 activity.tabManager.updateTab(tabId, progress = newProgress)
             }
             override fun onReceivedTitle(view: WebView?, title: String?) {
@@ -216,8 +229,7 @@ class BrowserFragment : Fragment() {
             if (actionId == EditorInfo.IME_ACTION_GO ||
                 (event?.keyCode == KeyEvent.KEYCODE_ENTER && event.action == KeyEvent.ACTION_DOWN)) {
                 processInput(urlEditText.text.toString())
-                hideKeyboard()
-                true
+                hideKeyboard(); true
             } else false
         }
         urlEditText.setOnFocusChangeListener { _, hasFocus ->
@@ -228,8 +240,8 @@ class BrowserFragment : Fragment() {
                 urlEditText.selectAll()
             } else {
                 urlEditText.setBackgroundResource(R.drawable.url_bar_background)
-                val tab = (requireActivity() as MainActivity).tabManager.getTabById(tabId)
                 if (isNewTabPage) { urlEditText.setText(""); return@setOnFocusChangeListener }
+                val tab = (requireActivity() as MainActivity).tabManager.getTabById(tabId)
                 tab?.let { urlEditText.setText(UrlUtils.formatUrl(it.url)) }
             }
         }
@@ -252,21 +264,15 @@ class BrowserFragment : Fragment() {
 
     private fun setupNavigation() {
         btnBack.setOnClickListener {
-            when {
-                isNewTabPage -> Unit
-                webView.canGoBack() -> webView.goBack()
-                else -> updateNavState()
-            }
+            if (!isNewTabPage && webView.canGoBack()) webView.goBack()
         }
         btnForward.setOnClickListener {
-            if (webView.canGoForward()) webView.goForward() else updateNavState()
+            if (webView.canGoForward()) webView.goForward()
         }
         btnReload.setOnClickListener {
             if (isNewTabPage) return@setOnClickListener
-            if (webView.progress in 1..99) webView.stopLoading()
-            else webView.reload()
+            if (webView.progress in 1..99) webView.stopLoading() else webView.reload()
         }
-        btnMenu.setOnClickListener { shareCurrentPage() }
     }
 
     private fun setupBottomBar() {
@@ -274,8 +280,10 @@ class BrowserFragment : Fragment() {
         btnBookmark.setOnLongClickListener { (requireActivity() as MainActivity).showBookmarks(); true }
         btnHistory.setOnClickListener      { (requireActivity() as MainActivity).showHistory() }
         btnTabs.setOnClickListener         { (requireActivity() as MainActivity).showTabSwitcher() }
+        btnDownloads.setOnClickListener    { (requireActivity() as MainActivity).showDownloads() }
         btnPrivacy.setOnClickListener      { (requireActivity() as MainActivity).showPrivacyReport() }
         btnSettings.setOnClickListener     { (requireActivity() as MainActivity).showSettings() }
+        btnShare.setOnClickListener        { shareCurrentPage() }
     }
 
     private fun toggleBookmark() {
@@ -297,11 +305,11 @@ class BrowserFragment : Fragment() {
     private fun updateNavState() {
         val canBack    = !isNewTabPage && (_webView?.canGoBack()    ?: false)
         val canForward = !isNewTabPage && (_webView?.canGoForward() ?: false)
-        btnBack.alpha    = if (canBack)    1.0f else 0.3f
-        btnForward.alpha = if (canForward) 1.0f else 0.3f
+        btnBack.alpha    = if (canBack)    1.0f else 0.28f
+        btnForward.alpha = if (canForward) 1.0f else 0.28f
         btnBack.isEnabled    = canBack
         btnForward.isEnabled = canForward
-        btnReload.alpha      = if (isNewTabPage) 0.3f else 1.0f
+        btnReload.alpha      = if (isNewTabPage) 0.28f else 1.0f
         btnReload.isEnabled  = !isNewTabPage
     }
 

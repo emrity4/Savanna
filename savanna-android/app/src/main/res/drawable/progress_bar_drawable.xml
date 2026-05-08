@@ -1,14 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Purple-tinted progress bar used for page load AND download items -->
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:id="@android:id/background">
         <shape>
-            <solid android:color="#00000000" />
+            <solid android:color="#20FFFFFF" />
+            <corners android:radius="4dp" />
         </shape>
     </item>
     <item android:id="@android:id/progress">
         <clip>
             <shape>
-                <solid android:color="#FFFFFFFF" />
+                <solid android:color="#FFB6A8FF" />
+                <corners android:radius="4dp" />
             </shape>
         </clip>
     </item>

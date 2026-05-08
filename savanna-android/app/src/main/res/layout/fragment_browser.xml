@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  Savanna Browser — Liquid Glass (iOS 26) layout
-  WebView fills full screen; top bar and bottom dock float on top
+  Savanna Browser — iOS 26 Safari Liquid Glass layout
+  WebView fills full screen; top bar and bottom dock float on top.
+  Each toolbar button has an individual glass-circle background (Safari iOS 26 style).
 -->
 <FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
@@ -15,7 +16,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
-    <!-- Thin loading progress bar at very top -->
+    <!-- Thin loading progress bar at very top (above URL bar) -->
     <ProgressBar
         android:id="@+id/progress_bar"
         style="@android:style/Widget.ProgressBar.Horizontal"
@@ -27,9 +28,10 @@
         android:progress="0"
         android:visibility="gone" />
 
-    <!-- ══════════════════════════════════════
-         TOP BAR — Liquid Glass URL bar
-         ══════════════════════════════════════ -->
+    <!-- ════════════════════════════════════════════════════════
+         TOP BAR — iOS 26 Safari style
+         Back · Forward | Glass URL pill | Reload | Share
+         ════════════════════════════════════════════════════════ -->
     <LinearLayout
         android:id="@+id/url_bar_container"
         android:layout_width="match_parent"
@@ -37,40 +39,42 @@
         android:layout_gravity="top"
         android:orientation="horizontal"
         android:gravity="center_vertical"
-        android:paddingStart="10dp"
-        android:paddingEnd="10dp"
-        android:paddingTop="8dp"
-        android:paddingBottom="8dp"
-        android:background="#EE000000">
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp"
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp"
+        android:background="#F2000000">
 
+        <!-- Back — Safari iOS 26: glass circle, dims when unavailable -->
         <ImageView
             android:id="@+id/btn_back"
-            android:layout_width="38dp"
-            android:layout_height="38dp"
+            android:layout_width="42dp"
+            android:layout_height="42dp"
             android:src="@drawable/ic_back"
-            android:background="@drawable/button_background"
-            android:padding="8dp"
+            android:background="@drawable/button_glass_circle"
+            android:padding="10dp"
             android:scaleType="centerInside"
             android:contentDescription="@string/go_back"
-            android:alpha="0.35" />
+            android:alpha="0.28" />
 
+        <!-- Forward -->
         <ImageView
             android:id="@+id/btn_forward"
-            android:layout_width="38dp"
-            android:layout_height="38dp"
+            android:layout_width="42dp"
+            android:layout_height="42dp"
             android:src="@drawable/ic_forward"
-            android:background="@drawable/button_background"
-            android:padding="8dp"
+            android:background="@drawable/button_glass_circle"
+            android:padding="10dp"
             android:scaleType="centerInside"
             android:contentDescription="@string/go_forward"
-            android:alpha="0.35"
+            android:alpha="0.28"
             android:layout_marginStart="2dp" />
 
-        <!-- Liquid Glass URL pill -->
+        <!-- Liquid Glass URL pill — centered, takes remaining space -->
         <EditText
             android:id="@+id/url_edit_text"
             android:layout_width="0dp"
-            android:layout_height="42dp"
+            android:layout_height="44dp"
             android:layout_weight="1"
             android:layout_marginStart="8dp"
             android:layout_marginEnd="8dp"
@@ -81,71 +85,78 @@
             android:drawablePadding="8dp"
             android:importantForAutofill="no" />
 
+        <!-- Reload / Stop -->
         <ImageView
             android:id="@+id/btn_reload"
-            android:layout_width="38dp"
-            android:layout_height="38dp"
+            android:layout_width="42dp"
+            android:layout_height="42dp"
             android:src="@drawable/ic_reload"
-            android:background="@drawable/button_background"
-            android:padding="8dp"
+            android:background="@drawable/button_glass_circle"
+            android:padding="10dp"
             android:scaleType="centerInside"
             android:contentDescription="@string/reload" />
 
+        <!-- Share -->
         <ImageView
-            android:id="@+id/btn_menu"
-            android:layout_width="38dp"
-            android:layout_height="38dp"
-            android:src="@drawable/ic_menu"
-            android:background="@drawable/button_background"
-            android:padding="8dp"
+            android:id="@+id/btn_share"
+            android:layout_width="42dp"
+            android:layout_height="42dp"
+            android:src="@drawable/ic_share"
+            android:background="@drawable/button_glass_circle"
+            android:padding="10dp"
             android:scaleType="centerInside"
             android:layout_marginStart="2dp"
-            android:contentDescription="More options" />
+            android:contentDescription="Share" />
     </LinearLayout>
 
-    <!-- ══════════════════════════════════════
-         BOTTOM DOCK — Floating Liquid Glass
-         ══════════════════════════════════════ -->
+    <!-- ════════════════════════════════════════════════════════
+         BOTTOM DOCK — iOS 26 Safari 5-button toolbar
+         Bookmark | History | Tabs | Downloads | Settings
+         Each icon sits on an individual glass-circle button.
+         ════════════════════════════════════════════════════════ -->
     <LinearLayout
         android:id="@+id/bottom_bar"
         android:layout_width="match_parent"
-        android:layout_height="64dp"
+        android:layout_height="72dp"
         android:layout_gravity="bottom"
         android:orientation="horizontal"
         android:gravity="center"
         android:background="@drawable/bottom_bar_background"
-        android:paddingStart="8dp"
-        android:paddingEnd="8dp"
-        android:paddingTop="6dp"
-        android:paddingBottom="8dp"
+        android:paddingStart="4dp"
+        android:paddingEnd="4dp"
+        android:paddingTop="4dp"
+        android:paddingBottom="12dp"
         android:elevation="8dp">
 
+        <!-- Bookmark (long-press = show bookmarks list) -->
         <ImageView
             android:id="@+id/btn_bookmark"
             android:layout_width="0dp"
-            android:layout_height="44dp"
+            android:layout_height="48dp"
             android:layout_weight="1"
             android:src="@drawable/ic_bookmark"
-            android:background="@drawable/button_background"
-            android:padding="10dp"
+            android:background="@drawable/button_glass_circle"
+            android:padding="12dp"
             android:scaleType="centerInside"
             android:contentDescription="@string/bookmarks" />
 
+        <!-- History -->
         <ImageView
             android:id="@+id/btn_history"
             android:layout_width="0dp"
-            android:layout_height="44dp"
+            android:layout_height="48dp"
             android:layout_weight="1"
             android:src="@drawable/ic_history"
-            android:background="@drawable/button_background"
-            android:padding="10dp"
+            android:background="@drawable/button_glass_circle"
+            android:padding="12dp"
             android:scaleType="centerInside"
             android:contentDescription="@string/history" />
 
+        <!-- Tabs (with count badge) — FrameLayout to overlay badge -->
         <FrameLayout
             android:id="@+id/btn_tabs_container"
             android:layout_width="0dp"
-            android:layout_height="44dp"
+            android:layout_height="48dp"
             android:layout_weight="1">
 
             <ImageView
@@ -153,47 +164,61 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:src="@drawable/ic_tabs"
-                android:background="@drawable/button_background"
-                android:padding="10dp"
+                android:background="@drawable/button_glass_circle"
+                android:padding="12dp"
                 android:scaleType="centerInside"
                 android:contentDescription="@string/tabs" />
 
             <TextView
                 android:id="@+id/tab_count_badge"
-                android:layout_width="18dp"
-                android:layout_height="18dp"
+                android:layout_width="17dp"
+                android:layout_height="17dp"
                 android:layout_gravity="top|end"
+                android:layout_marginTop="2dp"
+                android:layout_marginEnd="6dp"
                 android:background="@drawable/badge_background"
                 android:gravity="center"
                 android:textColor="@color/text_primary"
-                android:textSize="9sp"
+                android:textSize="8sp"
                 android:textStyle="bold"
-                android:text="1"
-                android:layout_marginTop="3dp"
-                android:layout_marginEnd="9dp" />
+                android:text="1" />
         </FrameLayout>
 
+        <!-- Downloads -->
+        <ImageView
+            android:id="@+id/btn_downloads"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:src="@drawable/ic_download"
+            android:background="@drawable/button_glass_circle"
+            android:padding="12dp"
+            android:scaleType="centerInside"
+            android:contentDescription="Downloads" />
+
+        <!-- Privacy (hidden from bottom bar; accessible via Settings) -->
+        <!-- Keep invisible placeholder so code refs compile without crash -->
         <ImageView
             android:id="@+id/btn_privacy"
             android:layout_width="0dp"
-            android:layout_height="44dp"
-            android:layout_weight="1"
+            android:layout_height="48dp"
+            android:layout_weight="0"
+            android:visibility="gone"
             android:src="@drawable/ic_shield"
-            android:background="@drawable/button_background"
-            android:padding="10dp"
-            android:scaleType="centerInside"
             android:contentDescription="@string/privacy_report" />
 
+        <!-- Settings -->
         <ImageView
             android:id="@+id/btn_settings"
             android:layout_width="0dp"
-            android:layout_height="44dp"
+            android:layout_height="48dp"
             android:layout_weight="1"
             android:src="@drawable/ic_settings"
-            android:background="@drawable/button_background"
-            android:padding="10dp"
+            android:background="@drawable/button_glass_circle"
+            android:padding="12dp"
             android:scaleType="centerInside"
             android:contentDescription="@string/settings" />
+
     </LinearLayout>
 
 </FrameLayout>
