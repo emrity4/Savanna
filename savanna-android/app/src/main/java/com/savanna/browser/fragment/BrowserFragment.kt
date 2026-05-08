@@ -1,19 +1,23 @@
 package com.savanna.browser.fragment
 
 import android.annotation.SuppressLint
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.AnimationUtils
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.webkit.*
 import android.widget.EditText
+import android.widget.HorizontalScrollView
 import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
@@ -40,12 +44,20 @@ class BrowserFragment : Fragment() {
     private lateinit var btnPrivacy: ImageView
     private lateinit var btnSettings: ImageView
     private lateinit var tabCountBadge: TextView
-    private var tabId: String = ""
 
+    // URL action strip
+    private lateinit var urlActionsStrip: HorizontalScrollView
+    private lateinit var chipClear: TextView
+    private lateinit var chipCopy: TextView
+    private lateinit var chipPaste: TextView
+    private lateinit var chipPasteGo: TextView
+    private lateinit var chipShareLink: TextView
+
+    private var tabId: String = ""
     private val webView get() = _webView!!
     private var isNewTabPage = false
 
-    // ── Chrome for Android UA — avoids Google suspicious-activity detection ──
+    // Chrome for Android UA — prevents Google suspicious-activity
     private val CHROME_UA =
         "Mozilla/5.0 (Linux; Android 14; Pixel 8 Pro) " +
         "AppleWebKit/537.36 (KHTML, like Gecko) " +
@@ -75,23 +87,30 @@ class BrowserFragment : Fragment() {
         tabId = arguments?.getString(ARG_TAB_ID) ?: ""
         val initialUrl = arguments?.getString(ARG_URL) ?: ""
 
-        _webView      = view.findViewById(R.id.web_view)
-        urlEditText   = view.findViewById(R.id.url_edit_text)
-        progressBar   = view.findViewById(R.id.progress_bar)
-        btnBack       = view.findViewById(R.id.btn_back)
-        btnForward    = view.findViewById(R.id.btn_forward)
-        btnReload     = view.findViewById(R.id.btn_reload)
-        btnShare      = view.findViewById(R.id.btn_share)
-        btnBookmark   = view.findViewById(R.id.btn_bookmark)
-        btnHistory    = view.findViewById(R.id.btn_history)
-        btnTabs       = view.findViewById(R.id.btn_tabs)
-        btnDownloads  = view.findViewById(R.id.btn_downloads)
-        btnPrivacy    = view.findViewById(R.id.btn_privacy)
-        btnSettings   = view.findViewById(R.id.btn_settings)
-        tabCountBadge = view.findViewById(R.id.tab_count_badge)
+        _webView         = view.findViewById(R.id.web_view)
+        urlEditText      = view.findViewById(R.id.url_edit_text)
+        progressBar      = view.findViewById(R.id.progress_bar)
+        btnBack          = view.findViewById(R.id.btn_back)
+        btnForward       = view.findViewById(R.id.btn_forward)
+        btnReload        = view.findViewById(R.id.btn_reload)
+        btnShare         = view.findViewById(R.id.btn_share)
+        btnBookmark      = view.findViewById(R.id.btn_bookmark)
+        btnHistory       = view.findViewById(R.id.btn_history)
+        btnTabs          = view.findViewById(R.id.btn_tabs)
+        btnDownloads     = view.findViewById(R.id.btn_downloads)
+        btnPrivacy       = view.findViewById(R.id.btn_privacy)
+        btnSettings      = view.findViewById(R.id.btn_settings)
+        tabCountBadge    = view.findViewById(R.id.tab_count_badge)
+        urlActionsStrip  = view.findViewById(R.id.url_actions_strip)
+        chipClear        = view.findViewById(R.id.chip_clear)
+        chipCopy         = view.findViewById(R.id.chip_copy)
+        chipPaste        = view.findViewById(R.id.chip_paste)
+        chipPasteGo      = view.findViewById(R.id.chip_paste_go)
+        chipShareLink    = view.findViewById(R.id.chip_share_link)
 
         setupWebView()
         setupUrlBar()
+        setupUrlActions()
         setupNavigation()
         setupBottomBar()
         refreshTabCount()
@@ -101,10 +120,11 @@ class BrowserFragment : Fragment() {
         loadUrl(urlToLoad)
     }
 
+    // ── WebView setup ─────────────────────────────────────────────────────────
+
     @SuppressLint("SetJavaScriptEnabled")
     private fun setupWebView() {
         val activity = requireActivity() as MainActivity
-        val settings = activity.settingsManager
 
         webView.settings.apply {
             javaScriptEnabled         = true
@@ -121,11 +141,9 @@ class BrowserFragment : Fragment() {
             mixedContentMode          = WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE
             mediaPlaybackRequiresUserGesture = true
             databaseEnabled           = true
-            // ── Chrome UA — prevents Google suspicious-activity challenge ──
             userAgentString           = CHROME_UA
         }
 
-        // JS bridge for the new tab home page
         webView.addJavascriptInterface(
             NewTabBridge(
                 historyManager = activity.historyManager,
@@ -135,24 +153,19 @@ class BrowserFragment : Fragment() {
             "Android"
         )
 
-        // ── Download listener ──
-        webView.setDownloadListener { url, userAgent, contentDisposition, mimetype, _ ->
+        webView.setDownloadListener { url, _, contentDisposition, mimetype, _ ->
             try {
-                val id = activity.downloadManager.enqueue(url, CHROME_UA, contentDisposition, mimetype)
+                activity.downloadManager.enqueue(url, CHROME_UA, contentDisposition, mimetype)
                 Toast.makeText(requireContext(), "Download started", Toast.LENGTH_SHORT).show()
             } catch (e: Exception) {
-                // Fallback: open in external browser / system handler
-                try {
-                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
-                    startActivity(intent)
-                } catch (_: Exception) {
+                try { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url))) }
+                catch (_: Exception) {
                     Toast.makeText(requireContext(), "Cannot download this file", Toast.LENGTH_SHORT).show()
                 }
             }
         }
 
         webView.webViewClient = object : WebViewClient() {
-
             override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
                 super.onPageStarted(view, url, favicon)
                 isNewTabPage = (url == NEW_TAB_URL)
@@ -180,8 +193,7 @@ class BrowserFragment : Fragment() {
                         if (!urlEditText.isFocused) urlEditText.setText(UrlUtils.formatUrl(it))
                         activity.tabManager.updateTab(
                             tabId, url = it, title = title,
-                            isLoading = false,
-                            canGoBack = webView.canGoBack(),
+                            isLoading = false, canGoBack = webView.canGoBack(),
                             canGoForward = webView.canGoForward()
                         )
                         activity.historyManager.addEntry(it, title)
@@ -195,20 +207,16 @@ class BrowserFragment : Fragment() {
 
             override fun shouldOverrideUrlLoading(view: WebView?, request: WebResourceRequest?): Boolean {
                 val url = request?.url?.toString() ?: return false
-                if (url.startsWith("http://") || url.startsWith("https://") ||
-                    url.startsWith("file://")) return false
-                return try {
-                    startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url))); true
-                } catch (_: Exception) { false }
+                if (url.startsWith("http://") || url.startsWith("https://") || url.startsWith("file://")) return false
+                return try { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url))); true } catch (_: Exception) { false }
             }
 
             override fun shouldInterceptRequest(view: WebView?, request: WebResourceRequest?): WebResourceResponse? {
                 val url = request?.url?.toString() ?: return null
                 if (url.startsWith("file://")) return null
-                return if (activity.settingsManager.blockTrackers &&
-                    activity.trackerBlocker.shouldBlockUrl(url))
-                    WebResourceResponse("text/plain", "UTF-8", null)
-                else null
+                val act = activity as? MainActivity ?: return null
+                return if (act.settingsManager.blockTrackers && act.trackerBlocker.shouldBlockUrl(url))
+                    WebResourceResponse("text/plain", "UTF-8", null) else null
             }
         }
 
@@ -224,12 +232,14 @@ class BrowserFragment : Fragment() {
         }
     }
 
+    // ── URL bar ───────────────────────────────────────────────────────────────
+
     private fun setupUrlBar() {
         urlEditText.setOnEditorActionListener { _, actionId, event ->
             if (actionId == EditorInfo.IME_ACTION_GO ||
                 (event?.keyCode == KeyEvent.KEYCODE_ENTER && event.action == KeyEvent.ACTION_DOWN)) {
                 processInput(urlEditText.text.toString())
-                hideKeyboard(); true
+                hideKeyboardAndStrip(); true
             } else false
         }
         urlEditText.setOnFocusChangeListener { _, hasFocus ->
@@ -238,13 +248,90 @@ class BrowserFragment : Fragment() {
                 val tab = (requireActivity() as MainActivity).tabManager.getTabById(tabId)
                 if (!isNewTabPage) tab?.let { urlEditText.setText(it.url) }
                 urlEditText.selectAll()
+                showActionsStrip()
             } else {
                 urlEditText.setBackgroundResource(R.drawable.url_bar_background)
                 if (isNewTabPage) { urlEditText.setText(""); return@setOnFocusChangeListener }
                 val tab = (requireActivity() as MainActivity).tabManager.getTabById(tabId)
                 tab?.let { urlEditText.setText(UrlUtils.formatUrl(it.url)) }
+                hideActionsStrip()
             }
         }
+    }
+
+    // ── URL action strip ──────────────────────────────────────────────────────
+
+    private fun setupUrlActions() {
+        chipClear.setOnClickListener {
+            urlEditText.setText("")
+            urlEditText.requestFocus()
+        }
+
+        chipCopy.setOnClickListener {
+            val url = currentUrl()
+            if (url.isNotBlank()) {
+                clipboard().setPrimaryClip(ClipData.newPlainText("URL", url))
+                Toast.makeText(requireContext(), "Link copied", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        chipPaste.setOnClickListener {
+            val text = pasteFromClipboard()
+            if (text != null) {
+                urlEditText.setText(text)
+                urlEditText.setSelection(text.length)
+            }
+        }
+
+        chipPasteGo.setOnClickListener {
+            val text = pasteFromClipboard()
+            if (text != null) {
+                urlEditText.setText(text)
+                processInput(text)
+                hideKeyboardAndStrip()
+            }
+        }
+
+        chipShareLink.setOnClickListener {
+            val activity = requireActivity() as MainActivity
+            val tab = activity.tabManager.getTabById(tabId)
+            val url = tab?.url?.takeIf { it.isNotBlank() } ?: return@setOnClickListener
+            startActivity(Intent.createChooser(
+                Intent(Intent.ACTION_SEND).apply {
+                    type = "text/plain"
+                    putExtra(Intent.EXTRA_TEXT, url)
+                    putExtra(Intent.EXTRA_SUBJECT, tab.title)
+                }, "Share Link"
+            ))
+        }
+    }
+
+    private fun showActionsStrip() {
+        if (urlActionsStrip.visibility == View.VISIBLE) return
+        urlActionsStrip.visibility = View.VISIBLE
+        urlActionsStrip.startAnimation(
+            android.view.animation.TranslateAnimation(0f, 0f, -urlActionsStrip.height.toFloat().coerceAtLeast(40f), 0f).apply {
+                duration = 180
+            }
+        )
+    }
+
+    private fun hideActionsStrip() {
+        urlActionsStrip.visibility = View.GONE
+    }
+
+    private fun currentUrl(): String {
+        val activity = requireActivity() as? MainActivity ?: return ""
+        return activity.tabManager.getTabById(tabId)?.url ?: ""
+    }
+
+    private fun clipboard(): ClipboardManager =
+        requireContext().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+
+    private fun pasteFromClipboard(): String? {
+        val clip = clipboard().primaryClip ?: return null
+        if (clip.itemCount == 0) return null
+        return clip.getItemAt(0)?.text?.toString()
     }
 
     fun focusUrlBar() {
@@ -262,6 +349,8 @@ class BrowserFragment : Fragment() {
 
     fun loadUrl(url: String) { _webView?.loadUrl(url) }
 
+    // ── Navigation ────────────────────────────────────────────────────────────
+
     private fun setupNavigation() {
         btnBack.setOnClickListener {
             if (!isNewTabPage && webView.canGoBack()) webView.goBack()
@@ -274,6 +363,8 @@ class BrowserFragment : Fragment() {
             if (webView.progress in 1..99) webView.stopLoading() else webView.reload()
         }
     }
+
+    // ── Bottom bar ────────────────────────────────────────────────────────────
 
     private fun setupBottomBar() {
         btnBookmark.setOnClickListener     { toggleBookmark() }
@@ -322,18 +413,20 @@ class BrowserFragment : Fragment() {
         if (isNewTabPage) return
         val activity = requireActivity() as MainActivity
         val tab = activity.tabManager.getTabById(tabId)
-        val intent = Intent(Intent.ACTION_SEND).apply {
-            type = "text/plain"
-            putExtra(Intent.EXTRA_TEXT, tab?.url ?: "")
-            putExtra(Intent.EXTRA_SUBJECT, tab?.title ?: "")
-        }
-        startActivity(Intent.createChooser(intent, "Share"))
+        startActivity(Intent.createChooser(
+            Intent(Intent.ACTION_SEND).apply {
+                type = "text/plain"
+                putExtra(Intent.EXTRA_TEXT, tab?.url ?: "")
+                putExtra(Intent.EXTRA_SUBJECT, tab?.title ?: "")
+            }, "Share"
+        ))
     }
 
-    private fun hideKeyboard() {
+    private fun hideKeyboardAndStrip() {
         val imm = requireContext().getSystemService(InputMethodManager::class.java)
         imm.hideSoftInputFromWindow(urlEditText.windowToken, 0)
         urlEditText.clearFocus()
+        hideActionsStrip()
     }
 
     fun canGoBack(): Boolean = !isNewTabPage && (_webView?.canGoBack() ?: false)

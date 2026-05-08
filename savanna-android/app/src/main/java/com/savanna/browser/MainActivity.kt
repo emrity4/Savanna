@@ -14,12 +14,17 @@ class MainActivity : AppCompatActivity() {
     lateinit var settingsManager: SettingsManager
     lateinit var trackerBlocker: TrackerBlocker
     lateinit var downloadManager: AppDownloadManager
+    lateinit var themeManager: ThemeManager
 
     private var currentBrowserFragment: BrowserFragment? = null
     private var isOverlayShowing = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        themeManager    = ThemeManager(this)
+        themeManager.applyToWindow(window)   // apply background + status/nav bar color
+
         setContentView(R.layout.activity_main)
 
         tabManager      = TabManager()
@@ -67,6 +72,8 @@ class MainActivity : AppCompatActivity() {
     fun showBookmarks()     = showOverlayFragment(BookmarksFragment(),      "bookmarks")
     fun showPrivacyReport() = showOverlayFragment(PrivacyReportFragment(),  "privacy_report")
     fun showDownloads()     = showOverlayFragment(DownloadsFragment(),      "downloads")
+    fun showTheme()         = showOverlayFragment(ThemeFragment(),          "theme",
+                                  R.anim.slide_in_right, R.anim.slide_out_left)
     fun showSettings()      = showOverlayFragment(SettingsFragment(),       "settings",
                                   R.anim.slide_in_right, R.anim.slide_out_left)
 

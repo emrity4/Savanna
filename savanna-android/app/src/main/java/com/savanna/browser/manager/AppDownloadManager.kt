@@ -14,7 +14,9 @@ class AppDownloadManager(private val context: Context) {
     private val system: DownloadManager =
         context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
 
-    /** Enqueue a new download; returns the download ID. */
+    // Speed tracking: id → (bytesAtLastPoll, timeAtLastPoll)
+    private val speedTracker = mutableMapOf<Long, Pair<Long, Long>>()
+
     fun enqueue(
         url: String,
         userAgent: String,
@@ -42,11 +44,11 @@ class AppDownloadManager(private val context: Context) {
         return system.enqueue(request)
     }
 
-    /** Query all downloads tracked by this app (all entries in system DM). */
     fun getAll(): List<DownloadItem> {
+        val now   = System.currentTimeMillis()
         val items = mutableListOf<DownloadItem>()
-        val query = DownloadManager.Query()
-        val cursor = system.query(query)
+
+        val cursor = system.query(DownloadManager.Query())
         cursor?.use {
             while (it.moveToNext()) {
                 fun str(col: String): String? =
@@ -56,16 +58,35 @@ class AppDownloadManager(private val context: Context) {
                 fun int_(col: String): Int =
                     try { it.getInt(it.getColumnIndexOrThrow(col)) } catch (_: Exception) { 0 }
 
+                val id              = lng(DownloadManager.COLUMN_ID)
+                val bytesDownloaded = lng(DownloadManager.COLUMN_BYTES_DOWNLOADED_SO_FAR)
+                val status          = int_(DownloadManager.COLUMN_STATUS)
+
+                // ── Compute speed ──────────────────────────────────────────
+                val speedBps: Long = if (status == DownloadManager.STATUS_RUNNING) {
+                    val prev = speedTracker[id]
+                    speedTracker[id] = bytesDownloaded to now
+                    if (prev != null) {
+                        val dBytes = bytesDownloaded - prev.first
+                        val dMs    = now - prev.second
+                        if (dMs > 200L && dBytes >= 0L) (dBytes * 1000L) / dMs else 0L
+                    } else 0L
+                } else {
+                    speedTracker.remove(id)
+                    0L
+                }
+
                 items.add(
                     DownloadItem(
-                        id              = lng(DownloadManager.COLUMN_ID),
+                        id              = id,
                         title           = str(DownloadManager.COLUMN_TITLE) ?: "Download",
                         url             = str(DownloadManager.COLUMN_URI) ?: "",
-                        status          = int_(DownloadManager.COLUMN_STATUS),
-                        bytesDownloaded = lng(DownloadManager.COLUMN_BYTES_DOWNLOADED_SO_FAR),
+                        status          = status,
+                        bytesDownloaded = bytesDownloaded,
                         totalBytes      = lng(DownloadManager.COLUMN_TOTAL_SIZE_BYTES),
                         mimeType        = str(DownloadManager.COLUMN_MEDIA_TYPE),
-                        localUri        = str(DownloadManager.COLUMN_LOCAL_URI)
+                        localUri        = str(DownloadManager.COLUMN_LOCAL_URI),
+                        speedBps        = speedBps
                     )
                 )
             }
@@ -73,7 +94,6 @@ class AppDownloadManager(private val context: Context) {
         return items.sortedByDescending { it.id }
     }
 
-    /** Open a completed file with the system viewer. */
     fun openFile(item: DownloadItem) {
         val uri = system.getUriForDownloadedFile(item.id) ?: return
         val intent = Intent(Intent.ACTION_VIEW).apply {
@@ -83,8 +103,10 @@ class AppDownloadManager(private val context: Context) {
         try { context.startActivity(intent) } catch (_: Exception) { }
     }
 
-    /** Remove a download entry (and its file if complete). */
-    fun remove(id: Long) = system.remove(id)
+    fun remove(id: Long) {
+        speedTracker.remove(id)
+        system.remove(id)
+    }
 
     val downloadCount: Int
         get() = getAll().count { it.isPending }

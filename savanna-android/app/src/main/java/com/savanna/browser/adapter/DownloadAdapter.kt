@@ -26,27 +26,25 @@ class DownloadAdapter(
         val btnDelete: ImageView  = view.findViewById(R.id.btn_delete_download)
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.item_download, parent, false)
-        return ViewHolder(view)
-    }
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder =
+        ViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.item_download, parent, false))
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = items[position]
 
         holder.title.text      = item.title
-        holder.statusText.text = item.statusLabel
+        holder.statusText.text = item.statusLabel   // includes speed e.g. "47% · 12.3 MB  1.2 MB/s"
 
         when {
             item.isComplete -> {
                 holder.icon.setImageResource(R.drawable.ic_download_done)
+                holder.icon.alpha          = 1f
                 holder.progress.visibility = View.GONE
                 holder.btnOpen.visibility  = View.VISIBLE
             }
             item.isFailed -> {
                 holder.icon.setImageResource(R.drawable.ic_download)
-                holder.icon.alpha          = 0.4f
+                holder.icon.alpha          = 0.35f
                 holder.progress.visibility = View.GONE
                 holder.btnOpen.visibility  = View.GONE
             }
@@ -64,6 +62,7 @@ class DownloadAdapter(
             }
             else -> {
                 holder.icon.setImageResource(R.drawable.ic_download)
+                holder.icon.alpha          = 0.5f
                 holder.progress.visibility = View.GONE
                 holder.btnOpen.visibility  = View.GONE
             }

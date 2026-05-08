@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Liquid Glass Settings Sheet (slides in from right) -->
+<!-- Liquid Glass Settings Sheet -->
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
@@ -62,6 +62,71 @@
             android:padding="16dp"
             android:paddingBottom="48dp">
 
+            <!-- ── APPEARANCE ── -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="APPEARANCE"
+                android:textColor="@color/purple_primary"
+                android:textSize="11sp"
+                android:textStyle="bold"
+                android:letterSpacing="0.12"
+                android:layout_marginBottom="10dp"
+                android:layout_marginStart="4dp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/glass_background"
+                android:orientation="vertical"
+                android:padding="2dp"
+                android:layout_marginBottom="24dp">
+
+                <RelativeLayout
+                    android:id="@+id/setting_theme"
+                    android:layout_width="match_parent"
+                    android:layout_height="54dp"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="16dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:background="?android:attr/selectableItemBackground">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:text="Theme &amp; Colors"
+                        android:textColor="@color/text_primary"
+                        android:textSize="15sp" />
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerVertical="true"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+
+                        <TextView
+                            android:id="@+id/theme_value"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="OLED Black"
+                            android:textColor="@color/text_secondary"
+                            android:textSize="14sp"
+                            android:layout_marginEnd="6dp" />
+
+                        <ImageView
+                            android:layout_width="16dp"
+                            android:layout_height="16dp"
+                            android:src="@drawable/ic_forward"
+                            android:scaleType="centerInside"
+                            android:alpha="0.4" />
+                    </LinearLayout>
+                </RelativeLayout>
+            </LinearLayout>
+
             <!-- ── GENERAL ── -->
             <TextView
                 android:layout_width="match_parent"
@@ -111,11 +176,8 @@
                         android:textSize="14sp" />
                 </RelativeLayout>
 
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="0.5dp"
-                    android:background="#18FFFFFF"
-                    android:layout_marginStart="16dp" />
+                <View android:layout_width="match_parent" android:layout_height="0.5dp"
+                    android:background="#18FFFFFF" android:layout_marginStart="16dp" />
 
                 <RelativeLayout
                     android:id="@+id/setting_tab_mode"
@@ -146,11 +208,8 @@
                         android:textSize="14sp" />
                 </RelativeLayout>
 
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="0.5dp"
-                    android:background="#18FFFFFF"
-                    android:layout_marginStart="16dp" />
+                <View android:layout_width="match_parent" android:layout_height="0.5dp"
+                    android:background="#18FFFFFF" android:layout_marginStart="16dp" />
 
                 <RelativeLayout
                     android:layout_width="match_parent"
@@ -200,21 +259,13 @@
                     android:layout_height="54dp"
                     android:paddingStart="16dp"
                     android:paddingEnd="16dp">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_centerVertical="true"
-                        android:text="@string/block_trackers"
-                        android:textColor="@color/text_primary"
-                        android:textSize="15sp" />
-
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:layout_centerVertical="true" android:text="@string/block_trackers"
+                        android:textColor="@color/text_primary" android:textSize="15sp" />
                     <com.google.android.material.materialswitch.MaterialSwitch
                         android:id="@+id/switch_block_trackers"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentEnd="true"
-                        android:layout_centerVertical="true" />
+                        android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true" android:layout_centerVertical="true" />
                 </RelativeLayout>
 
                 <View android:layout_width="match_parent" android:layout_height="0.5dp"
@@ -225,21 +276,13 @@
                     android:layout_height="54dp"
                     android:paddingStart="16dp"
                     android:paddingEnd="16dp">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_centerVertical="true"
-                        android:text="@string/block_ads"
-                        android:textColor="@color/text_primary"
-                        android:textSize="15sp" />
-
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:layout_centerVertical="true" android:text="@string/block_ads"
+                        android:textColor="@color/text_primary" android:textSize="15sp" />
                     <com.google.android.material.materialswitch.MaterialSwitch
                         android:id="@+id/switch_block_ads"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentEnd="true"
-                        android:layout_centerVertical="true" />
+                        android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true" android:layout_centerVertical="true" />
                 </RelativeLayout>
 
                 <View android:layout_width="match_parent" android:layout_height="0.5dp"
@@ -250,21 +293,13 @@
                     android:layout_height="54dp"
                     android:paddingStart="16dp"
                     android:paddingEnd="16dp">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_centerVertical="true"
-                        android:text="@string/block_popups"
-                        android:textColor="@color/text_primary"
-                        android:textSize="15sp" />
-
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:layout_centerVertical="true" android:text="@string/block_popups"
+                        android:textColor="@color/text_primary" android:textSize="15sp" />
                     <com.google.android.material.materialswitch.MaterialSwitch
                         android:id="@+id/switch_block_popups"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentEnd="true"
-                        android:layout_centerVertical="true" />
+                        android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true" android:layout_centerVertical="true" />
                 </RelativeLayout>
 
                 <View android:layout_width="match_parent" android:layout_height="0.5dp"
@@ -275,21 +310,13 @@
                     android:layout_height="54dp"
                     android:paddingStart="16dp"
                     android:paddingEnd="16dp">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_centerVertical="true"
-                        android:text="@string/do_not_track"
-                        android:textColor="@color/text_primary"
-                        android:textSize="15sp" />
-
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:layout_centerVertical="true" android:text="@string/do_not_track"
+                        android:textColor="@color/text_primary" android:textSize="15sp" />
                     <com.google.android.material.materialswitch.MaterialSwitch
                         android:id="@+id/switch_do_not_track"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentEnd="true"
-                        android:layout_centerVertical="true" />
+                        android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true" android:layout_centerVertical="true" />
                 </RelativeLayout>
 
                 <View android:layout_width="match_parent" android:layout_height="0.5dp"
@@ -300,21 +327,13 @@
                     android:layout_height="54dp"
                     android:paddingStart="16dp"
                     android:paddingEnd="16dp">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_centerVertical="true"
-                        android:text="@string/clear_on_exit"
-                        android:textColor="@color/text_primary"
-                        android:textSize="15sp" />
-
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:layout_centerVertical="true" android:text="@string/clear_on_exit"
+                        android:textColor="@color/text_primary" android:textSize="15sp" />
                     <com.google.android.material.materialswitch.MaterialSwitch
                         android:id="@+id/switch_clear_on_exit"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentEnd="true"
-                        android:layout_centerVertical="true" />
+                        android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true" android:layout_centerVertical="true" />
                 </RelativeLayout>
             </LinearLayout>
 
