@@ -1,45 +1,64 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Liquid Glass history row -->
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
+    android:orientation="horizontal"
     android:background="@drawable/menu_item_background"
-    android:padding="14dp"
+    android:padding="13dp"
     android:layout_marginBottom="6dp"
+    android:gravity="center_vertical"
     android:clickable="true"
     android:focusable="true">
 
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+    <!-- Domain initial letter icon -->
+    <TextView
+        android:id="@+id/history_favicon"
+        android:layout_width="34dp"
+        android:layout_height="34dp"
+        android:gravity="center"
+        android:textColor="#FFFFFFFF"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        android:background="@drawable/badge_background"
+        android:layout_marginEnd="12dp" />
+
+    <!-- Title + URL -->
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical">
 
         <TextView
             android:id="@+id/history_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_toStartOf="@id/history_time"
             android:textColor="@color/text_primary"
-            android:textSize="15sp"
+            android:textSize="14sp"
+            android:fontFamily="sans-serif-medium"
             android:maxLines="1"
             android:ellipsize="end" />
 
         <TextView
-            android:id="@+id/history_time"
-            android:layout_width="wrap_content"
+            android:id="@+id/history_url"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:textColor="@color/text_tertiary"
-            android:textSize="12sp" />
-    </RelativeLayout>
+            android:textColor="@color/text_secondary"
+            android:textSize="12sp"
+            android:maxLines="1"
+            android:ellipsize="end"
+            android:layout_marginTop="2dp" />
+    </LinearLayout>
 
+    <!-- Time stamp -->
     <TextView
-        android:id="@+id/history_url"
-        android:layout_width="match_parent"
+        android:id="@+id/history_time"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textColor="@color/text_url"
-        android:textSize="13sp"
-        android:maxLines="1"
-        android:ellipsize="end"
-        android:layout_marginTop="4dp" />
+        android:textColor="@color/text_tertiary"
+        android:textSize="11sp"
+        android:layout_marginStart="8dp" />
+
 </LinearLayout>

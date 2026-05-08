@@ -13,14 +13,16 @@ A native Android browser app located at `savanna-android/`. Built with Kotlin, G
 - **Build**: Gradle 8.5 + AGP 8.2.0
 - **Min SDK**: 26 (Android 8.0)
 - **Target SDK**: 34
-- **Design**: Dark liquid-glass aesthetic with purple accents (iOS 26-style)
+- **Design**: iOS 26 Liquid Glass aesthetic — OLED black surfaces, frosted white overlays, specular gradients, floating bars
 - **No database** — uses SharedPreferences for settings, JSON files for history/bookmarks, in-memory lists for runtime data
 
 ### Key Features
 - WebView browser with full navigation (back, forward, reload)
 - Smart URL/search bar with auto https:// and search engine integration
+- **Liquid Glass home page** (`assets/new_tab.html`) — time greeting, favorites grid, recently visited sites with colored domain icons, glass search bar, privacy badge
+- **JavaScript bridge** (`NewTabBridge.kt`) — exposes `getRecentHistory()`, `navigate()`, `focusUrlBar()` to the new tab page
 - Tab system with tab switcher (bottom and compact modes)
-- Browsing history with search and date grouping
+- Browsing history with search + colored domain initial-letter favicon icons
 - Bookmarks with persistence
 - Privacy report with tracker blocking statistics
 - Tracker blocker (analytics, advertising, social, fingerprinting categories)
@@ -28,23 +30,41 @@ A native Android browser app located at `savanna-android/`. Built with Kotlin, G
 - Smooth fragment transition animations
 - Fully offline-capable for core features
 
+### Liquid Glass Design System
+All UI elements follow iOS 26 Liquid Glass material:
+- `url_bar_background.xml` / `url_bar_focused.xml` — glass pill for URL bar
+- `bottom_bar_background.xml` — floating dock with top-edge specular line
+- `sheet_background.xml` — overlay bottom sheet with drag handle
+- `glass_background.xml` — card surfaces for settings/privacy groups
+- `menu_item_background.xml` — tappable row tiles with glass + ripple
+- All overlays have drag handle pills and white-tinted `#18FFFFFF` separators
+- Purple accent (`#B6A8FF`) only on tab card strokes and section headers
+
 ### Project Structure
 ```
 savanna-android/
+├── app/src/main/assets/
+│   └── new_tab.html              # Liquid Glass home page (CSS backdrop-filter)
 ├── app/src/main/java/com/savanna/browser/
-│   ├── MainActivity.kt          # Main orchestrator
-│   ├── adapter/                  # RecyclerView adapters
+│   ├── MainActivity.kt           # Main orchestrator
+│   ├── NewTabBridge.kt           # JS interface for new tab page
+│   ├── adapter/                  # RecyclerView adapters (History has colored favicon icons)
 │   ├── fragment/                 # UI fragments (Browser, TabSwitcher, History, Bookmarks, Settings, PrivacyReport)
-│   ├── manager/                  # Business logic (TabManager, HistoryManager, BookmarkManager, SettingsManager, TrackerBlocker)
-│   ├── model/                    # Data classes (Tab, HistoryItem, Bookmark, TrackerInfo)
+│   ├── manager/                  # Business logic managers
+│   ├── model/                    # Data classes
 │   └── util/                     # Utilities (UrlUtils)
-├── app/src/main/res/             # Layouts, drawables, colors, themes, animations
-├── build.gradle.kts              # Project-level Gradle
-└── settings.gradle.kts           # Gradle settings
+├── app/src/main/res/
+│   ├── drawable/                 # Liquid Glass drawables + SF Symbols icons
+│   ├── layout/                   # All layouts updated with glass aesthetic
+│   └── values/                   # OLED black colors, glass styles
+├── build.gradle.kts
+└── settings.gradle.kts
 ```
 
 ### To Build
 Open `savanna-android/` in Android Studio, sync Gradle, and run on device/emulator.
+
+EAS Build: `cd savanna-android && eas build --platform android --profile development`
 
 ## Monorepo Stack
 

@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Liquid Glass Settings Sheet (slides in from right) -->
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
@@ -6,39 +7,49 @@
     android:orientation="vertical"
     android:background="@color/bg_primary">
 
-    <RelativeLayout
+    <!-- Glass top bar -->
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="56dp"
-        android:paddingStart="20dp"
-        android:paddingEnd="20dp">
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="#EE000000"
+        android:paddingBottom="10dp">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_alignParentStart="true"
-            android:text="@string/settings"
-            android:textColor="@color/text_primary"
-            android:textSize="22sp"
-            android:textStyle="bold" />
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:paddingStart="22dp"
+            android:paddingEnd="12dp">
 
-        <ImageView
-            android:id="@+id/btn_close_settings"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_centerVertical="true"
-            android:layout_alignParentEnd="true"
-            android:src="@drawable/ic_close"
-            android:background="@drawable/button_background"
-            android:padding="8dp"
-            android:scaleType="centerInside"
-            android:contentDescription="@string/done" />
-    </RelativeLayout>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_alignParentStart="true"
+                android:text="@string/settings"
+                android:textColor="@color/text_primary"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:letterSpacing="-0.02" />
 
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="@color/border_glass" />
+            <ImageView
+                android:id="@+id/btn_close_settings"
+                android:layout_width="38dp"
+                android:layout_height="38dp"
+                android:layout_centerVertical="true"
+                android:layout_alignParentEnd="true"
+                android:src="@drawable/ic_close"
+                android:background="@drawable/button_background"
+                android:padding="9dp"
+                android:scaleType="centerInside"
+                android:contentDescription="@string/done" />
+        </RelativeLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0.5dp"
+            android:background="#22FFFFFF" />
+    </LinearLayout>
 
     <ScrollView
         android:layout_width="match_parent"
@@ -48,31 +59,33 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="16dp">
+            android:padding="16dp"
+            android:paddingBottom="48dp">
 
+            <!-- ── GENERAL ── -->
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/general"
+                android:text="GENERAL"
                 android:textColor="@color/purple_primary"
-                android:textSize="14sp"
+                android:textSize="11sp"
                 android:textStyle="bold"
-                android:textAllCaps="true"
-                android:letterSpacing="0.1"
-                android:layout_marginBottom="8dp" />
+                android:letterSpacing="0.12"
+                android:layout_marginBottom="10dp"
+                android:layout_marginStart="4dp" />
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@drawable/glass_background"
                 android:orientation="vertical"
-                android:padding="4dp"
-                android:layout_marginBottom="20dp">
+                android:padding="2dp"
+                android:layout_marginBottom="24dp">
 
                 <RelativeLayout
                     android:id="@+id/setting_search_engine"
                     android:layout_width="match_parent"
-                    android:layout_height="52dp"
+                    android:layout_height="54dp"
                     android:paddingStart="16dp"
                     android:paddingEnd="16dp"
                     android:clickable="true"
@@ -85,7 +98,7 @@
                         android:layout_centerVertical="true"
                         android:text="@string/search_engine"
                         android:textColor="@color/text_primary"
-                        android:textSize="16sp" />
+                        android:textSize="15sp" />
 
                     <TextView
                         android:id="@+id/search_engine_value"
@@ -100,14 +113,14 @@
 
                 <View
                     android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:background="@color/border_glass"
+                    android:layout_height="0.5dp"
+                    android:background="#18FFFFFF"
                     android:layout_marginStart="16dp" />
 
                 <RelativeLayout
                     android:id="@+id/setting_tab_mode"
                     android:layout_width="match_parent"
-                    android:layout_height="52dp"
+                    android:layout_height="54dp"
                     android:paddingStart="16dp"
                     android:paddingEnd="16dp"
                     android:clickable="true"
@@ -120,7 +133,7 @@
                         android:layout_centerVertical="true"
                         android:text="@string/tab_mode"
                         android:textColor="@color/text_primary"
-                        android:textSize="16sp" />
+                        android:textSize="15sp" />
 
                     <TextView
                         android:id="@+id/tab_mode_value"
@@ -135,13 +148,13 @@
 
                 <View
                     android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:background="@color/border_glass"
+                    android:layout_height="0.5dp"
+                    android:background="#18FFFFFF"
                     android:layout_marginStart="16dp" />
 
                 <RelativeLayout
                     android:layout_width="match_parent"
-                    android:layout_height="52dp"
+                    android:layout_height="54dp"
                     android:paddingStart="16dp"
                     android:paddingEnd="16dp">
 
@@ -151,7 +164,7 @@
                         android:layout_centerVertical="true"
                         android:text="@string/javascript"
                         android:textColor="@color/text_primary"
-                        android:textSize="16sp" />
+                        android:textSize="15sp" />
 
                     <com.google.android.material.materialswitch.MaterialSwitch
                         android:id="@+id/switch_javascript"
@@ -162,28 +175,29 @@
                 </RelativeLayout>
             </LinearLayout>
 
+            <!-- ── PRIVACY ── -->
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/privacy"
+                android:text="PRIVACY"
                 android:textColor="@color/purple_primary"
-                android:textSize="14sp"
+                android:textSize="11sp"
                 android:textStyle="bold"
-                android:textAllCaps="true"
-                android:letterSpacing="0.1"
-                android:layout_marginBottom="8dp" />
+                android:letterSpacing="0.12"
+                android:layout_marginBottom="10dp"
+                android:layout_marginStart="4dp" />
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@drawable/glass_background"
                 android:orientation="vertical"
-                android:padding="4dp"
-                android:layout_marginBottom="20dp">
+                android:padding="2dp"
+                android:layout_marginBottom="24dp">
 
                 <RelativeLayout
                     android:layout_width="match_parent"
-                    android:layout_height="52dp"
+                    android:layout_height="54dp"
                     android:paddingStart="16dp"
                     android:paddingEnd="16dp">
 
@@ -193,7 +207,7 @@
                         android:layout_centerVertical="true"
                         android:text="@string/block_trackers"
                         android:textColor="@color/text_primary"
-                        android:textSize="16sp" />
+                        android:textSize="15sp" />
 
                     <com.google.android.material.materialswitch.MaterialSwitch
                         android:id="@+id/switch_block_trackers"
@@ -203,15 +217,12 @@
                         android:layout_centerVertical="true" />
                 </RelativeLayout>
 
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:background="@color/border_glass"
-                    android:layout_marginStart="16dp" />
+                <View android:layout_width="match_parent" android:layout_height="0.5dp"
+                    android:background="#18FFFFFF" android:layout_marginStart="16dp" />
 
                 <RelativeLayout
                     android:layout_width="match_parent"
-                    android:layout_height="52dp"
+                    android:layout_height="54dp"
                     android:paddingStart="16dp"
                     android:paddingEnd="16dp">
 
@@ -221,7 +232,7 @@
                         android:layout_centerVertical="true"
                         android:text="@string/block_ads"
                         android:textColor="@color/text_primary"
-                        android:textSize="16sp" />
+                        android:textSize="15sp" />
 
                     <com.google.android.material.materialswitch.MaterialSwitch
                         android:id="@+id/switch_block_ads"
@@ -231,15 +242,12 @@
                         android:layout_centerVertical="true" />
                 </RelativeLayout>
 
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:background="@color/border_glass"
-                    android:layout_marginStart="16dp" />
+                <View android:layout_width="match_parent" android:layout_height="0.5dp"
+                    android:background="#18FFFFFF" android:layout_marginStart="16dp" />
 
                 <RelativeLayout
                     android:layout_width="match_parent"
-                    android:layout_height="52dp"
+                    android:layout_height="54dp"
                     android:paddingStart="16dp"
                     android:paddingEnd="16dp">
 
@@ -249,7 +257,7 @@
                         android:layout_centerVertical="true"
                         android:text="@string/block_popups"
                         android:textColor="@color/text_primary"
-                        android:textSize="16sp" />
+                        android:textSize="15sp" />
 
                     <com.google.android.material.materialswitch.MaterialSwitch
                         android:id="@+id/switch_block_popups"
@@ -259,15 +267,12 @@
                         android:layout_centerVertical="true" />
                 </RelativeLayout>
 
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:background="@color/border_glass"
-                    android:layout_marginStart="16dp" />
+                <View android:layout_width="match_parent" android:layout_height="0.5dp"
+                    android:background="#18FFFFFF" android:layout_marginStart="16dp" />
 
                 <RelativeLayout
                     android:layout_width="match_parent"
-                    android:layout_height="52dp"
+                    android:layout_height="54dp"
                     android:paddingStart="16dp"
                     android:paddingEnd="16dp">
 
@@ -277,7 +282,7 @@
                         android:layout_centerVertical="true"
                         android:text="@string/do_not_track"
                         android:textColor="@color/text_primary"
-                        android:textSize="16sp" />
+                        android:textSize="15sp" />
 
                     <com.google.android.material.materialswitch.MaterialSwitch
                         android:id="@+id/switch_do_not_track"
@@ -287,15 +292,12 @@
                         android:layout_centerVertical="true" />
                 </RelativeLayout>
 
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:background="@color/border_glass"
-                    android:layout_marginStart="16dp" />
+                <View android:layout_width="match_parent" android:layout_height="0.5dp"
+                    android:background="#18FFFFFF" android:layout_marginStart="16dp" />
 
                 <RelativeLayout
                     android:layout_width="match_parent"
-                    android:layout_height="52dp"
+                    android:layout_height="54dp"
                     android:paddingStart="16dp"
                     android:paddingEnd="16dp">
 
@@ -305,7 +307,7 @@
                         android:layout_centerVertical="true"
                         android:text="@string/clear_on_exit"
                         android:textColor="@color/text_primary"
-                        android:textSize="16sp" />
+                        android:textSize="15sp" />
 
                     <com.google.android.material.materialswitch.MaterialSwitch
                         android:id="@+id/switch_clear_on_exit"
@@ -316,39 +318,41 @@
                 </RelativeLayout>
             </LinearLayout>
 
+            <!-- ── ABOUT ── -->
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/about"
+                android:text="ABOUT"
                 android:textColor="@color/purple_primary"
-                android:textSize="14sp"
+                android:textSize="11sp"
                 android:textStyle="bold"
-                android:textAllCaps="true"
-                android:letterSpacing="0.1"
-                android:layout_marginBottom="8dp" />
+                android:letterSpacing="0.12"
+                android:layout_marginBottom="10dp"
+                android:layout_marginStart="4dp" />
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@drawable/glass_background"
                 android:orientation="vertical"
-                android:padding="16dp">
+                android:padding="18dp">
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="Savanna Browser"
                     android:textColor="@color/text_primary"
-                    android:textSize="18sp"
-                    android:textStyle="bold" />
+                    android:textSize="17sp"
+                    android:textStyle="bold"
+                    android:letterSpacing="-0.01" />
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="@string/version"
                     android:textColor="@color/text_secondary"
-                    android:textSize="14sp"
-                    android:layout_marginTop="4dp" />
+                    android:textSize="13sp"
+                    android:layout_marginTop="3dp" />
 
                 <TextView
                     android:layout_width="match_parent"
@@ -356,8 +360,10 @@
                     android:text="A Safari-inspired browser with dark liquid-glass design and privacy-first browsing."
                     android:textColor="@color/text_tertiary"
                     android:textSize="13sp"
-                    android:layout_marginTop="8dp" />
+                    android:lineSpacingMultiplier="1.3"
+                    android:layout_marginTop="10dp" />
             </LinearLayout>
+
         </LinearLayout>
     </ScrollView>
 </LinearLayout>

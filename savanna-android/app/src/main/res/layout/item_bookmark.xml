@@ -1,37 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
+<!-- Liquid Glass bookmark row -->
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:orientation="horizontal"
     android:background="@drawable/menu_item_background"
-    android:padding="14dp"
+    android:padding="13dp"
     android:layout_marginBottom="6dp"
+    android:gravity="center_vertical"
     android:clickable="true"
     android:focusable="true">
 
+    <!-- Bookmark color accent dot / icon -->
     <ImageView
         android:id="@+id/bookmark_icon"
-        android:layout_width="32dp"
-        android:layout_height="32dp"
-        android:layout_centerVertical="true"
+        android:layout_width="34dp"
+        android:layout_height="34dp"
         android:src="@drawable/ic_bookmark_filled"
-        android:scaleType="centerInside" />
+        android:scaleType="centerInside"
+        android:layout_marginEnd="12dp" />
 
+    <!-- Title + URL -->
     <LinearLayout
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_toEndOf="@id/bookmark_icon"
-        android:layout_toStartOf="@id/btn_delete_bookmark"
-        android:layout_centerVertical="true"
-        android:orientation="vertical"
-        android:layout_marginStart="12dp">
+        android:layout_weight="1"
+        android:orientation="vertical">
 
         <TextView
             android:id="@+id/bookmark_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textColor="@color/text_primary"
-            android:textSize="15sp"
+            android:textSize="14sp"
+            android:fontFamily="sans-serif-medium"
             android:maxLines="1"
             android:ellipsize="end" />
 
@@ -39,8 +42,8 @@
             android:id="@+id/bookmark_url"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textColor="@color/text_url"
-            android:textSize="13sp"
+            android:textColor="@color/text_secondary"
+            android:textSize="12sp"
             android:maxLines="1"
             android:ellipsize="end"
             android:layout_marginTop="2dp" />
@@ -48,13 +51,14 @@
 
     <ImageView
         android:id="@+id/btn_delete_bookmark"
-        android:layout_width="32dp"
-        android:layout_height="32dp"
-        android:layout_alignParentEnd="true"
-        android:layout_centerVertical="true"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
         android:src="@drawable/ic_delete"
         android:background="@drawable/button_background"
         android:padding="4dp"
         android:scaleType="centerInside"
+        android:alpha="0.5"
+        android:layout_marginStart="8dp"
         android:contentDescription="@string/delete" />
-</RelativeLayout>
+
+</LinearLayout>
