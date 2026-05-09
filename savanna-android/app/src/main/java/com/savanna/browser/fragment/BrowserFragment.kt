@@ -117,7 +117,6 @@ class BrowserFragment : Fragment() {
         setupUrlActions()
         setupNavigation()
         setupBottomBar()
-        setupFavoriteLinkDialog(view)
         refreshTabCount()
 
         val urlToLoad = if (initialUrl.isBlank() || initialUrl == "about:blank") NEW_TAB_URL else initialUrl
@@ -240,11 +239,6 @@ class BrowserFragment : Fragment() {
             val delta = scrollY - oldScrollY
             if (!isNewTabPage && abs(delta) > 6) updateBottomBarTint(currentUrl())
         }
-    }
-
-    private fun setupFavoriteLinkDialog(view: View) {
-        val favoriteAction = view.findViewById<TextView?>(R.id.home_favorite_action)
-        favoriteAction?.setOnClickListener { showFavoriteDialog() }
     }
 
     private fun showFavoriteDialog() {
@@ -392,6 +386,7 @@ class BrowserFragment : Fragment() {
         btnPrivacy.setOnClickListener { (requireActivity() as MainActivity).showPrivacyReport() }
         btnSettings.setOnClickListener { (requireActivity() as MainActivity).showSettings() }
         btnShare.setOnClickListener { shareCurrentPage() }
+        chipShareLink.setOnLongClickListener { showFavoriteDialog(); true }
     }
 
     private fun toggleBookmark() {
