@@ -14,7 +14,6 @@ import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.animation.AnimationUtils
 import android.view.animation.TranslateAnimation
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
@@ -25,7 +24,6 @@ import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.savanna.browser.MainActivity
 import com.savanna.browser.NewTabBridge
@@ -37,7 +35,6 @@ class BrowserFragment : Fragment() {
     private var _webView: WebView? = null
     private lateinit var urlEditText: EditText
     private lateinit var progressBar: ProgressBar
-    private lateinit var urlBarContainer: View
     private lateinit var bottomBar: View
     private lateinit var btnBack: ImageView
     private lateinit var btnForward: ImageView
@@ -50,7 +47,6 @@ class BrowserFragment : Fragment() {
     private lateinit var btnPrivacy: ImageView
     private lateinit var btnSettings: ImageView
     private lateinit var tabCountBadge: TextView
-
     private lateinit var urlActionsStrip: HorizontalScrollView
     private lateinit var chipClear: TextView
     private lateinit var chipCopy: TextView
@@ -70,8 +66,8 @@ class BrowserFragment : Fragment() {
 
     companion object {
         private const val ARG_TAB_ID = "tab_id"
-        private const val ARG_URL    = "url"
-        const val NEW_TAB_URL        = "file:///android_asset/new_tab.html"
+        private const val ARG_URL = "url"
+        const val NEW_TAB_URL = "file:///android_asset/new_tab.html"
 
         fun newInstance(tabId: String, url: String = "") = BrowserFragment().apply {
             arguments = Bundle().apply {
@@ -91,28 +87,27 @@ class BrowserFragment : Fragment() {
         tabId = arguments?.getString(ARG_TAB_ID) ?: ""
         val initialUrl = arguments?.getString(ARG_URL) ?: ""
 
-        _webView         = view.findViewById(R.id.web_view)
-        urlEditText      = view.findViewById(R.id.url_edit_text)
-        progressBar      = view.findViewById(R.id.progress_bar)
-        urlBarContainer  = view.findViewById(R.id.url_bar_container)
-        bottomBar        = view.findViewById(R.id.bottom_bar)
-        btnBack          = view.findViewById(R.id.btn_back)
-        btnForward       = view.findViewById(R.id.btn_forward)
-        btnReload        = view.findViewById(R.id.btn_reload)
-        btnShare         = view.findViewById(R.id.btn_share)
-        btnBookmark      = view.findViewById(R.id.btn_bookmark)
-        btnHistory       = view.findViewById(R.id.btn_history)
-        btnTabs          = view.findViewById(R.id.btn_tabs)
-        btnDownloads     = view.findViewById(R.id.btn_downloads)
-        btnPrivacy       = view.findViewById(R.id.btn_privacy)
-        btnSettings      = view.findViewById(R.id.btn_settings)
-        tabCountBadge    = view.findViewById(R.id.tab_count_badge)
-        urlActionsStrip  = view.findViewById(R.id.url_actions_strip)
-        chipClear        = view.findViewById(R.id.chip_clear)
-        chipCopy         = view.findViewById(R.id.chip_copy)
-        chipPaste        = view.findViewById(R.id.chip_paste)
-        chipPasteGo      = view.findViewById(R.id.chip_paste_go)
-        chipShareLink    = view.findViewById(R.id.chip_share_link)
+        _webView = view.findViewById(R.id.web_view)
+        urlEditText = view.findViewById(R.id.url_edit_text)
+        progressBar = view.findViewById(R.id.progress_bar)
+        bottomBar = view.findViewById(R.id.bottom_bar)
+        btnBack = view.findViewById(R.id.btn_back)
+        btnForward = view.findViewById(R.id.btn_forward)
+        btnReload = view.findViewById(R.id.btn_reload)
+        btnShare = view.findViewById(R.id.btn_share)
+        btnBookmark = view.findViewById(R.id.btn_bookmark)
+        btnHistory = view.findViewById(R.id.btn_history)
+        btnTabs = view.findViewById(R.id.btn_tabs)
+        btnDownloads = view.findViewById(R.id.btn_downloads)
+        btnPrivacy = view.findViewById(R.id.btn_privacy)
+        btnSettings = view.findViewById(R.id.btn_settings)
+        tabCountBadge = view.findViewById(R.id.tab_count_badge)
+        urlActionsStrip = view.findViewById(R.id.url_actions_strip)
+        chipClear = view.findViewById(R.id.chip_clear)
+        chipCopy = view.findViewById(R.id.chip_copy)
+        chipPaste = view.findViewById(R.id.chip_paste)
+        chipPasteGo = view.findViewById(R.id.chip_paste_go)
+        chipShareLink = view.findViewById(R.id.chip_share_link)
 
         setupWebView()
         setupUrlBar()
@@ -239,11 +234,7 @@ class BrowserFragment : Fragment() {
 
         webView.setOnScrollChangeListener { _, _, scrollY, _, oldScrollY ->
             val delta = scrollY - oldScrollY
-            if (!isNewTabPage) {
-                val activeUrl = currentUrl()
-                if (delta > 6) updateBottomBarTint(activeUrl)
-                if (delta < -6) updateBottomBarTint(activeUrl)
-            }
+            if (!isNewTabPage && delta.absoluteValue > 6) updateBottomBarTint(currentUrl())
         }
     }
 
@@ -272,10 +263,7 @@ class BrowserFragment : Fragment() {
     }
 
     private fun setupUrlActions() {
-        chipClear.setOnClickListener {
-            urlEditText.setText("")
-            urlEditText.requestFocus()
-        }
+        chipClear.setOnClickListener { urlEditText.setText(""); urlEditText.requestFocus() }
         chipCopy.setOnClickListener {
             val url = currentUrl()
             if (url.isNotBlank()) {

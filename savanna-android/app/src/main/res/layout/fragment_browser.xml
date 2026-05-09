@@ -11,18 +11,6 @@
         android:layout_marginTop="64dp"
         android:layout_marginBottom="72dp" />
 
-    <ProgressBar
-        android:id="@+id/progress_bar"
-        style="@android:style/Widget.ProgressBar.Horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="2dp"
-        android:layout_gravity="top"
-        android:progressDrawable="@drawable/progress_bar_drawable"
-        android:max="100"
-        android:progress="0"
-        android:indeterminate="false"
-        android:visibility="gone" />
-
     <LinearLayout
         android:id="@+id/url_bar_container"
         android:layout_width="match_parent"
@@ -94,6 +82,19 @@
             android:layout_marginStart="2dp"
             android:contentDescription="Share" />
     </LinearLayout>
+
+    <ProgressBar
+        android:id="@+id/progress_bar"
+        style="@android:style/Widget.ProgressBar.Horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:layout_gravity="top"
+        android:layout_marginTop="64dp"
+        android:progressDrawable="@drawable/progress_bar_drawable"
+        android:max="100"
+        android:progress="0"
+        android:indeterminate="false"
+        android:visibility="gone" />
 
     <HorizontalScrollView
         android:id="@+id/url_actions_strip"
