@@ -42,8 +42,6 @@ class ThemeFragment : Fragment() {
         setupAutoHide(view)
     }
 
-    // ── Preset theme cards ────────────────────────────────────────────────────
-
     private fun setupPresetCards(root: View) {
         val container = root.findViewById<LinearLayout>(R.id.theme_presets_container)
         container.removeAllViews()
@@ -52,29 +50,21 @@ class ThemeFragment : Fragment() {
         val selected = themeManager.themeId
 
         ThemeManager.PRESETS.forEach { preset ->
-            val card = layoutInflater.inflate(R.layout.item_theme_preset, container, false)
-                as LinearLayout
+            val card = layoutInflater.inflate(R.layout.item_theme_preset, container, false) as LinearLayout
+            val circle: View = card.findViewById(R.id.preset_color_circle)
+            val name: TextView = card.findViewById(R.id.preset_name)
+            val accent: View = card.findViewById(R.id.preset_accent_dot)
 
-            val circle: View      = card.findViewById(R.id.preset_color_circle)
-            val name: TextView    = card.findViewById(R.id.preset_name)
-            val accent: View      = card.findViewById(R.id.preset_accent_dot)
-
-            // Set the big circle to preset background color
             (circle.background as? GradientDrawable)?.setColor(preset.bgColor)
                 ?: circle.setBackgroundColor(preset.bgColor)
-
-            // Set small accent dot
-            val dot = accent.background as? GradientDrawable
-            dot?.setColor(preset.accentColor)
+            (accent.background as? GradientDrawable)?.setColor(preset.accentColor)
 
             name.text = preset.name
-
-            // Highlight selected
             applyCardSelection(card, preset.id == selected)
 
             card.setOnClickListener {
-                themeManager.themeId       = preset.id
-                themeManager.customAccentHex = ""  // reset custom accent
+                themeManager.themeId = preset.id
+                themeManager.customAccentHex = ""
                 highlightPreset(preset.id)
                 applyThemeNow()
             }
@@ -91,12 +81,8 @@ class ThemeFragment : Fragment() {
     }
 
     private fun applyCardSelection(card: LinearLayout, selected: Boolean) {
-        card.setBackgroundResource(
-            if (selected) R.drawable.theme_card_selected else R.drawable.theme_card_background
-        )
+        card.setBackgroundResource(if (selected) R.drawable.theme_card_selected else R.drawable.theme_card_background)
     }
-
-    // ── Accent colors ─────────────────────────────────────────────────────────
 
     private fun setupAccentColors(root: View) {
         val container = root.findViewById<LinearLayout>(R.id.accent_colors_container)
@@ -118,11 +104,7 @@ class ThemeFragment : Fragment() {
             val shape = GradientDrawable().apply {
                 shape = GradientDrawable.OVAL
                 setColor(color)
-                setStroke(
-                    (if (hex.equals(currentHex, ignoreCase = true)) 3 else 0) *
-                            resources.displayMetrics.density.toInt(),
-                    Color.WHITE
-                )
+                setStroke((if (hex.equals(currentHex, ignoreCase = true)) 3 else 0) * resources.displayMetrics.density.toInt(), Color.WHITE)
             }
             dot.background = shape
 
@@ -141,14 +123,9 @@ class ThemeFragment : Fragment() {
         ThemeManager.ACCENT_COLORS.forEachIndexed { i, hex ->
             val d = accentDots[i].background as? GradientDrawable ?: return@forEachIndexed
             val selected = hex.equals(selectedHex, ignoreCase = true)
-            d.setStroke(
-                (if (selected) 3 else 0) * resources.displayMetrics.density.toInt(),
-                Color.WHITE
-            )
+            d.setStroke((if (selected) 3 else 0) * resources.displayMetrics.density.toInt(), Color.WHITE)
         }
     }
-
-    // ── URL bar style ─────────────────────────────────────────────────────────
 
     private fun setupUrlBarStyles(root: View) {
         val btnGlass   = root.findViewById<TextView>(R.id.style_glass)
@@ -162,17 +139,15 @@ class ThemeFragment : Fragment() {
 
         styles.forEachIndexed { i, s -> applyChipSelection(styleButtons[i], s == current) }
 
-        btnGlass.setOnClickListener   { selectStyle(ThemeManager.STYLE_GLASS,   styles) }
+        btnGlass.setOnClickListener   { selectStyle(ThemeManager.STYLE_GLASS, styles) }
         btnFrosted.setOnClickListener { selectStyle(ThemeManager.STYLE_FROSTED, styles) }
-        btnSolid.setOnClickListener   { selectStyle(ThemeManager.STYLE_SOLID,   styles) }
+        btnSolid.setOnClickListener   { selectStyle(ThemeManager.STYLE_SOLID, styles) }
     }
 
     private fun selectStyle(style: String, all: List<String>) {
         themeManager.urlBarStyle = style
         all.forEachIndexed { i, s -> applyChipSelection(styleButtons[i], s == style) }
     }
-
-    // ── Text size ─────────────────────────────────────────────────────────────
 
     private fun setupTextSize(root: View) {
         val btnSmall  = root.findViewById<TextView>(R.id.size_small)
@@ -186,9 +161,9 @@ class ThemeFragment : Fragment() {
 
         sizes.forEachIndexed { i, s -> applyChipSelection(sizeButtons[i], s == current) }
 
-        btnSmall.setOnClickListener  { selectSize(ThemeManager.SIZE_SMALL,  sizes) }
+        btnSmall.setOnClickListener  { selectSize(ThemeManager.SIZE_SMALL, sizes) }
         btnMedium.setOnClickListener { selectSize(ThemeManager.SIZE_MEDIUM, sizes) }
-        btnLarge.setOnClickListener  { selectSize(ThemeManager.SIZE_LARGE,  sizes) }
+        btnLarge.setOnClickListener  { selectSize(ThemeManager.SIZE_LARGE, sizes) }
     }
 
     private fun selectSize(size: String, all: List<String>) {
@@ -196,35 +171,26 @@ class ThemeFragment : Fragment() {
         all.forEachIndexed { i, s -> applyChipSelection(sizeButtons[i], s == size) }
     }
 
-    // ── Auto-hide bars ────────────────────────────────────────────────────────
-
     private fun setupAutoHide(root: View) {
-        val sw = root.findViewById<com.google.android.material.materialswitch.MaterialSwitch>(
-            R.id.switch_auto_hide_bars
-        )
+        val sw = root.findViewById<com.google.android.material.materialswitch.MaterialSwitch>(R.id.switch_auto_hide_bars)
         sw.isChecked = themeManager.autoHideBars
         sw.setOnCheckedChangeListener { _, checked -> themeManager.autoHideBars = checked }
     }
 
-    // ── Helpers ───────────────────────────────────────────────────────────────
-
     private fun applyChipSelection(chip: TextView, selected: Boolean) {
         val accent = themeManager.accentColor
-        if (selected) {
-            chip.setBackgroundResource(R.drawable.action_chip_background)
-            chip.setTextColor(accent)
-            chip.backgroundTintList = ColorStateList.valueOf(
-                Color.argb(48, Color.red(accent), Color.green(accent), Color.blue(accent))
-            )
+        chip.setBackgroundResource(R.drawable.action_chip_background)
+        chip.text = chip.text
+        chip.setTextColor(if (selected) accent else Color.parseColor("#99FFFFFF"))
+        chip.backgroundTintList = if (selected) {
+            ColorStateList.valueOf(Color.argb(34, Color.red(accent), Color.green(accent), Color.blue(accent)))
         } else {
-            chip.setBackgroundResource(R.drawable.action_chip_background)
-            chip.setTextColor(Color.parseColor("#99FFFFFF"))
-            chip.backgroundTintList = null
+            null
         }
     }
 
     private fun applyThemeNow() {
         val activity = requireActivity() as MainActivity
-        themeManager.applyToWindow(activity.window)
+        activity.themeManager.applyToWindow(activity.window)
     }
 }
