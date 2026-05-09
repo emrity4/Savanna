@@ -6,6 +6,8 @@ import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
+import android.graphics.Color
+import android.graphics.drawable.GradientDrawable
 import android.net.Uri
 import android.os.Bundle
 import android.view.KeyEvent
@@ -13,6 +15,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AnimationUtils
+import android.view.animation.TranslateAnimation
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.webkit.*
@@ -22,6 +25,7 @@ import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.savanna.browser.MainActivity
 import com.savanna.browser.NewTabBridge
@@ -33,6 +37,8 @@ class BrowserFragment : Fragment() {
     private var _webView: WebView? = null
     private lateinit var urlEditText: EditText
     private lateinit var progressBar: ProgressBar
+    private lateinit var urlBarContainer: View
+    private lateinit var bottomBar: View
     private lateinit var btnBack: ImageView
     private lateinit var btnForward: ImageView
     private lateinit var btnReload: ImageView
@@ -45,7 +51,6 @@ class BrowserFragment : Fragment() {
     private lateinit var btnSettings: ImageView
     private lateinit var tabCountBadge: TextView
 
-    // URL action strip
     private lateinit var urlActionsStrip: HorizontalScrollView
     private lateinit var chipClear: TextView
     private lateinit var chipCopy: TextView
@@ -56,8 +61,8 @@ class BrowserFragment : Fragment() {
     private var tabId: String = ""
     private val webView get() = _webView!!
     private var isNewTabPage = false
+    private var currentToolbarTint = Color.TRANSPARENT
 
-    // Chrome for Android UA — prevents Google suspicious-activity
     private val CHROME_UA =
         "Mozilla/5.0 (Linux; Android 14; Pixel 8 Pro) " +
         "AppleWebKit/537.36 (KHTML, like Gecko) " +
@@ -76,9 +81,8 @@ class BrowserFragment : Fragment() {
         }
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
-    ): View? = inflater.inflate(R.layout.fragment_browser, container, false)
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? =
+        inflater.inflate(R.layout.fragment_browser, container, false)
 
     @SuppressLint("SetJavaScriptEnabled")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -90,6 +94,8 @@ class BrowserFragment : Fragment() {
         _webView         = view.findViewById(R.id.web_view)
         urlEditText      = view.findViewById(R.id.url_edit_text)
         progressBar      = view.findViewById(R.id.progress_bar)
+        urlBarContainer  = view.findViewById(R.id.url_bar_container)
+        bottomBar        = view.findViewById(R.id.bottom_bar)
         btnBack          = view.findViewById(R.id.btn_back)
         btnForward       = view.findViewById(R.id.btn_forward)
         btnReload        = view.findViewById(R.id.btn_reload)
@@ -115,40 +121,37 @@ class BrowserFragment : Fragment() {
         setupBottomBar()
         refreshTabCount()
 
-        val urlToLoad = if (initialUrl.isBlank() || initialUrl == "about:blank") NEW_TAB_URL
-                        else initialUrl
+        val urlToLoad = if (initialUrl.isBlank() || initialUrl == "about:blank") NEW_TAB_URL else initialUrl
         loadUrl(urlToLoad)
     }
-
-    // ── WebView setup ─────────────────────────────────────────────────────────
 
     @SuppressLint("SetJavaScriptEnabled")
     private fun setupWebView() {
         val activity = requireActivity() as MainActivity
 
         webView.settings.apply {
-            javaScriptEnabled         = true
-            domStorageEnabled         = true
-            loadWithOverviewMode      = true
-            useWideViewPort           = true
-            builtInZoomControls       = true
-            displayZoomControls       = false
+            javaScriptEnabled = true
+            domStorageEnabled = true
+            loadWithOverviewMode = true
+            useWideViewPort = true
+            builtInZoomControls = true
+            displayZoomControls = false
             setSupportZoom(true)
-            allowFileAccess           = true
-            allowContentAccess        = true
+            allowFileAccess = true
+            allowContentAccess = true
             setSupportMultipleWindows(false)
-            cacheMode                 = WebSettings.LOAD_DEFAULT
-            mixedContentMode          = WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE
+            cacheMode = WebSettings.LOAD_DEFAULT
+            mixedContentMode = WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE
             mediaPlaybackRequiresUserGesture = true
-            databaseEnabled           = true
-            userAgentString           = CHROME_UA
+            databaseEnabled = true
+            userAgentString = CHROME_UA
         }
 
         webView.addJavascriptInterface(
             NewTabBridge(
                 historyManager = activity.historyManager,
-                onNavigate     = { url -> requireActivity().runOnUiThread { loadUrl(url) } },
-                onFocusUrlBar  = { requireActivity().runOnUiThread { focusUrlBar() } }
+                onNavigate = { url -> requireActivity().runOnUiThread { loadUrl(url) } },
+                onFocusUrlBar = { requireActivity().runOnUiThread { focusUrlBar() } }
             ),
             "Android"
         )
@@ -170,8 +173,7 @@ class BrowserFragment : Fragment() {
                 super.onPageStarted(view, url, favicon)
                 isNewTabPage = (url == NEW_TAB_URL)
                 url?.let {
-                    if (!urlEditText.isFocused && !isNewTabPage)
-                        urlEditText.setText(UrlUtils.formatUrl(it))
+                    if (!urlEditText.isFocused && !isNewTabPage) urlEditText.setText(UrlUtils.formatUrl(it))
                     else if (isNewTabPage) {
                         urlEditText.setText("")
                         urlEditText.hint = "Search or enter address"
@@ -179,6 +181,7 @@ class BrowserFragment : Fragment() {
                     activity.tabManager.updateTab(tabId, url = it, isLoading = true)
                 }
                 progressBar.visibility = View.VISIBLE
+                progressBar.progress = 0
                 btnReload.setImageResource(R.drawable.ic_stop)
                 updateNavState()
             }
@@ -186,6 +189,7 @@ class BrowserFragment : Fragment() {
             override fun onPageFinished(view: WebView?, url: String?) {
                 super.onPageFinished(view, url)
                 progressBar.visibility = View.GONE
+                progressBar.progress = 0
                 btnReload.setImageResource(R.drawable.ic_reload)
                 url?.let {
                     if (!isNewTabPage) {
@@ -198,8 +202,10 @@ class BrowserFragment : Fragment() {
                         )
                         activity.historyManager.addEntry(it, title)
                         updateBookmarkIcon()
+                        updateBottomBarTint(it)
                     } else {
                         activity.tabManager.updateTab(tabId, title = "New Tab", isLoading = false, url = "")
+                        resetBottomBarTint()
                     }
                 }
                 updateNavState()
@@ -230,14 +236,20 @@ class BrowserFragment : Fragment() {
                 if (!isNewTabPage) title?.let { activity.tabManager.updateTab(tabId, title = it) }
             }
         }
-    }
 
-    // ── URL bar ───────────────────────────────────────────────────────────────
+        webView.setOnScrollChangeListener { _, _, scrollY, _, oldScrollY ->
+            val delta = scrollY - oldScrollY
+            if (!isNewTabPage) {
+                val activeUrl = currentUrl()
+                if (delta > 6) updateBottomBarTint(activeUrl)
+                if (delta < -6) updateBottomBarTint(activeUrl)
+            }
+        }
+    }
 
     private fun setupUrlBar() {
         urlEditText.setOnEditorActionListener { _, actionId, event ->
-            if (actionId == EditorInfo.IME_ACTION_GO ||
-                (event?.keyCode == KeyEvent.KEYCODE_ENTER && event.action == KeyEvent.ACTION_DOWN)) {
+            if (actionId == EditorInfo.IME_ACTION_GO || (event?.keyCode == KeyEvent.KEYCODE_ENTER && event.action == KeyEvent.ACTION_DOWN)) {
                 processInput(urlEditText.text.toString())
                 hideKeyboardAndStrip(); true
             } else false
@@ -259,14 +271,11 @@ class BrowserFragment : Fragment() {
         }
     }
 
-    // ── URL action strip ──────────────────────────────────────────────────────
-
     private fun setupUrlActions() {
         chipClear.setOnClickListener {
             urlEditText.setText("")
             urlEditText.requestFocus()
         }
-
         chipCopy.setOnClickListener {
             val url = currentUrl()
             if (url.isNotBlank()) {
@@ -274,7 +283,6 @@ class BrowserFragment : Fragment() {
                 Toast.makeText(requireContext(), "Link copied", Toast.LENGTH_SHORT).show()
             }
         }
-
         chipPaste.setOnClickListener {
             val text = pasteFromClipboard()
             if (text != null) {
@@ -282,7 +290,6 @@ class BrowserFragment : Fragment() {
                 urlEditText.setSelection(text.length)
             }
         }
-
         chipPasteGo.setOnClickListener {
             val text = pasteFromClipboard()
             if (text != null) {
@@ -291,7 +298,6 @@ class BrowserFragment : Fragment() {
                 hideKeyboardAndStrip()
             }
         }
-
         chipShareLink.setOnClickListener {
             val activity = requireActivity() as MainActivity
             val tab = activity.tabManager.getTabById(tabId)
@@ -310,9 +316,7 @@ class BrowserFragment : Fragment() {
         if (urlActionsStrip.visibility == View.VISIBLE) return
         urlActionsStrip.visibility = View.VISIBLE
         urlActionsStrip.startAnimation(
-            android.view.animation.TranslateAnimation(0f, 0f, -urlActionsStrip.height.toFloat().coerceAtLeast(40f), 0f).apply {
-                duration = 180
-            }
+            TranslateAnimation(0f, 0f, -urlActionsStrip.height.toFloat().coerceAtLeast(40f), 0f).apply { duration = 180 }
         )
     }
 
@@ -343,38 +347,29 @@ class BrowserFragment : Fragment() {
 
     private fun processInput(input: String) {
         val (isUrl, processed) = UrlUtils.smartUrlProcess(input.trim())
-        loadUrl(if (isUrl) processed
-                else (requireActivity() as MainActivity).settingsManager.getSearchUrl(processed))
+        loadUrl(if (isUrl) processed else (requireActivity() as MainActivity).settingsManager.getSearchUrl(processed))
     }
 
     fun loadUrl(url: String) { _webView?.loadUrl(url) }
 
-    // ── Navigation ────────────────────────────────────────────────────────────
-
     private fun setupNavigation() {
-        btnBack.setOnClickListener {
-            if (!isNewTabPage && webView.canGoBack()) webView.goBack()
-        }
-        btnForward.setOnClickListener {
-            if (webView.canGoForward()) webView.goForward()
-        }
+        btnBack.setOnClickListener { if (!isNewTabPage && webView.canGoBack()) webView.goBack() }
+        btnForward.setOnClickListener { if (webView.canGoForward()) webView.goForward() }
         btnReload.setOnClickListener {
             if (isNewTabPage) return@setOnClickListener
             if (webView.progress in 1..99) webView.stopLoading() else webView.reload()
         }
     }
 
-    // ── Bottom bar ────────────────────────────────────────────────────────────
-
     private fun setupBottomBar() {
-        btnBookmark.setOnClickListener     { toggleBookmark() }
+        btnBookmark.setOnClickListener { toggleBookmark() }
         btnBookmark.setOnLongClickListener { (requireActivity() as MainActivity).showBookmarks(); true }
-        btnHistory.setOnClickListener      { (requireActivity() as MainActivity).showHistory() }
-        btnTabs.setOnClickListener         { (requireActivity() as MainActivity).showTabSwitcher() }
-        btnDownloads.setOnClickListener    { (requireActivity() as MainActivity).showDownloads() }
-        btnPrivacy.setOnClickListener      { (requireActivity() as MainActivity).showPrivacyReport() }
-        btnSettings.setOnClickListener     { (requireActivity() as MainActivity).showSettings() }
-        btnShare.setOnClickListener        { shareCurrentPage() }
+        btnHistory.setOnClickListener { (requireActivity() as MainActivity).showHistory() }
+        btnTabs.setOnClickListener { (requireActivity() as MainActivity).showTabSwitcher() }
+        btnDownloads.setOnClickListener { (requireActivity() as MainActivity).showDownloads() }
+        btnPrivacy.setOnClickListener { (requireActivity() as MainActivity).showPrivacyReport() }
+        btnSettings.setOnClickListener { (requireActivity() as MainActivity).showSettings() }
+        btnShare.setOnClickListener { shareCurrentPage() }
     }
 
     private fun toggleBookmark() {
@@ -394,14 +389,14 @@ class BrowserFragment : Fragment() {
     }
 
     private fun updateNavState() {
-        val canBack    = !isNewTabPage && (_webView?.canGoBack()    ?: false)
+        val canBack = !isNewTabPage && (_webView?.canGoBack() ?: false)
         val canForward = !isNewTabPage && (_webView?.canGoForward() ?: false)
-        btnBack.alpha    = if (canBack)    1.0f else 0.28f
+        btnBack.alpha = if (canBack) 1.0f else 0.28f
         btnForward.alpha = if (canForward) 1.0f else 0.28f
-        btnBack.isEnabled    = canBack
+        btnBack.isEnabled = canBack
         btnForward.isEnabled = canForward
-        btnReload.alpha      = if (isNewTabPage) 0.28f else 1.0f
-        btnReload.isEnabled  = !isNewTabPage
+        btnReload.alpha = if (isNewTabPage) 0.28f else 1.0f
+        btnReload.isEnabled = !isNewTabPage
     }
 
     fun refreshTabCount() {
@@ -444,5 +439,32 @@ class BrowserFragment : Fragment() {
         _webView?.destroy()
         _webView = null
         super.onDestroyView()
+    }
+
+    private fun updateBottomBarTint(url: String) {
+        val color = websiteTint(url)
+        if (color == currentToolbarTint) return
+        currentToolbarTint = color
+        val drawable = GradientDrawable().apply {
+            shape = GradientDrawable.RECTANGLE
+            cornerRadius = resources.displayMetrics.density * 24f
+            setColor(color)
+            setStroke((resources.displayMetrics.density).toInt(), Color.argb(38, 255, 255, 255))
+        }
+        bottomBar.background = drawable
+    }
+
+    private fun resetBottomBarTint() {
+        currentToolbarTint = Color.TRANSPARENT
+        bottomBar.setBackgroundResource(R.drawable.bottom_bar_background)
+    }
+
+    private fun websiteTint(url: String): Int {
+        val host = try { Uri.parse(url).host ?: "" } catch (_: Exception) { "" }
+        val hash = host.hashCode()
+        val r = 24 + (hash shr 16 and 0x3F)
+        val g = 16 + (hash shr 8 and 0x3F)
+        val b = 16 + (hash and 0x3F)
+        return Color.argb(242, r, g, b)
     }
 }

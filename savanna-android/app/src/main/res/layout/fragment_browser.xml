@@ -1,18 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
-  Savanna Browser — iOS 26 Safari Liquid Glass layout
-  • WebView has explicit top/bottom margins so bars never cover content
-  • Top bar buttons use glass circles (back, forward, reload, share)
-  • Bottom bar buttons use plain ripple backgrounds (no oval shapes)
-  • URL action strip slides in below the top bar when URL bar is focused
--->
-<FrameLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/bg_primary">
 
-    <!-- WebView — pushed down from top bar and up from bottom bar -->
     <android.webkit.WebView
         android:id="@+id/web_view"
         android:layout_width="match_parent"
@@ -20,7 +11,6 @@
         android:layout_marginTop="64dp"
         android:layout_marginBottom="72dp" />
 
-    <!-- Page-load progress bar — lives at the very top of the window -->
     <ProgressBar
         android:id="@+id/progress_bar"
         style="@android:style/Widget.ProgressBar.Horizontal"
@@ -30,12 +20,9 @@
         android:progressDrawable="@drawable/progress_bar_drawable"
         android:max="100"
         android:progress="0"
+        android:indeterminate="false"
         android:visibility="gone" />
 
-    <!-- ════════════════════════════════════════════════════════
-         TOP BAR — iOS 26 Safari navigation bar
-         Back · Forward │ Glass URL pill │ Reload · Share
-         ════════════════════════════════════════════════════════ -->
     <LinearLayout
         android:id="@+id/url_bar_container"
         android:layout_width="match_parent"
@@ -49,7 +36,6 @@
         android:paddingBottom="10dp"
         android:background="#F2000000">
 
-        <!-- Back -->
         <ImageView
             android:id="@+id/btn_back"
             android:layout_width="42dp"
@@ -61,7 +47,6 @@
             android:contentDescription="@string/go_back"
             android:alpha="0.28" />
 
-        <!-- Forward -->
         <ImageView
             android:id="@+id/btn_forward"
             android:layout_width="42dp"
@@ -74,7 +59,6 @@
             android:alpha="0.28"
             android:layout_marginStart="2dp" />
 
-        <!-- Glass URL pill -->
         <EditText
             android:id="@+id/url_edit_text"
             android:layout_width="0dp"
@@ -89,7 +73,6 @@
             android:drawablePadding="8dp"
             android:importantForAutofill="no" />
 
-        <!-- Reload / Stop -->
         <ImageView
             android:id="@+id/btn_reload"
             android:layout_width="42dp"
@@ -100,7 +83,6 @@
             android:scaleType="centerInside"
             android:contentDescription="@string/reload" />
 
-        <!-- Share -->
         <ImageView
             android:id="@+id/btn_share"
             android:layout_width="42dp"
@@ -113,11 +95,6 @@
             android:contentDescription="Share" />
     </LinearLayout>
 
-    <!-- ════════════════════════════════════════════════════════
-         URL ACTION STRIP
-         Slides in just below the top bar when URL bar is focused.
-         Chips: Clear · Copy Link · Paste · Paste & Go · Share Link
-         ════════════════════════════════════════════════════════ -->
     <HorizontalScrollView
         android:id="@+id/url_actions_strip"
         android:layout_width="match_parent"
@@ -139,78 +116,15 @@
             android:orientation="horizontal"
             android:gravity="center_vertical">
 
-            <TextView
-                android:id="@+id/chip_clear"
-                android:layout_width="wrap_content"
-                android:layout_height="34dp"
-                android:text="Clear"
-                android:gravity="center"
-                android:paddingStart="14dp"
-                android:paddingEnd="14dp"
-                android:textColor="@color/text_primary"
-                android:textSize="13sp"
-                android:background="@drawable/action_chip_background"
-                android:layout_marginEnd="8dp" />
-
-            <TextView
-                android:id="@+id/chip_copy"
-                android:layout_width="wrap_content"
-                android:layout_height="34dp"
-                android:text="Copy Link"
-                android:gravity="center"
-                android:paddingStart="14dp"
-                android:paddingEnd="14dp"
-                android:textColor="@color/text_primary"
-                android:textSize="13sp"
-                android:background="@drawable/action_chip_background"
-                android:layout_marginEnd="8dp" />
-
-            <TextView
-                android:id="@+id/chip_paste"
-                android:layout_width="wrap_content"
-                android:layout_height="34dp"
-                android:text="Paste"
-                android:gravity="center"
-                android:paddingStart="14dp"
-                android:paddingEnd="14dp"
-                android:textColor="@color/text_primary"
-                android:textSize="13sp"
-                android:background="@drawable/action_chip_background"
-                android:layout_marginEnd="8dp" />
-
-            <TextView
-                android:id="@+id/chip_paste_go"
-                android:layout_width="wrap_content"
-                android:layout_height="34dp"
-                android:text="Paste &amp; Go"
-                android:gravity="center"
-                android:paddingStart="14dp"
-                android:paddingEnd="14dp"
-                android:textColor="@color/text_primary"
-                android:textSize="13sp"
-                android:background="@drawable/action_chip_background"
-                android:layout_marginEnd="8dp" />
-
-            <TextView
-                android:id="@+id/chip_share_link"
-                android:layout_width="wrap_content"
-                android:layout_height="34dp"
-                android:text="Share Link"
-                android:gravity="center"
-                android:paddingStart="14dp"
-                android:paddingEnd="14dp"
-                android:textColor="@color/text_primary"
-                android:textSize="13sp"
-                android:background="@drawable/action_chip_background" />
+            <TextView android:id="@+id/chip_clear" android:layout_width="wrap_content" android:layout_height="34dp" android:text="Clear" android:gravity="center" android:paddingStart="14dp" android:paddingEnd="14dp" android:textColor="@color/text_primary" android:textSize="13sp" android:background="@drawable/action_chip_background" android:layout_marginEnd="8dp" />
+            <TextView android:id="@+id/chip_copy" android:layout_width="wrap_content" android:layout_height="34dp" android:text="Copy Link" android:gravity="center" android:paddingStart="14dp" android:paddingEnd="14dp" android:textColor="@color/text_primary" android:textSize="13sp" android:background="@drawable/action_chip_background" android:layout_marginEnd="8dp" />
+            <TextView android:id="@+id/chip_paste" android:layout_width="wrap_content" android:layout_height="34dp" android:text="Paste" android:gravity="center" android:paddingStart="14dp" android:paddingEnd="14dp" android:textColor="@color/text_primary" android:textSize="13sp" android:background="@drawable/action_chip_background" android:layout_marginEnd="8dp" />
+            <TextView android:id="@+id/chip_paste_go" android:layout_width="wrap_content" android:layout_height="34dp" android:text="Paste &amp; Go" android:gravity="center" android:paddingStart="14dp" android:paddingEnd="14dp" android:textColor="@color/text_primary" android:textSize="13sp" android:background="@drawable/action_chip_background" android:layout_marginEnd="8dp" />
+            <TextView android:id="@+id/chip_share_link" android:layout_width="wrap_content" android:layout_height="34dp" android:text="Share Link" android:gravity="center" android:paddingStart="14dp" android:paddingEnd="14dp" android:textColor="@color/text_primary" android:textSize="13sp" android:background="@drawable/action_chip_background" />
 
         </LinearLayout>
     </HorizontalScrollView>
 
-    <!-- ════════════════════════════════════════════════════════
-         BOTTOM DOCK — iOS 26 Safari 5-button toolbar
-         Bookmark | History | Tabs+badge | Downloads | Settings
-         Plain ripple backgrounds — no oval/ellipse shapes.
-         ════════════════════════════════════════════════════════ -->
     <LinearLayout
         android:id="@+id/bottom_bar"
         android:layout_width="match_parent"
@@ -225,91 +139,15 @@
         android:paddingBottom="12dp"
         android:elevation="8dp">
 
-        <ImageView
-            android:id="@+id/btn_bookmark"
-            android:layout_width="0dp"
-            android:layout_height="48dp"
-            android:layout_weight="1"
-            android:src="@drawable/ic_bookmark"
-            android:background="@drawable/button_background"
-            android:padding="12dp"
-            android:scaleType="centerInside"
-            android:contentDescription="@string/bookmarks" />
-
-        <ImageView
-            android:id="@+id/btn_history"
-            android:layout_width="0dp"
-            android:layout_height="48dp"
-            android:layout_weight="1"
-            android:src="@drawable/ic_history"
-            android:background="@drawable/button_background"
-            android:padding="12dp"
-            android:scaleType="centerInside"
-            android:contentDescription="@string/history" />
-
-        <!-- Tabs with count badge -->
-        <FrameLayout
-            android:id="@+id/btn_tabs_container"
-            android:layout_width="0dp"
-            android:layout_height="48dp"
-            android:layout_weight="1">
-
-            <ImageView
-                android:id="@+id/btn_tabs"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:src="@drawable/ic_tabs"
-                android:background="@drawable/button_background"
-                android:padding="12dp"
-                android:scaleType="centerInside"
-                android:contentDescription="@string/tabs" />
-
-            <TextView
-                android:id="@+id/tab_count_badge"
-                android:layout_width="17dp"
-                android:layout_height="17dp"
-                android:layout_gravity="top|end"
-                android:layout_marginTop="2dp"
-                android:layout_marginEnd="6dp"
-                android:background="@drawable/badge_background"
-                android:gravity="center"
-                android:textColor="@color/text_primary"
-                android:textSize="8sp"
-                android:textStyle="bold"
-                android:text="1" />
+        <ImageView android:id="@+id/btn_bookmark" android:layout_width="0dp" android:layout_height="48dp" android:layout_weight="1" android:src="@drawable/ic_bookmark" android:background="@drawable/button_background" android:padding="12dp" android:scaleType="centerInside" android:contentDescription="@string/bookmarks" />
+        <ImageView android:id="@+id/btn_history" android:layout_width="0dp" android:layout_height="48dp" android:layout_weight="1" android:src="@drawable/ic_history" android:background="@drawable/button_background" android:padding="12dp" android:scaleType="centerInside" android:contentDescription="@string/history" />
+        <FrameLayout android:id="@+id/btn_tabs_container" android:layout_width="0dp" android:layout_height="48dp" android:layout_weight="1">
+            <ImageView android:id="@+id/btn_tabs" android:layout_width="match_parent" android:layout_height="match_parent" android:src="@drawable/ic_tabs" android:background="@drawable/button_background" android:padding="12dp" android:scaleType="centerInside" android:contentDescription="@string/tabs" />
+            <TextView android:id="@+id/tab_count_badge" android:layout_width="17dp" android:layout_height="17dp" android:layout_gravity="top|end" android:layout_marginTop="2dp" android:layout_marginEnd="6dp" android:background="@drawable/badge_background" android:gravity="center" android:textColor="@color/text_primary" android:textSize="8sp" android:textStyle="bold" android:text="1" />
         </FrameLayout>
-
-        <ImageView
-            android:id="@+id/btn_downloads"
-            android:layout_width="0dp"
-            android:layout_height="48dp"
-            android:layout_weight="1"
-            android:src="@drawable/ic_download"
-            android:background="@drawable/button_background"
-            android:padding="12dp"
-            android:scaleType="centerInside"
-            android:contentDescription="Downloads" />
-
-        <!-- Privacy: hidden but keeping ID for code refs -->
-        <ImageView
-            android:id="@+id/btn_privacy"
-            android:layout_width="0dp"
-            android:layout_height="48dp"
-            android:layout_weight="0"
-            android:visibility="gone"
-            android:src="@drawable/ic_shield"
-            android:contentDescription="@string/privacy_report" />
-
-        <ImageView
-            android:id="@+id/btn_settings"
-            android:layout_width="0dp"
-            android:layout_height="48dp"
-            android:layout_weight="1"
-            android:src="@drawable/ic_settings"
-            android:background="@drawable/button_background"
-            android:padding="12dp"
-            android:scaleType="centerInside"
-            android:contentDescription="@string/settings" />
+        <ImageView android:id="@+id/btn_downloads" android:layout_width="0dp" android:layout_height="48dp" android:layout_weight="1" android:src="@drawable/ic_download" android:background="@drawable/button_background" android:padding="12dp" android:scaleType="centerInside" android:contentDescription="Downloads" />
+        <ImageView android:id="@+id/btn_privacy" android:layout_width="0dp" android:layout_height="48dp" android:layout_weight="0" android:visibility="gone" android:src="@drawable/ic_shield" android:contentDescription="@string/privacy_report" />
+        <ImageView android:id="@+id/btn_settings" android:layout_width="0dp" android:layout_height="48dp" android:layout_weight="1" android:src="@drawable/ic_settings" android:background="@drawable/button_background" android:padding="12dp" android:scaleType="centerInside" android:contentDescription="@string/settings" />
 
     </LinearLayout>
 
