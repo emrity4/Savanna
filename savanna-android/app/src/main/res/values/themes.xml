@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="Theme.Savanna" parent="Theme.Material3.Dark.NoActionBar">
-        <!-- OLED black everywhere -->
+    <style name="Theme.Savanna" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <item name="colorPrimary">#FFFFFFFF</item>
         <item name="colorPrimaryDark">#FF000000</item>
         <item name="colorAccent">#FFFFFFFF</item>
@@ -15,22 +14,15 @@
         <item name="android:statusBarColor">#FF000000</item>
         <item name="android:navigationBarColor">#FF000000</item>
         <item name="android:windowLightStatusBar">false</item>
-        <!-- SF Pro: place SF-Pro-Text-Regular.ttf etc in res/font/ and
-             set android:fontFamily="@font/sf_pro" to activate system-wide -->
     </style>
 
-    <!--
-      Glass BottomSheet theme — TabSwitcherFragment (BottomSheetDialogFragment)
-      Transparent sheet background so our glass drawable shows through.
-      Light dim because blur-behind handles the visual depth on API 31+.
-    -->
-    <style name="GlassBottomSheetDialog" parent="Theme.Material3.BottomSheetDialog">
+    <style name="GlassBottomSheetDialog" parent="Theme.MaterialComponents.BottomSheetDialog">
         <item name="android:backgroundDimAmount">0.28</item>
         <item name="bottomSheetStyle">@style/GlassBottomSheetStyle</item>
         <item name="android:windowIsFloating">false</item>
     </style>
 
-    <style name="GlassBottomSheetStyle" parent="Widget.Material3.BottomSheet.Modal">
+    <style name="GlassBottomSheetStyle" parent="Widget.MaterialComponents.BottomSheet.Modal">
         <item name="android:background">@android:color/transparent</item>
         <item name="backgroundTint">@android:color/transparent</item>
         <item name="android:elevation">0dp</item>

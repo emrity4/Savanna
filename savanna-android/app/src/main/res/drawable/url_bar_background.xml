@@ -1,59 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
-  iOS 26 Liquid Glass URL pill — resting state.
-  Pill shape, strong specular at top half, bright border.
--->
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
-
-    <!-- 1. Dark glass base -->
     <item>
         <shape android:shape="rectangle">
-            <solid android:color="#CC000000" />
+            <solid android:color="#DD000000" />
             <corners android:radius="12dp" />
         </shape>
     </item>
-
-    <!-- 2. Frosted white tint -->
     <item>
         <shape android:shape="rectangle">
-            <solid android:color="#1AFFFFFF" />
+            <solid android:color="#20FFFFFF" />
             <corners android:radius="12dp" />
         </shape>
     </item>
-
-    <!-- 3. Broad specular sweep — top half -->
-    <item android:bottom="50%">
+    <item>
         <shape android:shape="rectangle">
-            <gradient android:type="linear" android:angle="270"
-                android:startColor="#40FFFFFF" android:endColor="#00FFFFFF" />
-            <corners android:topLeftRadius="12dp" android:topRightRadius="12dp" />
+            <gradient android:type="linear" android:angle="270" android:startColor="#60FFFFFF" android:endColor="#00FFFFFF" />
+            <corners android:radius="12dp" />
         </shape>
     </item>
-
-    <!-- 4. Hot specular peak — top 25% -->
-    <item android:bottom="75%">
-        <shape android:shape="rectangle">
-            <gradient android:type="linear" android:angle="270"
-                android:startColor="#52FFFFFF" android:endColor="#00FFFFFF" />
-            <corners android:topLeftRadius="12dp" android:topRightRadius="12dp" />
-        </shape>
-    </item>
-
-    <!-- 5. Glass border -->
     <item>
         <shape android:shape="rectangle">
             <solid android:color="#00000000" />
-            <stroke android:width="1dp" android:color="#42FFFFFF" />
+            <stroke android:width="1.25dp" android:color="#66FFFFFF" />
             <corners android:radius="12dp" />
         </shape>
     </item>
-
-    <!-- 6. Top-edge specular line -->
-    <item android:bottom="96%">
-        <shape android:shape="rectangle">
-            <solid android:color="#68FFFFFF" />
-            <corners android:topLeftRadius="12dp" android:topRightRadius="12dp" />
-        </shape>
-    </item>
-
 </layer-list>

@@ -1,59 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
-  iOS 26 Liquid Glass URL pill — focused/active state.
-  Brighter border and even stronger specular when user is typing.
--->
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
-
-    <!-- 1. Slightly brighter dark base when focused -->
     <item>
         <shape android:shape="rectangle">
-            <solid android:color="#D5000000" />
+            <solid android:color="#E8000000" />
             <corners android:radius="12dp" />
         </shape>
     </item>
-
-    <!-- 2. Stronger frosted tint on focus -->
     <item>
         <shape android:shape="rectangle">
-            <solid android:color="#28FFFFFF" />
+            <solid android:color="#30FFFFFF" />
             <corners android:radius="12dp" />
         </shape>
     </item>
-
-    <!-- 3. Broad specular sweep -->
-    <item android:bottom="50%">
+    <item>
         <shape android:shape="rectangle">
-            <gradient android:type="linear" android:angle="270"
-                android:startColor="#48FFFFFF" android:endColor="#00FFFFFF" />
-            <corners android:topLeftRadius="12dp" android:topRightRadius="12dp" />
+            <gradient android:type="linear" android:angle="270" android:startColor="#78FFFFFF" android:endColor="#00FFFFFF" />
+            <corners android:radius="12dp" />
         </shape>
     </item>
-
-    <!-- 4. Hot specular peak -->
-    <item android:bottom="75%">
-        <shape android:shape="rectangle">
-            <gradient android:type="linear" android:angle="270"
-                android:startColor="#60FFFFFF" android:endColor="#00FFFFFF" />
-            <corners android:topLeftRadius="12dp" android:topRightRadius="12dp" />
-        </shape>
-    </item>
-
-    <!-- 5. Bright focus border (blue-tinted white for active state) -->
     <item>
         <shape android:shape="rectangle">
             <solid android:color="#00000000" />
-            <stroke android:width="1.5dp" android:color="#70FFFFFF" />
+            <stroke android:width="1.5dp" android:color="#90FFFFFF" />
             <corners android:radius="12dp" />
         </shape>
     </item>
-
-    <!-- 6. Top-edge specular line (even brighter on focus) -->
-    <item android:bottom="96%">
-        <shape android:shape="rectangle">
-            <solid android:color="#80FFFFFF" />
-            <corners android:topLeftRadius="12dp" android:topRightRadius="12dp" />
-        </shape>
-    </item>
-
 </layer-list>

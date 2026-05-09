@@ -1,51 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
-  iOS 26 Liquid Glass bottom dock.
-  Very dark base (near-opaque) + strong frosted tint + intense specular
-  at the top rounded edge — the "table edge" catching overhead light.
--->
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
-
-    <!-- 1. Near-opaque dark base -->
     <item>
         <shape android:shape="rectangle">
-            <solid android:color="#D8000000" />
+            <solid android:color="#E4000000" />
             <corners android:topLeftRadius="24dp" android:topRightRadius="24dp" />
         </shape>
     </item>
-
-    <!-- 2. Frosted white overlay (simulate blur reveal) -->
     <item>
         <shape android:shape="rectangle">
-            <solid android:color="#1EFFFFFF" />
+            <solid android:color="#24FFFFFF" />
             <corners android:topLeftRadius="24dp" android:topRightRadius="24dp" />
         </shape>
     </item>
-
-    <!-- 3. Broad specular sweep — top 35% of bar -->
-    <item android:bottom="65%">
+    <item>
         <shape android:shape="rectangle">
-            <gradient android:type="linear" android:angle="270"
-                android:startColor="#48FFFFFF" android:endColor="#00FFFFFF" />
+            <gradient android:type="linear" android:angle="270" android:startColor="#66FFFFFF" android:endColor="#00FFFFFF" />
             <corners android:topLeftRadius="24dp" android:topRightRadius="24dp" />
         </shape>
     </item>
-
-    <!-- 4. Hot specular peak — top 15% -->
-    <item android:bottom="85%">
+    <item>
         <shape android:shape="rectangle">
-            <gradient android:type="linear" android:angle="270"
-                android:startColor="#60FFFFFF" android:endColor="#00FFFFFF" />
+            <solid android:color="#00000000" />
+            <stroke android:width="1.25dp" android:color="#66FFFFFF" />
             <corners android:topLeftRadius="24dp" android:topRightRadius="24dp" />
         </shape>
     </item>
-
-    <!-- 5. Bright top-edge specular line -->
-    <item android:bottom="97%">
+    <item>
         <shape android:shape="rectangle">
-            <solid android:color="#75FFFFFF" />
+            <solid android:color="#9AFFFFFF" />
             <corners android:topLeftRadius="24dp" android:topRightRadius="24dp" />
+            <padding android:top="1dp" />
         </shape>
     </item>
-
 </layer-list>
