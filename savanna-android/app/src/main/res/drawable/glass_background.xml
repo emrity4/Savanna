@@ -2,32 +2,32 @@
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
     <item>
         <shape android:shape="rectangle">
-            <solid android:color="#E0000000" />
+            <solid android:color="#CC000000" />
             <corners android:radius="16dp" />
         </shape>
     </item>
     <item>
         <shape android:shape="rectangle">
-            <solid android:color="#22FFFFFF" />
+            <solid android:color="#14FFFFFF" />
             <corners android:radius="16dp" />
         </shape>
     </item>
     <item>
         <shape android:shape="rectangle">
-            <gradient android:type="linear" android:angle="270" android:startColor="#5AFFFFFF" android:endColor="#00FFFFFF" />
+            <gradient android:type="linear" android:angle="270" android:startColor="#26FFFFFF" android:endColor="#00FFFFFF" />
             <corners android:radius="16dp" />
         </shape>
     </item>
     <item>
         <shape android:shape="rectangle">
             <solid android:color="#00000000" />
-            <stroke android:width="1.25dp" android:color="#55FFFFFF" />
+            <stroke android:width="1dp" android:color="#35FFFFFF" />
             <corners android:radius="16dp" />
         </shape>
     </item>
     <item>
         <shape android:shape="rectangle">
-            <solid android:color="#88FFFFFF" />
+            <solid android:color="#45FFFFFF" />
             <corners android:topLeftRadius="16dp" android:topRightRadius="16dp" />
             <padding android:top="1dp" />
         </shape>

@@ -1,0 +1,41 @@
+The current implementation is close but not nearly exact enough. Please generate the complete code for these buttons using [React with Tailwind CSS / SwiftUI / plain HTML+CSS] (choose the relevant one).
+
+The buttons must match every aspect of the iOS 26 Safari glass buttons:
+
+### BASE GLASS SURFACE
+- Background: semi‑transparent white, approximately `rgba(255, 255, 255, 0.15)` over a vibrant, colourful background. The glass should lighten its background like real frosted glass.
+- Blur: a strong `backdrop‑filter: blur(30px)` combined with a subtle `saturate(1.8)` to amplify colours behind the glass (exactly like iOS). The blur must be progressive – larger buttons can have slightly more blur (e.g. 30‑40px) while smaller ones use 20‑25px.
+- The glass must feel layered, not flat. There should be a sense of depth, as if the button is a piece of physical glass floating above the content.
+
+### EDGE TREATMENT (BORDER)
+- A hairline border of 0.5‑1px that simulates a bevelled glass edge. Use a gradient border:
+  - Top/left: `rgba(255, 255, 255, 0.5)` → bright catch light
+  - Bottom/right: `rgba(255, 255, 255, 0.1)` or slightly darker to mimic the edge of glass
+- For SwiftUI: a `RoundedRectangle` stroke with a `LinearGradient`.
+- For CSS/Tailwind: use a pseudo‑element or a `border‑image` with the gradient. Alternatively, a subtle `box‑shadow` inset can help.
+
+### INNER HIGHLIGHTS & DEPTH
+- A soft inset shadow at the top edge (`0 1px 2px rgba(255,255,255,0.6)`) to create a rim light.
+- A deeper inset shadow at the bottom (`0 -1px 2px rgba(0,0,0,0.05)`) for internal shadow.
+- A delicate, almost imperceptible gradient overlay across the button surface (top‑left to bottom‑right): from `rgba(255,255,255,0.3)` to `rgba(255,255,255,0.05)`. This gives the glass a slight “curved” appearance.
+
+### OUTER SHADOWS (CAST SHADOW)
+- Multiple layered shadows that mimic a floating glass plane:
+  1. A tight, dark shadow close to the button: `0 2px 4px rgba(0,0,0,0.1)`
+  2. A softer, more spread shadow: `0 8px 16px rgba(0,0,0,0.08)`
+  3. A very diffuse ambient shadow: `0 20px 40px rgba(0,0,0,0.04)`
+- The shadows must be lifted and not muddy the glass. Ensure the blur of the shadow relates to the button’s elevation.
+
+### TEXT STYLING
+- Primary label: crisp white or a very light grey (`#FFFFFF` at 90% opacity) with a subtle text‑shadow to improve legibility on busy backgrounds. Use `text-shadow: 0px 1px 4px rgba(0,0,0,0.2)`.
+- Font: SF Pro (or system font), slightly bold (`font-weight: 500‑600`), with appropriate letter‑spacing (`‑0.01em`).
+- When the glass is over a very light background, the text should automatically adjust to darker tones – use `mix‑blend‑mode: difference` or a conditional style (if supported) to maintain contrast.
+
+### ROUNDED CORNERS
+- Fully continuous rounded corners (the “squircle” shape if possible, otherwise a high border‑radius like `20‑24px`). The curvature should match iOS 26’s rounded icon shapes.
+
+### INTERACTIVE STATES
+- Default: as described above.
+- Hover (web) / Pressed (mobile): The glass becomes slightly more opaque (`rgba(255,255,255,0.25)`) and the shadows shrink (the button looks like it’s being pushed down). Scale down to 97% with a smooth spring animation (duration ~0.2s).
+- Active/Selected: A subtle tint of the system accent colour bleeds into the glass via a secondary background `rgba(accentColor, 0.15)` and a matching inner glow.
+- Disabled: Reduce opacity of the whole button to 0.4, remove pointer events, blur slightly less.

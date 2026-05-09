@@ -13,7 +13,6 @@ import com.google.android.material.textfield.TextInputEditText
 import com.savanna.browser.MainActivity
 import com.savanna.browser.R
 import com.savanna.browser.manager.SettingsManager
-import java.io.File
 
 class SettingsFragment : Fragment() {
 
@@ -115,7 +114,6 @@ class SettingsFragment : Fragment() {
         android.webkit.CookieManager.getInstance().removeAllCookies(null)
         android.webkit.CookieManager.getInstance().flush()
         android.webkit.WebStorage.getInstance().deleteAllData()
-        activity.tabManager.getTabs().forEach { }
     }
 
     private fun getSearchEngineName(value: String) = when (value) {
