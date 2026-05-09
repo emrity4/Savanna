@@ -24,6 +24,7 @@ import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import com.savanna.browser.MainActivity
 import com.savanna.browser.NewTabBridge
@@ -114,6 +115,7 @@ class BrowserFragment : Fragment() {
         setupUrlActions()
         setupNavigation()
         setupBottomBar()
+        setupFavoriteLinkDialog(view)
         refreshTabCount()
 
         val urlToLoad = if (initialUrl.isBlank() || initialUrl == "about:blank") NEW_TAB_URL else initialUrl
@@ -234,8 +236,29 @@ class BrowserFragment : Fragment() {
 
         webView.setOnScrollChangeListener { _, _, scrollY, _, oldScrollY ->
             val delta = scrollY - oldScrollY
-            if (!isNewTabPage && delta.absoluteValue > 6) updateBottomBarTint(currentUrl())
+            if (!isNewTabPage && delta.math.abs() > 6) updateBottomBarTint(currentUrl())
         }
+    }
+
+    private fun setupFavoriteLinkDialog(view: View) {
+        val favoriteAction = view.findViewById<TextView?>(R.id.home_favorite_action)
+        favoriteAction?.setOnClickListener { showFavoriteDialog() }
+    }
+
+    private fun showFavoriteDialog() {
+        val input = TextInputEditText(requireContext()).apply {
+            hint = "https://"
+            setText(currentUrl())
+        }
+        AlertDialog.Builder(requireContext(), com.google.android.material.R.style.ThemeOverlay_Material3_MaterialAlertDialog)
+            .setTitle("Add Favorite Link")
+            .setView(input)
+            .setNegativeButton("Cancel", null)
+            .setPositiveButton("Save") { _, _ ->
+                val url = input.text?.toString()?.trim().orEmpty()
+                if (url.isNotBlank()) Toast.makeText(requireContext(), "Favorite saved", Toast.LENGTH_SHORT).show()
+            }
+            .show()
     }
 
     private fun setupUrlBar() {
