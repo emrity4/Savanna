@@ -1,30 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Liquid Glass URL bar — focused / active state -->
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
-
     <item>
         <shape android:shape="rectangle">
             <solid android:color="#E6000000" />
             <corners android:radius="12dp" />
         </shape>
     </item>
-
     <item>
         <shape android:shape="rectangle">
             <solid android:color="#1FFFFFFF" />
             <corners android:radius="12dp" />
         </shape>
     </item>
-
-    <item android:bottom="50%">
+    <item>
         <shape android:shape="rectangle">
             <gradient android:type="linear" android:angle="270"
                 android:startColor="#22FFFFFF" android:endColor="#00FFFFFF" />
             <corners android:topLeftRadius="12dp" android:topRightRadius="12dp" />
         </shape>
     </item>
-
-    <!-- Brighter border when focused -->
     <item>
         <shape android:shape="rectangle">
             <solid android:color="#00000000" />
@@ -32,5 +26,4 @@
             <corners android:radius="12dp" />
         </shape>
     </item>
-
 </layer-list>

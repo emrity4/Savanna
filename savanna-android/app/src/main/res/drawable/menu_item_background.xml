@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Liquid Glass row — tappable list item -->
 <ripple xmlns:android="http://schemas.android.com/apk/res/android"
     android:color="#33FFFFFF">
     <item>
@@ -16,11 +15,11 @@
                     <corners android:radius="14dp" />
                 </shape>
             </item>
-            <item android:bottom="52%">
+            <item>
                 <shape android:shape="rectangle">
                     <gradient android:type="linear" android:angle="270"
                         android:startColor="#16FFFFFF" android:endColor="#00FFFFFF" />
-                    <corners android:topLeftRadius="14dp" android:topRightRadius="14dp" />
+                    <corners android:radius="14dp" />
                 </shape>
             </item>
             <item>

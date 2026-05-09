@@ -1,43 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
-  Liquid Glass bottom navigation bar (iOS 26 style)
-  Floating dock with glass material
--->
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
-
-    <!-- Dark glass base with top-rounded corners -->
     <item>
         <shape android:shape="rectangle">
             <solid android:color="#CC000000" />
-            <corners
-                android:topLeftRadius="22dp"
-                android:topRightRadius="22dp" />
+            <corners android:topLeftRadius="22dp" android:topRightRadius="22dp" />
         </shape>
     </item>
-
-    <!-- White frosted overlay -->
     <item>
         <shape android:shape="rectangle">
             <solid android:color="#0DFFFFFF" />
             <corners android:topLeftRadius="22dp" android:topRightRadius="22dp" />
         </shape>
     </item>
-
-    <!-- Specular top-edge gradient -->
-    <item android:bottom="70%">
+    <item>
         <shape android:shape="rectangle">
             <gradient android:type="linear" android:angle="270"
                 android:startColor="#22FFFFFF" android:endColor="#00FFFFFF" />
             <corners android:topLeftRadius="22dp" android:topRightRadius="22dp" />
         </shape>
     </item>
-
-    <!-- Top border line (glass edge highlight) -->
-    <item android:bottom="96%">
+    <item>
         <shape android:shape="rectangle">
-            <solid android:color="#2FFFFFFF" />
+            <solid android:color="#00000000" />
+            <stroke android:width="0.75dp" android:color="#2FFFFFFF" />
             <corners android:topLeftRadius="22dp" android:topRightRadius="22dp" />
         </shape>
     </item>
-
 </layer-list>
