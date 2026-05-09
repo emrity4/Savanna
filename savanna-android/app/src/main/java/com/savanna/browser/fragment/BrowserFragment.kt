@@ -26,10 +26,12 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
+import com.google.android.material.textfield.TextInputEditText
 import com.savanna.browser.MainActivity
 import com.savanna.browser.NewTabBridge
 import com.savanna.browser.R
 import com.savanna.browser.util.UrlUtils
+import kotlin.math.abs
 
 class BrowserFragment : Fragment() {
 
@@ -236,7 +238,7 @@ class BrowserFragment : Fragment() {
 
         webView.setOnScrollChangeListener { _, _, scrollY, _, oldScrollY ->
             val delta = scrollY - oldScrollY
-            if (!isNewTabPage && delta.math.abs() > 6) updateBottomBarTint(currentUrl())
+            if (!isNewTabPage && abs(delta) > 6) updateBottomBarTint(currentUrl())
         }
     }
 
@@ -252,11 +254,20 @@ class BrowserFragment : Fragment() {
         }
         AlertDialog.Builder(requireContext(), com.google.android.material.R.style.ThemeOverlay_Material3_MaterialAlertDialog)
             .setTitle("Add Favorite Link")
-            .setView(input)
+            .setView(input as View)
             .setNegativeButton("Cancel", null)
-            .setPositiveButton("Save") { _, _ ->
-                val url = input.text?.toString()?.trim().orEmpty()
-                if (url.isNotBlank()) Toast.makeText(requireContext(), "Favorite saved", Toast.LENGTH_SHORT).show()
+            .setPositiveButton("Save", null)
+            .create()
+            .apply {
+                setOnShowListener {
+                    getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
+                        val url = input.text?.toString()?.trim().orEmpty()
+                        if (url.isNotBlank()) {
+                            Toast.makeText(requireContext(), "Favorite saved", Toast.LENGTH_SHORT).show()
+                            dismiss()
+                        }
+                    }
+                }
             }
             .show()
     }
