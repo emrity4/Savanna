@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  iOS Safari Bottom Bar — Material Blur Simulation
+  ================================================
+  Blur:  Simulated via layered translucent compositing
+  Tint:  White at 75% opacity overlaid on dark base
+  Border: 0.5dp solid hairline at top edge
+  Structure: Edge-to-edge, no rounded corners
+-->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- LAYER 1: Base dark underlay (matches OLED black) -->
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="#F2000000" />
+        </shape>
+    </item>
+
+    <!-- LAYER 2: White tint overlay at 75% opacity for material blur effect -->
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="#BFFFFFFF" />
+        </shape>
+    </item>
+
+    <!-- LAYER 3: Saturation boost layer — subtle cool tint -->
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="#0AFFFFFF" />
+        </shape>
+    </item>
+
+    <!-- LAYER 4: Top hairline separator — 0.5dp crisp white line -->
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="#55FFFFFF" />
+            <padding android:top="0.5dp" />
+        </shape>
+    </item>
+</layer-list>

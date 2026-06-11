@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  iOS Safari URL Capsule — Nested inside bottom bar
+  ================================================
+  Height:  44dp
+  Shape:   Full rounded ends (pill / capsule)
+  Tint:    Flat gray adaptive overlay
+  Border:  Subtle hairline
+-->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- LAYER 1: Base gray fill -->
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="#E5E5EA" />
+            <corners android:radius="22dp" />
+        </shape>
+    </item>
+
+    <!-- LAYER 2: Adaptive tint overlay (dark mode variant) -->
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="#1A1A1A" />
+            <corners android:radius="22dp" />
+        </shape>
+    </item>
+
+    <!-- LAYER 3: Subtle inner highlight for depth -->
+    <item>
+        <shape android:shape="rectangle">
+            <gradient
+                android:type="linear"
+                android:angle="270"
+                android:startColor="#18FFFFFF"
+                android:endColor="#00FFFFFF" />
+            <corners android:radius="22dp" />
+        </shape>
+    </item>
+
+    <!-- LAYER 4: Hairline border -->
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="#00000000" />
+            <stroke
+                android:width="0.5dp"
+                android:color="#30FFFFFF" />
+            <corners android:radius="22dp" />
+        </shape>
+    </item>
+</layer-list>

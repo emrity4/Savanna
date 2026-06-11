@@ -46,8 +46,6 @@ class BrowserFragment : Fragment() {
     private lateinit var btnBookmark: ImageView
     private lateinit var btnHistory: ImageView
     private lateinit var btnTabs: ImageView
-    private lateinit var btnDownloads: ImageView
-    private lateinit var btnPrivacy: ImageView
     private lateinit var btnSettings: ImageView
     private lateinit var tabCountBadge: TextView
     private lateinit var urlActionsStrip: HorizontalScrollView
@@ -101,8 +99,6 @@ class BrowserFragment : Fragment() {
         btnBookmark = view.findViewById(R.id.btn_bookmark)
         btnHistory = view.findViewById(R.id.btn_history)
         btnTabs = view.findViewById(R.id.btn_tabs)
-        btnDownloads = view.findViewById(R.id.btn_downloads)
-        btnPrivacy = view.findViewById(R.id.btn_privacy)
         btnSettings = view.findViewById(R.id.btn_settings)
         tabCountBadge = view.findViewById(R.id.tab_count_badge)
         urlActionsStrip = view.findViewById(R.id.url_actions_strip)
@@ -275,13 +271,11 @@ class BrowserFragment : Fragment() {
         }
         urlEditText.setOnFocusChangeListener { _, hasFocus ->
             if (hasFocus) {
-                urlEditText.setBackgroundResource(R.drawable.url_bar_focused)
                 val tab = (requireActivity() as MainActivity).tabManager.getTabById(tabId)
                 if (!isNewTabPage) tab?.let { urlEditText.setText(it.url) }
                 urlEditText.selectAll()
                 showActionsStrip()
             } else {
-                urlEditText.setBackgroundResource(R.drawable.url_bar_background)
                 if (isNewTabPage) { urlEditText.setText(""); return@setOnFocusChangeListener }
                 val tab = (requireActivity() as MainActivity).tabManager.getTabById(tabId)
                 tab?.let { urlEditText.setText(UrlUtils.formatUrl(it.url)) }
@@ -382,8 +376,6 @@ class BrowserFragment : Fragment() {
         btnBookmark.setOnLongClickListener { (requireActivity() as MainActivity).showBookmarks(); true }
         btnHistory.setOnClickListener { (requireActivity() as MainActivity).showHistory() }
         btnTabs.setOnClickListener { (requireActivity() as MainActivity).showTabSwitcher() }
-        btnDownloads.setOnClickListener { (requireActivity() as MainActivity).showDownloads() }
-        btnPrivacy.setOnClickListener { (requireActivity() as MainActivity).showPrivacyReport() }
         btnSettings.setOnClickListener { (requireActivity() as MainActivity).showSettings() }
         btnShare.setOnClickListener { shareCurrentPage() }
         chipShareLink.setOnLongClickListener { showFavoriteDialog(); true }
@@ -464,16 +456,14 @@ class BrowserFragment : Fragment() {
         currentToolbarTint = color
         val drawable = GradientDrawable().apply {
             shape = GradientDrawable.RECTANGLE
-            cornerRadius = resources.displayMetrics.density * 24f
             setColor(color)
-            setStroke((resources.displayMetrics.density).toInt(), Color.argb(38, 255, 255, 255))
         }
         bottomBar.background = drawable
     }
 
     private fun resetBottomBarTint() {
         currentToolbarTint = Color.TRANSPARENT
-        bottomBar.setBackgroundResource(R.drawable.bottom_bar_background)
+        bottomBar.setBackgroundResource(R.drawable.safari_bottom_bar)
     }
 
     private fun websiteTint(url: String): Int {
