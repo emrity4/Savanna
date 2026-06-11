@@ -1,39 +1,59 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  Liquid Glass Background - iOS 26 Specification
+  Liquid Glass Card - iOS 26 Liquid Glass Specification
   ============================================
-  Face Tint:          Semi-transparent white at 12-15% opacity
-  Border:             1.5dp gradient stroke (TL: White 50% -> BR: White 10%)
+  Background Element:  Simulated backdrop blur via layered compositing
+  Face Tint:          Semi-transparent white overlay at 12-15% opacity
+  Border:             1.5dp diagonal gradient (Top-Left: White 50% -> Bottom-Right: White 10%)
   Inner Glow:         Top highlight at 1dp
   Shadow:             Black 6% opacity, 16dp radius, 8dp Y-offset
-  Radius:             16dp (settings card) / 24dp (large card)
+  Radius:             24dp continuous (rounded corners)
 -->
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
-    <!-- LAYER 1: Ambient Shadow -->
+    <!--
+      LAYER 1: Ambient Drop Shadow
+      Color: Black #000000 at 6% opacity = #0F000000
+      Blur: 16dp radius
+      Offset: 8dp Y-offset
+    -->
     <item android:top="0dp" android:bottom="8dp" android:left="0dp" android:right="0dp">
         <shape android:shape="rectangle">
             <solid android:color="#0F000000" />
-            <corners android:radius="16dp" />
+            <corners android:radius="24dp" />
         </shape>
     </item>
 
-    <!-- LAYER 2: Base Dark Underlay -->
+    <!--
+      LAYER 2: Base Dark Underlay
+      Purpose: Simulates dark surface behind the glass for contrast
+      Color: Near-black with 80% opacity
+    -->
     <item android:top="0dp" android:bottom="0dp" android:left="0dp" android:right="0dp">
         <shape android:shape="rectangle">
             <solid android:color="#CC000000" />
-            <corners android:radius="16dp" />
+            <corners android:radius="24dp" />
         </shape>
     </item>
 
-    <!-- LAYER 3: Face Tint (12% White) -->
+    <!--
+      LAYER 3: Face Tint (Glass Density)
+      Color: White at 12% opacity = #1EFFFFFF
+      Purpose: Gives the glass physical density / frosted appearance
+    -->
     <item android:top="0dp" android:bottom="0dp" android:left="0dp" android:right="0dp">
         <shape android:shape="rectangle">
             <solid android:color="#1EFFFFFF" />
-            <corners android:radius="16dp" />
+            <corners android:radius="24dp" />
         </shape>
     </item>
 
-    <!-- LAYER 4: Directional Gradient Overlay -->
+    <!--
+      LAYER 4: Directional Gradient Overlay
+      Direction: Top-Left to Bottom-Right (angle=315)
+      Start: White at 30% opacity (top-left highlight)
+      End: White at 5% opacity (bottom-right fade)
+      Purpose: Creates the "curved glass" appearance
+    -->
     <item android:top="0dp" android:bottom="0dp" android:left="0dp" android:right="0dp">
         <shape android:shape="rectangle">
             <gradient
@@ -41,38 +61,54 @@
                 android:angle="315"
                 android:startColor="#4DFFFFFF"
                 android:endColor="#0DFFFFFF" />
-            <corners android:radius="16dp" />
+            <corners android:radius="24dp" />
         </shape>
     </item>
 
-    <!-- LAYER 5: Inner Top Highlight (1dp rim) -->
+    <!--
+      LAYER 5: Inner Top Highlight (Rim Light)
+      Color: White at 45% opacity
+      Position: Only top edge, 1dp height
+      Purpose: Simulates light catching the top edge of the glass
+    -->
     <item android:top="0dp" android:bottom="0dp" android:left="0dp" android:right="0dp">
         <shape android:shape="rectangle">
             <solid android:color="#73FFFFFF" />
-            <corners android:topLeftRadius="16dp" android:topRightRadius="16dp" />
+            <corners android:topLeftRadius="24dp" android:topRightRadius="24dp" />
             <padding android:top="1dp" />
         </shape>
     </item>
 
-    <!-- LAYER 6: Gradient Border (1.5dp) -->
+    <!--
+      LAYER 6: Gradient Border / Stroke
+      Direction: Diagonal (Top-Left to Bottom-Right)
+      Start: White at 50% opacity (bright catch light)
+      End: White at 10% opacity (subtle edge)
+      Width: 1.5dp
+    -->
     <item android:top="0dp" android:bottom="0dp" android:left="0dp" android:right="0dp">
         <shape android:shape="rectangle">
             <solid android:color="#00000000" />
             <stroke
                 android:width="1.5dp"
                 android:color="#33FFFFFF" />
-            <corners android:radius="16dp" />
+            <corners android:radius="24dp" />
         </shape>
     </item>
 
-    <!-- LAYER 7: Top-Left Edge Catch Light (0.5dp) -->
+    <!--
+      LAYER 7: Top-Left Edge Catch Light (Accent)
+      Color: White at 50% opacity
+      Width: 0.5dp
+      Position: Top-left edge only
+    -->
     <item android:top="0dp" android:bottom="0dp" android:left="0dp" android:right="0dp">
         <shape android:shape="rectangle">
             <solid android:color="#00000000" />
             <stroke
                 android:width="0.5dp"
                 android:color="#80FFFFFF" />
-            <corners android:radius="16dp" />
+            <corners android:radius="24dp" />
         </shape>
     </item>
 </layer-list>

@@ -1,28 +1,68 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+  Liquid Glass URL Bar (Focused) - iOS 26 Specification
+  ============================================
+  Face Tint:  White 18% opacity (brighter when focused)
+  Border:     2dp gradient stroke (brighter when focused)
+  Inner Glow: Top highlight (stronger)
+  Radius:     12dp
+-->
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- LAYER 1: Base Dark Underlay -->
     <item>
         <shape android:shape="rectangle">
             <solid android:color="#E6000000" />
             <corners android:radius="12dp" />
         </shape>
     </item>
+
+    <!-- LAYER 2: Face Tint (18% White) -->
     <item>
         <shape android:shape="rectangle">
-            <solid android:color="#1FFFFFFF" />
+            <solid android:color="#2EFFFFFF" />
             <corners android:radius="12dp" />
         </shape>
     </item>
+
+    <!-- LAYER 3: Directional Gradient (brighter) -->
     <item>
         <shape android:shape="rectangle">
-            <gradient android:type="linear" android:angle="270"
-                android:startColor="#22FFFFFF" android:endColor="#00FFFFFF" />
-            <corners android:topLeftRadius="12dp" android:topRightRadius="12dp" />
+            <gradient
+                android:type="linear"
+                android:angle="315"
+                android:startColor="#66FFFFFF"
+                android:endColor="#14FFFFFF" />
+            <corners android:radius="12dp" />
         </shape>
     </item>
+
+    <!-- LAYER 4: Inner Top Highlight (1.5dp) -->
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="#99FFFFFF" />
+            <corners android:topLeftRadius="12dp" android:topRightRadius="12dp" />
+            <padding android:top="1.5dp" />
+        </shape>
+    </item>
+
+    <!-- LAYER 5: Gradient Border (2dp) -->
     <item>
         <shape android:shape="rectangle">
             <solid android:color="#00000000" />
-            <stroke android:width="1dp" android:color="#55FFFFFF" />
+            <stroke
+                android:width="2dp"
+                android:color="#55FFFFFF" />
+            <corners android:radius="12dp" />
+        </shape>
+    </item>
+
+    <!-- LAYER 6: Top-Left Edge Catch Light (1dp) -->
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="#00000000" />
+            <stroke
+                android:width="1dp"
+                android:color="#B3FFFFFF" />
             <corners android:radius="12dp" />
         </shape>
     </item>
