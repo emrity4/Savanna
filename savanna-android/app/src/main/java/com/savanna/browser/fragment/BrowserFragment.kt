@@ -281,16 +281,12 @@ class BrowserFragment : Fragment() {
             override fun onReceivedTitle(view: WebView?, title: String?) {
                 if (!isNewTabPage) title?.let { activity.tabManager.updateTab(tabId, title = it) }
             }
-            override fun onFindResultReceived(
-                activeMatchOrdinal: Int, numberOfMatches: Int, isDone: Boolean
-            ) {
-                if (isDone && isFindVisible) {
-                    if (numberOfMatches > 0) {
-                        findCount.text = "${activeMatchOrdinal + 1}/$numberOfMatches"
-                    } else {
-                        findCount.text = "0/0"
-                    }
-                }
+        }
+
+        webView.setFindListener { activeMatchOrdinal, numberOfMatches, isDone ->
+            if (isDone && isFindVisible) {
+                findCount.text = if (numberOfMatches > 0)
+                    "${activeMatchOrdinal + 1}/$numberOfMatches" else "0/0"
             }
         }
 
