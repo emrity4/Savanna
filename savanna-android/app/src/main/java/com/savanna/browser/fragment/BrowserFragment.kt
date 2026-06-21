@@ -49,9 +49,8 @@ class BrowserFragment : Fragment() {
     private lateinit var btnForward: ImageView
     private lateinit var btnShare: ImageView
     private lateinit var btnBookmark: ImageView
-    private lateinit var btnTabs: ImageView
+    private lateinit var btnTabs: TextView
     private lateinit var btnSettings: ImageView
-    private lateinit var tabCountBadge: TextView
     private lateinit var urlActionsStrip: HorizontalScrollView
     private lateinit var chipClear: TextView
     private lateinit var chipCopy: TextView
@@ -83,11 +82,13 @@ class BrowserFragment : Fragment() {
     private val webView get() = _webView!!
     private var isNewTabPage = false
     private var currentToolbarTint = Color.TRANSPARENT
+    private var themeBgColor = Color.parseColor("#FF1C1C1E")
+    private var lastDefaultBg = Color.parseColor("#FF1C1C1E")
 
-    private val CHROME_UA =
-        "Mozilla/5.0 (Linux; Android 14; Pixel 8 Pro) " +
-        "AppleWebKit/537.36 (KHTML, like Gecko) " +
-        "Chrome/124.0.0.0 Mobile Safari/537.36"
+    private val SAFARI_UA =
+        "Mozilla/5.0 (iPhone; CPU iPhone OS 17_4 like Mac OS X) " +
+        "AppleWebKit/605.1.15 (KHTML, like Gecko) " +
+        "Version/17.4 Mobile/15E148 Safari/604.1"
 
     companion object {
         private const val ARG_TAB_ID = "tab_id"
@@ -122,7 +123,6 @@ class BrowserFragment : Fragment() {
         btnBookmark = view.findViewById(R.id.btn_bookmark)
         btnTabs = view.findViewById(R.id.btn_tabs)
         btnSettings = view.findViewById(R.id.btn_settings)
-        tabCountBadge = view.findViewById(R.id.tab_count_badge)
         urlActionsStrip = view.findViewById(R.id.url_actions_strip)
         chipClear = view.findViewById(R.id.chip_clear)
         chipCopy = view.findViewById(R.id.chip_copy)
@@ -180,7 +180,7 @@ class BrowserFragment : Fragment() {
             mixedContentMode = WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE
             mediaPlaybackRequiresUserGesture = true
             databaseEnabled = true
-            userAgentString = CHROME_UA
+            userAgentString = SAFARI_UA
         }
 
         webView.addJavascriptInterface(
@@ -194,7 +194,7 @@ class BrowserFragment : Fragment() {
 
         webView.setDownloadListener { url, _, contentDisposition, mimetype, _ ->
             try {
-                activity.downloadManager.enqueue(url, CHROME_UA, contentDisposition, mimetype)
+                activity.downloadManager.enqueue(url, SAFARI_UA, contentDisposition, mimetype)
                 Toast.makeText(requireContext(), "Download started", Toast.LENGTH_SHORT).show()
             } catch (e: Exception) {
                 try { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url))) }
@@ -323,7 +323,7 @@ class BrowserFragment : Fragment() {
 
     private fun setupUrlBar() {
         urlEditText.setOnEditorActionListener { _, actionId, event ->
-            if (actionId == EditorInfo.IME_ACTION_GO || (event?.keyCode == KeyEvent.KEYCODE_ENTER && event.action == KeyEvent.ACTION_DOWN)) {
+            if (actionId == EditorInfo.IME_ACTION_SEARCH || (event?.keyCode == KeyEvent.KEYCODE_ENTER && event.action == KeyEvent.ACTION_DOWN)) {
                 processInput(urlEditText.text.toString())
                 hideKeyboardAndStrip(); true
             } else false
@@ -740,7 +740,14 @@ class BrowserFragment : Fragment() {
 
     fun refreshTabCount() {
         val count = (requireActivity() as? MainActivity)?.tabManager?.tabCount ?: 1
-        tabCountBadge.text = count.toString()
+        btnTabs.text = count.toString()
+    }
+
+    private fun applyThemeColors() {
+        val activity = requireActivity() as? MainActivity ?: return
+        themeBgColor = activity.themeManager.activePreset.bgColor
+        if (currentToolbarTint == lastDefaultBg) resetBottomBarTint()
+        lastDefaultBg = themeBgColor
     }
 
     private fun shareCurrentPage() {
@@ -773,6 +780,7 @@ class BrowserFragment : Fragment() {
         refreshTabCount()
         updateNavState()
         updateBookmarkIcon()
+        applyThemeColors()
     }
 
     override fun onDestroyView() {
@@ -794,8 +802,12 @@ class BrowserFragment : Fragment() {
     }
 
     private fun resetBottomBarTint() {
-        currentToolbarTint = Color.TRANSPARENT
-        bottomBar.setBackgroundResource(R.drawable.safari_bottom_bar)
+        currentToolbarTint = themeBgColor
+        val d = GradientDrawable().apply {
+            shape = GradientDrawable.RECTANGLE
+            setColor(themeBgColor)
+        }
+        bottomBar.background = d
     }
 
     private fun websiteTint(url: String): Int {
