@@ -25,6 +25,7 @@ class SettingsFragment : Fragment() {
         val activity = requireActivity() as MainActivity
         val settings = activity.settingsManager
         val theme = activity.themeManager
+        view.setBackgroundColor(theme.activePreset.bgColor)
 
         val btnClose = view.findViewById<ImageView>(R.id.btn_close_settings)
         val themeValue = view.findViewById<TextView>(R.id.theme_value)

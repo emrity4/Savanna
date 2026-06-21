@@ -27,6 +27,7 @@ class BookmarksFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         val activity = requireActivity() as MainActivity
+        view.setBackgroundColor(activity.themeManager.activePreset.bgColor)
 
         recyclerView = view.findViewById(R.id.bookmarks_recycler)
         emptyText = view.findViewById(R.id.empty_text)

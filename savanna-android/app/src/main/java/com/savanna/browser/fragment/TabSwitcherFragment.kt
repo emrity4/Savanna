@@ -49,6 +49,7 @@ class TabSwitcherFragment : BottomSheetDialogFragment() {
         super.onViewCreated(view, savedInstanceState)
 
         val activity = requireActivity() as MainActivity
+        view.setBackgroundColor(activity.themeManager.activePreset.bgColor)
 
         recyclerView = view.findViewById(R.id.tabs_recycler)
         val btnNewTab: ImageView = view.findViewById(R.id.btn_new_tab)

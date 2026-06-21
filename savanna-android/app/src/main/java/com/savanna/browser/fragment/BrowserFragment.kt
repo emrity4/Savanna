@@ -36,6 +36,7 @@ import com.google.android.material.textfield.TextInputEditText
 import com.savanna.browser.MainActivity
 import com.savanna.browser.NewTabBridge
 import com.savanna.browser.R
+import com.savanna.browser.manager.ThemeManager
 import com.savanna.browser.util.UrlUtils
 import kotlin.math.abs
 
@@ -84,6 +85,9 @@ class BrowserFragment : Fragment() {
     private var currentToolbarTint = Color.TRANSPARENT
     private var themeBgColor = Color.parseColor("#FF1C1C1E")
     private var lastDefaultBg = Color.parseColor("#FF1C1C1E")
+    private var lastUrlBarStyle = ThemeManager.STYLE_GLASS
+    private lateinit var urlBarContainer: View
+    private val density get() = resources.displayMetrics.density
 
     private val SAFARI_UA =
         "Mozilla/5.0 (iPhone; CPU iPhone OS 17_4 like Mac OS X) " +
@@ -123,6 +127,7 @@ class BrowserFragment : Fragment() {
         btnBookmark = view.findViewById(R.id.btn_bookmark)
         btnTabs = view.findViewById(R.id.btn_tabs)
         btnSettings = view.findViewById(R.id.btn_settings)
+        urlBarContainer = view.findViewById(R.id.url_bar_container)
         urlActionsStrip = view.findViewById(R.id.url_actions_strip)
         chipClear = view.findViewById(R.id.chip_clear)
         chipCopy = view.findViewById(R.id.chip_copy)
@@ -745,9 +750,62 @@ class BrowserFragment : Fragment() {
 
     private fun applyThemeColors() {
         val activity = requireActivity() as? MainActivity ?: return
-        themeBgColor = activity.themeManager.activePreset.bgColor
-        if (currentToolbarTint == lastDefaultBg) resetBottomBarTint()
-        lastDefaultBg = themeBgColor
+        val tm = activity.themeManager
+        val newBg = tm.activePreset.bgColor
+        val style = tm.urlBarStyle
+        val bgChanged = newBg != themeBgColor
+        val styleChanged = style != lastUrlBarStyle
+        if (!bgChanged && !styleChanged) return
+
+        themeBgColor = newBg
+        lastUrlBarStyle = style
+        view?.setBackgroundColor(newBg)
+
+        when (style) {
+            ThemeManager.STYLE_SOLID -> {
+                val d = GradientDrawable().apply {
+                    shape = GradientDrawable.RECTANGLE
+                    cornerRadius = 24f * density
+                    setColor(newBg)
+                }
+                urlBarContainer.background = d
+            }
+            ThemeManager.STYLE_FROSTED -> {
+                urlBarContainer.setBackgroundResource(R.drawable.tabs_mode_b)
+                urlBarContainer.background.alpha = 120
+            }
+            else -> {
+                if (tm.themeId == "oled") {
+                    urlBarContainer.setBackgroundResource(R.drawable.tabs_mode_b)
+                    urlBarContainer.background.alpha = 255
+                } else {
+                    val d = GradientDrawable().apply {
+                        shape = GradientDrawable.RECTANGLE
+                        cornerRadius = 24f * density
+                        setColor(newBg)
+                    }
+                    urlBarContainer.background = d
+                }
+            }
+        }
+
+        _webView?.settings?.textZoom = (100 * tm.textSizeMultiplier).toInt()
+
+        val showingDefault = currentToolbarTint == lastDefaultBg || currentToolbarTint == Color.TRANSPARENT
+        if (showingDefault || bgChanged) {
+            if (tm.themeId == "oled") {
+                currentToolbarTint = Color.TRANSPARENT
+                bottomBar.setBackgroundResource(R.drawable.safari_bottom_bar)
+            } else {
+                currentToolbarTint = newBg
+                val d = GradientDrawable().apply {
+                    shape = GradientDrawable.RECTANGLE
+                    setColor(newBg)
+                }
+                bottomBar.background = d
+            }
+        }
+        lastDefaultBg = newBg
     }
 
     private fun shareCurrentPage() {
@@ -802,12 +860,18 @@ class BrowserFragment : Fragment() {
     }
 
     private fun resetBottomBarTint() {
-        currentToolbarTint = themeBgColor
-        val d = GradientDrawable().apply {
-            shape = GradientDrawable.RECTANGLE
-            setColor(themeBgColor)
+        val activity = requireActivity() as? MainActivity ?: return
+        if (activity.themeManager.themeId == "oled") {
+            currentToolbarTint = Color.TRANSPARENT
+            bottomBar.setBackgroundResource(R.drawable.safari_bottom_bar)
+        } else {
+            currentToolbarTint = themeBgColor
+            val d = GradientDrawable().apply {
+                shape = GradientDrawable.RECTANGLE
+                setColor(themeBgColor)
+            }
+            bottomBar.background = d
         }
-        bottomBar.background = d
     }
 
     private fun websiteTint(url: String): Int {

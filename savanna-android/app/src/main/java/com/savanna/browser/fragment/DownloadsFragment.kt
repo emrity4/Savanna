@@ -38,6 +38,7 @@ class DownloadsFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         val activity = requireActivity() as MainActivity
+        view.setBackgroundColor(activity.themeManager.activePreset.bgColor)
         val dm      = activity.downloadManager
 
         recyclerView = view.findViewById(R.id.downloads_recycler)

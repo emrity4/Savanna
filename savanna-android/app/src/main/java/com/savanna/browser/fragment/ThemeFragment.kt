@@ -30,6 +30,7 @@ class ThemeFragment : Fragment() {
 
         val activity = requireActivity() as MainActivity
         themeManager = activity.themeManager
+        view.setBackgroundColor(themeManager.activePreset.bgColor)
 
         view.findViewById<ImageView>(R.id.btn_close_theme).setOnClickListener {
             activity.closeOverlay()
@@ -66,6 +67,7 @@ class ThemeFragment : Fragment() {
                 themeManager.themeId = preset.id
                 themeManager.customAccentHex = ""
                 highlightPreset(preset.id)
+                view?.setBackgroundColor(preset.bgColor)
                 applyThemeNow()
             }
 
