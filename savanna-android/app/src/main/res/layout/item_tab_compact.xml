@@ -1,8 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
-  COMPACT mode tab card — user's exact code as the outer container.
-  350×120dp, clipToOutline, @drawable/tabs_mode_c (OLED black fill, purple stroke).
--->
+<!-- Compact tab card -->
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/tabs_mode_c"

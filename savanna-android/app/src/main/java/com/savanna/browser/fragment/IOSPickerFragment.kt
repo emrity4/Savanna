@@ -66,7 +66,7 @@ class IOSDatePickerFragment(
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT
             )
-            setBackgroundColor(Color.parseColor("#FF1C1C1E"))
+            setBackgroundColor(Color.parseColor("#FF151515"))
             addView(row)
             addView(done, FrameLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
@@ -75,10 +75,20 @@ class IOSDatePickerFragment(
             ).apply { topMargin = 220 })
         }
 
+        val container = FrameLayout(requireContext()).apply {
+            layoutParams = ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            )
+            setBackgroundResource(R.drawable.date_picker)
+            setPadding(20, 20, 20, 20)
+            addView(root)
+        }
+
         return object : Dialog(requireContext(), R.style.GlassBottomSheetDialog) {
             override fun onCreate(savedInstanceState: Bundle?) {
                 super.onCreate(savedInstanceState)
-                setContentView(root)
+                setContentView(container)
                 window?.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
                 window?.setGravity(Gravity.BOTTOM)
                 window?.setBackgroundDrawableResource(android.R.color.transparent)
@@ -148,7 +158,7 @@ class IOSTimePickerFragment(
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT
             )
-            setBackgroundColor(Color.parseColor("#FF1C1C1E"))
+            setBackgroundColor(Color.parseColor("#FF151515"))
             addView(row)
             addView(done, FrameLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
@@ -157,10 +167,20 @@ class IOSTimePickerFragment(
             ).apply { topMargin = 220 })
         }
 
+        val container = FrameLayout(requireContext()).apply {
+            layoutParams = ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            )
+            setBackgroundResource(R.drawable.wheel_time)
+            setPadding(20, 20, 20, 20)
+            addView(root)
+        }
+
         return object : Dialog(requireContext(), R.style.GlassBottomSheetDialog) {
             override fun onCreate(savedInstanceState: Bundle?) {
                 super.onCreate(savedInstanceState)
-                setContentView(root)
+                setContentView(container)
                 window?.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
                 window?.setGravity(Gravity.BOTTOM)
                 window?.setBackgroundDrawableResource(android.R.color.transparent)

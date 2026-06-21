@@ -1,8 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
-  Tab card — iOS 26 Liquid Glass aesthetic.
-  Uses glass_tab_card drawable: dark frosted base + white specular + purple accent border.
--->
+<!-- Tab card -- Safari minimal -->
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/tabs_mode_b"
@@ -52,11 +49,11 @@
             android:layout_marginStart="6dp" />
     </LinearLayout>
 
-    <!-- Hairline divider below header -->
+    <!-- Divider -->
     <View
         android:layout_width="match_parent"
         android:layout_height="0.5dp"
-        android:background="#40B6A8FF" />
+        android:background="#20FFFFFF" />
 
     <!-- URL / body — centered in remaining card space -->
     <TextView

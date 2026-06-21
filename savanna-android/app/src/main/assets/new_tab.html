@@ -2,117 +2,54 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <title>New Tab</title>
 <style>
-*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; -webkit-user-select: none; }
-:root { --glass-bg: rgba(255,255,255,0.065); --glass-border: rgba(255,255,255,0.18); --glass-highlight: rgba(255,255,255,0.13); --text-primary: #FFFFFF; --text-dim: rgba(255,255,255,0.55); --text-faint: rgba(255,255,255,0.28); --bg: #000000; --radius-card: 20px; --radius-icon: 16px; }
-html { background: var(--bg); height: 100%; }
-body { background: var(--bg); color: var(--text-primary); font-family: -apple-system, 'SF Pro Display', 'SF Pro Text', Helvetica, Arial, sans-serif; min-height: 100%; padding: 0 20px 140px; overflow-x: hidden; }
-@keyframes pageEnter { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
-body { animation: pageEnter 0.45s cubic-bezier(0.22, 1, 0.36, 1) both; }
-.glass { position: relative; background: var(--glass-bg); backdrop-filter: blur(48px) saturate(180%) brightness(1.1); -webkit-backdrop-filter: blur(48px) saturate(180%) brightness(1.1); border: 0.5px solid var(--glass-border); border-radius: var(--radius-card); overflow: hidden; isolation: isolate; }
-.glass::before { content: ''; position: absolute; inset: 0; background: linear-gradient(148deg, rgba(255,255,255,0.16) 0%, rgba(255,255,255,0.06) 35%, transparent 55%); border-radius: inherit; pointer-events: none; z-index: 1; }
-.glass::after { content: ''; position: absolute; top: 0; left: 8%; right: 8%; height: 0.5px; background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.5) 50%, transparent 100%); pointer-events: none; z-index: 2; }
-.hero { padding-top: 52px; padding-bottom: 36px; text-align: center; }
-.brand-mark { display: inline-flex; align-items: center; justify-content: center; gap: 7px; margin-bottom: 18px; }
-.brand-icon { width: 36px; height: 36px; border-radius: 9px; background: linear-gradient(145deg, #B6A8FF 0%, #8B7FF0 100%); display: flex; align-items: center; justify-content: center; box-shadow: inset 0 1px 0 rgba(255,255,255,0.4), 0 4px 16px rgba(182,168,255,0.35); position: relative; overflow: hidden; }
-.brand-icon::after { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 50%; background: rgba(255,255,255,0.2); border-radius: 9px 9px 0 0; }
-.brand-icon svg { position: relative; z-index: 1; }
-.brand-name { font-size: 17px; font-weight: 600; letter-spacing: 0.04em; color: rgba(255,255,255,0.85); }
-.greeting { font-size: 38px; font-weight: 700; letter-spacing: -0.8px; line-height: 1.08; color: var(--text-primary); }
-.date-line { margin-top: 8px; font-size: 15px; color: var(--text-dim); font-weight: 400; }
-.search-wrap { margin-bottom: 24px; }
-.search-bar { padding: 14px 18px; border-radius: 18px; display: flex; align-items: center; gap: 10px; cursor: pointer; transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.15s ease; }
-.search-bar:active { transform: scale(0.975); opacity: 0.9; }
-.search-hint { font-size: 15.5px; color: rgba(255,255,255,0.35); flex: 1; font-weight: 400; }
-.section-label { font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: rgba(255,255,255,0.3); margin-bottom: 14px; padding-left: 4px; }
-.sites-wrap { margin-bottom: 24px; }
-.home-actions { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 28px; }
-.home-action { display: flex; align-items: center; gap: 10px; padding: 14px 16px; border-radius: 16px; cursor: pointer; }
-.home-action svg { flex-shrink: 0; }
-.home-action .label { font-size: 14px; font-weight: 600; color: var(--text-primary); }
-.home-action .sub { font-size: 12px; color: var(--text-dim); margin-top: 1px; }
-.sites-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px 12px; }
-@keyframes popIn { 0% { opacity: 0; transform: scale(0.65); } 70% { transform: scale(1.06); } 100% { opacity: 1; transform: scale(1); } }
-.site-item { display: flex; flex-direction: column; align-items: center; gap: 7px; cursor: pointer; opacity: 0; animation: popIn 0.38s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
-.site-icon { width: 60px; height: 60px; border-radius: var(--radius-icon); display: flex; align-items: center; justify-content: center; font-size: 26px; font-weight: 700; color: #fff; position: relative; overflow: hidden; transition: transform 0.15s ease, box-shadow 0.15s ease; border: 0.5px solid rgba(255,255,255,0.2); box-shadow: inset 0 1px 0 rgba(255,255,255,0.28), 0 6px 18px rgba(0,0,0,0.55); }
-.site-icon::before { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 50%; background: linear-gradient(180deg, rgba(255,255,255,0.22) 0%, transparent 100%); border-radius: var(--radius-icon) var(--radius-icon) 0 0; pointer-events: none; z-index: 1; }
-.site-icon span { position: relative; z-index: 2; }
-.site-item:active .site-icon { transform: scale(0.87); box-shadow: 0 2px 8px rgba(0,0,0,0.5); }
-.site-name { font-size: 11px; color: rgba(255,255,255,0.65); text-align: center; max-width: 64px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 400; line-height: 1.2; }
-.recents-list { display: flex; flex-direction: column; gap: 2px; border-radius: var(--radius-card); overflow: hidden; }
-.recent-row { display: flex; align-items: center; gap: 12px; padding: 12px 16px; cursor: pointer; transition: background 0.12s ease; position: relative; background: var(--glass-bg); backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px); border: 0.5px solid var(--glass-border); border-radius: 14px; overflow: hidden; animation: slideIn 0.3s ease both; }
-@keyframes slideIn { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: translateX(0); } }
-.recent-row:active { background: rgba(255,255,255,0.12); }
-.recent-favicon { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; color: #fff; flex-shrink: 0; border: 0.5px solid rgba(255,255,255,0.15); box-shadow: inset 0 1px 0 rgba(255,255,255,0.2); position: relative; overflow: hidden; }
-.recent-favicon::before { content: ''; position: absolute; inset: 0; background: linear-gradient(160deg, rgba(255,255,255,0.18) 0%, transparent 55%); pointer-events: none; }
-.recent-info { flex: 1; min-width: 0; }
-.recent-title { font-size: 14px; font-weight: 500; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.recent-url { font-size: 12px; color: var(--text-dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 1px; }
-.recent-arrow { opacity: 0.25; flex-shrink: 0; }
-.privacy-badge { display: flex; align-items: center; justify-content: center; gap: 6px; margin: 24px auto 0; padding: 9px 18px; border-radius: 100px; width: fit-content; font-size: 12px; font-weight: 500; color: rgba(255,255,255,0.35); }
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;-webkit-user-select:none}
+body{background:#000;color:#fff;font-family:-apple-system,'SF Pro Display','SF Pro Text',Helvetica,Arial,sans-serif;min-height:100%;padding:0 20px 120px;overflow-x:hidden}
+.hero{padding-top:48px;padding-bottom:28px;text-align:center}
+.greeting{font-size:34px;font-weight:700;letter-spacing:-0.5px;color:#fff}
+.date-line{margin-top:6px;font-size:14px;color:#8E8E93}
+.search-hint{text-align:center;padding:14px;margin-bottom:24px;border-radius:22px;background:#151515;color:#636366;font-size:15px;cursor:pointer}
+.section-label{font-size:12px;font-weight:600;letter-spacing:0.05em;text-transform:uppercase;color:#48484A;margin-bottom:12px;padding-left:2px}
+.sites-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px 8px;margin-bottom:24px}
+.site-item{display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer}
+.site-icon{width:56px;height:56px;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700;color:#fff}
+.site-name{font-size:11px;color:#8E8E93;text-align:center;max-width:64px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.recents-list{display:flex;flex-direction:column;gap:2px}
+.recent-row{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:14px;background:#151515;cursor:pointer}
+.recent-favicon{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;flex-shrink:0}
+.recent-info{flex:1;min-width:0}
+.recent-title{font-size:13px;font-weight:500;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.recent-url{font-size:11px;color:#8E8E93;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px}
+.privacy-badge{text-align:center;margin:20px auto 0;padding:8px 16px;border-radius:100px;font-size:11px;color:#48484A}
 </style>
 </head>
 <body>
 <div class="hero">
-  <div class="brand-mark">
-    <div class="brand-icon">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10"/>
-        <path d="M19 5l-7 7"/>
-        <path d="M15 5h4v4"/>
-      </svg>
-    </div>
-    <span class="brand-name">Savanna</span>
-  </div>
   <div class="greeting" id="greeting">Good Morning</div>
   <div class="date-line" id="dateLine"></div>
 </div>
-<div class="search-wrap">
-  <div class="glass search-bar" onclick="Android.focusUrlBar()">
-    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="2" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.5"/><line x1="15.5" y1="15.5" x2="20" y2="20"/></svg>
-    <span class="search-hint">Search or enter address…</span>
-  </div>
-</div>
-<div class="sites-wrap">
-  <div class="section-label">Favorites</div>
-  <div class="home-actions">
-    <div class="glass home-action" onclick="Android.focusUrlBar()">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.85)" stroke-width="2" stroke-linecap="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
-      <div><div class="label">Add Favorite Link</div><div class="sub">Pin a site from the URL bar</div></div>
-    </div>
-    <div class="glass home-action" onclick="Android.focusUrlBar()">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.85)" stroke-width="2" stroke-linecap="round"><path d="M7 7h10v10H7z"/><path d="M9 9l6 6M15 9l-6 6"/></svg>
-      <div><div class="label">Manage Favorites</div><div class="sub">Edit saved links</div></div>
-    </div>
-  </div>
-</div>
-<div class="sites-wrap" id="favWrap">
-  <div class="section-label">Favorites</div>
-  <div class="sites-grid" id="favGrid"></div>
-</div>
-<div class="sites-wrap" id="recentWrap" style="display:none">
+<div class="search-hint" onclick="Android.focusUrlBar()">Search or enter address</div>
+<div class="section-label" id="favLabel">Favorites</div>
+<div class="sites-grid" id="favGrid"></div>
+<div id="recentWrap" style="display:none">
   <div class="section-label">Recently Visited</div>
-  <div id="recentList"></div>
+  <div class="recents-list" id="recentList"></div>
 </div>
-<div class="glass privacy-badge">
-  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.5)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L4 6v6c0 5.5 3.8 10.7 9 12 5.2-1.3 9-6.5 9-12V6z"/></svg>
-  Trackers blocked · Private browsing
-</div>
+<div class="privacy-badge">Private browsing</div>
 <script>
-const PALETTE=['#FF453A','#FF9F0A','#30D158','#0A84FF','#5E5CE6','#BF5AF2','#FF375F','#64D2FF','#FFD60A','#32D74B','#FF6961','#5AC8FA','#FF6B35','#34C759','#007AFF','#AF52DE'];
+const PALETTE=['#FF453A','#FF9F0A','#30D158','#0A84FF','#5E5CE6','#BF5AF2','#FF375F','#64D2FF'];
 function domainColor(d){let h=0;for(let i=0;i<d.length;i++)h=d.charCodeAt(i)+((h<<5)-h);return PALETTE[Math.abs(h)%PALETTE.length]}
 function getDomain(url){try{return new URL(url).hostname.replace(/^www\./,'')}catch{return url}}
-function getInitial(title,url){const s=(title||getDomain(url)||'?');return s[0].toUpperCase()}
-function getLabel(title,url){const dom=getDomain(url).split('.')[0];if(title&&title.length<22&&title!==url){const words=title.split(' ');return words.length>2?words.slice(0,2).join(' '):title}return dom.charAt(0).toUpperCase()+dom.slice(1)}
+function getInitial(title,url){return((title||getDomain(url)||'?')[0]).toUpperCase()}
 function navigate(url){try{Android.navigate(url)}catch(e){window.location.href=url}}
 const DEFAULTS=[{url:'https://google.com',title:'Google'},{url:'https://youtube.com',title:'YouTube'},{url:'https://reddit.com',title:'Reddit'},{url:'https://x.com',title:'X'},{url:'https://github.com',title:'GitHub'},{url:'https://wikipedia.org',title:'Wikipedia'},{url:'https://amazon.com',title:'Amazon'},{url:'https://netflix.com',title:'Netflix'}];
-function buildIcon(site,delay){const dom=getDomain(site.url);const color=domainColor(dom);const init=getInitial(site.title,site.url);const label=getLabel(site.title,site.url);const el=document.createElement('div');el.className='site-item';el.style.animationDelay=delay+'s';el.innerHTML=`<div class="site-icon" style="background:${color}"><span>${init}</span></div><span class="site-name">${label}</span>`;el.addEventListener('click',()=>navigate(site.url));return el}
-function buildRecentRow(item,delay){const dom=getDomain(item.url);const color=domainColor(dom);const init=getInitial(item.title,item.url);const label=getLabel(item.title,item.url);const el=document.createElement('div');el.className='recent-row';el.style.animationDelay=delay+'s';el.innerHTML=`<div class="recent-favicon" style="background:${color}"><span style="position:relative;z-index:2">${init}</span></div><div class="recent-info"><div class="recent-title">${label}</div><div class="recent-url">${dom}</div></div><svg class="recent-arrow" width="8" height="14" viewBox="0 0 8 14" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round"><path d="M1 1l6 6-6 6"/></svg>`;el.addEventListener('click',()=>navigate(item.url));return el}
-function init(histJson){const favGrid=document.getElementById('favGrid');DEFAULTS.forEach((s,i)=>favGrid.appendChild(buildIcon(s,i*0.04)));try{const hist=JSON.parse(histJson||'[]');if(!hist.length)return;const seen=new Set();const unique=[];for(const item of hist){const dom=getDomain(item.url);if(!seen.has(dom)&&item.url&&item.url!=='about:blank'){seen.add(dom);unique.push(item);if(unique.length>=8)break}}if(unique.length<2)return;const wrap=document.getElementById('recentWrap');const list=document.getElementById('recentList');wrap.style.display='block';unique.forEach((item,i)=>list.appendChild(buildRecentRow(item,i*0.05)))}catch(e){}}
-(function(){const h=new Date().getHours();const greet=h<5?'Good Night':h<12?'Good Morning':h<17?'Good Afternoon':h<21?'Good Evening':'Good Night';document.getElementById('greeting').textContent=greet;document.getElementById('dateLine').textContent=new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'})})();
-(function(){try{const h=typeof Android!=='undefined'?Android.getRecentHistory():'[]';init(h)}catch(e){init('[]')}})();
+function buildIcon(site,delay){const dom=getDomain(site.url);const c=domainColor(dom);const el=document.createElement('div');el.className='site-item';el.style.animationDelay=delay+'s';el.innerHTML='<div class="site-icon" style="background:'+c+'"><span>'+getInitial(site.title,site.url)+'</span></div><div class="site-name">'+(site.title.length<18?site.title:dom.charAt(0).toUpperCase()+dom.slice(1))+'</div>';el.addEventListener('click',function(){navigate(site.url)});return el}
+function buildRecentRow(item){const dom=getDomain(item.url);const c=domainColor(dom);const el=document.createElement('div');el.className='recent-row';el.innerHTML='<div class="recent-favicon" style="background:'+c+'"><span>'+getInitial(item.title,item.url)+'</span></div><div class="recent-info"><div class="recent-title">'+(item.title||dom)+'</div><div class="recent-url">'+dom+'</div></div>';el.addEventListener('click',function(){navigate(item.url)});return el}
+function init(histJson){var g=document.getElementById('favGrid');DEFAULTS.forEach(function(s,i){g.appendChild(buildIcon(s,i*0.04))});try{var h=JSON.parse(histJson||'[]');if(!h.length)return;var seen={},unique=[];for(var i=0;i<h.length;i++){var d=getDomain(h[i].url);if(!seen[d]&&h[i].url&&h[i].url!=='about:blank'){seen[d]=true;unique.push(h[i]);if(unique.length>=8)break}}if(unique.length<2)return;document.getElementById('recentWrap').style.display='block';var l=document.getElementById('recentList');unique.forEach(function(item){l.appendChild(buildRecentRow(item))})}catch(e){}}
+(function(){var h=new Date().getHours();document.getElementById('greeting').textContent=h<5?'Good Night':h<12?'Good Morning':h<17?'Good Afternoon':h<21?'Good Evening':'Good Night';document.getElementById('dateLine').textContent=new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'})})();
+(function(){try{init(typeof Android!=='undefined'?Android.getRecentHistory():'[]')}catch(e){init('[]')}})();
 </script>
 </body>
 </html>
