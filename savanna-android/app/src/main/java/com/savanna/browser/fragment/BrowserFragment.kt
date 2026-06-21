@@ -791,6 +791,21 @@ class BrowserFragment : Fragment() {
 
         _webView?.settings?.textZoom = (100 * tm.textSizeMultiplier).toInt()
 
+        swipeRefresh.setProgressBackgroundColorSchemeColor(newBg)
+
+        if (tm.themeId != "oled") {
+            findBar.setBackgroundColor(newBg)
+            val fi = GradientDrawable().apply {
+                shape = GradientDrawable.RECTANGLE
+                cornerRadius = 18f * density
+                setColor(newBg)
+            }
+            findInput.background = fi
+        } else {
+            findBar.setBackgroundResource(R.drawable.safari_bottom_bar)
+            findInput.setBackgroundResource(R.drawable.safari_url_capsule)
+        }
+
         val showingDefault = currentToolbarTint == lastDefaultBg || currentToolbarTint == Color.TRANSPARENT
         if (showingDefault || bgChanged) {
             if (tm.themeId == "oled") {
