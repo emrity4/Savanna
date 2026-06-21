@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Tab card -- Safari minimal -->
+<!-- Tab card - Safari minimal -->
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/tabs_mode_b"
