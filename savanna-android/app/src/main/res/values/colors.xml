@@ -5,6 +5,7 @@
     <color name="bg_secondary">#FF0A0A0A</color>
     <color name="bg_tertiary">#FF111111</color>
     <color name="bg_card">#FF1C1C1E</color>
+    <color name="bg_glass_cool">#FF1C1C1E</color>
     <color name="bg_glass">#FF111111</color>
     <color name="bg_glass_light">#FF1C1C1E</color>
     <color name="bg_input">#FF1C1C1E</color>
