@@ -14,7 +14,6 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.view.KeyEvent
 import android.view.LayoutInflater
-import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.TranslateAnimation
@@ -75,6 +74,8 @@ class BrowserFragment : Fragment() {
     private lateinit var findNext: ImageView
     private lateinit var findClose: ImageView
     private lateinit var urlSuggestions: RecyclerView
+    private lateinit var urlLock: ImageView
+    private lateinit var urlReader: ImageView
     private var isReaderMode = false
     private var isFindVisible = false
 
@@ -144,6 +145,8 @@ class BrowserFragment : Fragment() {
         findClose = view.findViewById(R.id.find_close)
         urlSuggestions = view.findViewById(R.id.url_suggestions)
         urlSuggestions.layoutManager = LinearLayoutManager(requireContext())
+        urlLock = view.findViewById(R.id.url_lock)
+        urlReader = view.findViewById(R.id.url_reader)
 
         setupWebView()
         setupUrlBar()
@@ -216,6 +219,7 @@ class BrowserFragment : Fragment() {
                 progressBar.visibility = View.VISIBLE
                 progressBar.progress = 0
                 chipReload.text = "Stop"
+                if (!isNewTabPage) updateReaderIcon()
                 updateNavState()
             }
 
@@ -346,17 +350,7 @@ class BrowserFragment : Fragment() {
                 if (urlEditText.isFocused) showUrlSuggestions()
             }
         })
-        urlEditText.setOnTouchListener { _, event ->
-            if (event.action == MotionEvent.ACTION_UP) {
-                val drawableEnd = urlEditText.compoundDrawables[2] ?: return@setOnTouchListener false
-                val isTouchingEnd = event.rawX >= (urlEditText.right - drawableEnd.bounds.width() - urlEditText.totalPaddingEnd)
-                if (isTouchingEnd && !isNewTabPage) {
-                    toggleReaderMode()
-                    return@setOnTouchListener true
-                }
-            }
-            false
-        }
+        urlReader.setOnClickListener { if (!isNewTabPage) toggleReaderMode() }
     }
 
     private fun setupUrlActions() {
@@ -489,16 +483,14 @@ class BrowserFragment : Fragment() {
 
     private fun updateReaderIcon() {
         if (isNewTabPage) {
-            urlEditText.setCompoundDrawablesRelativeWithIntrinsicBounds(
-                R.drawable.ic_lock, 0, 0, 0
-            )
+            urlLock.visibility = View.GONE
+            urlReader.visibility = View.GONE
             return
         }
-        urlEditText.setCompoundDrawablesRelativeWithIntrinsicBounds(
-            R.drawable.ic_lock, 0,
-            if (isReaderMode) R.drawable.ic_reader_active else R.drawable.ic_reader,
-            0
-        )
+        val url = currentUrl()
+        urlLock.visibility = if (url.startsWith("https")) View.VISIBLE else View.GONE
+        urlReader.setImageResource(if (isReaderMode) R.drawable.ic_reader_active else R.drawable.ic_reader)
+        urlReader.visibility = View.VISIBLE
     }
 
     private fun setupSwipeRefresh() {
