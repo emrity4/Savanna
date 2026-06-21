@@ -39,4 +39,13 @@
     <string name="version">Version 1.0</string>
     <string name="compact">Compact</string>
     <string name="bottom_tabs">Bottom</string>
+    <string name="nav_back">Back</string>
+    <string name="nav_forward">Forward</string>
+    <string name="pick_date">Date</string>
+    <string name="pick_time">Time</string>
+    <string name="reader_mode">Reader Mode</string>
+    <string name="find_in_page">Find in Page</string>
+    <string name="reader_on">Reader</string>
+    <string name="reader_off">Original</string>
+    <string name="no_results">No results</string>
 </resources>

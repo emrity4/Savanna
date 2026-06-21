@@ -10,8 +10,11 @@ import android.graphics.Color
 import android.graphics.drawable.GradientDrawable
 import android.net.Uri
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.KeyEvent
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.TranslateAnimation
@@ -21,11 +24,15 @@ import android.webkit.*
 import android.widget.EditText
 import android.widget.HorizontalScrollView
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.google.android.material.textfield.TextInputEditText
 import com.savanna.browser.MainActivity
 import com.savanna.browser.NewTabBridge
@@ -41,10 +48,8 @@ class BrowserFragment : Fragment() {
     private lateinit var bottomBar: View
     private lateinit var btnBack: ImageView
     private lateinit var btnForward: ImageView
-    private lateinit var btnReload: ImageView
     private lateinit var btnShare: ImageView
     private lateinit var btnBookmark: ImageView
-    private lateinit var btnHistory: ImageView
     private lateinit var btnTabs: ImageView
     private lateinit var btnSettings: ImageView
     private lateinit var tabCountBadge: TextView
@@ -54,6 +59,24 @@ class BrowserFragment : Fragment() {
     private lateinit var chipPaste: TextView
     private lateinit var chipPasteGo: TextView
     private lateinit var chipShareLink: TextView
+    private lateinit var chipBack: TextView
+    private lateinit var chipForward: TextView
+    private lateinit var chipDate: TextView
+    private lateinit var chipTime: TextView
+    private lateinit var chipReload: TextView
+    private lateinit var chipHistory: TextView
+    private lateinit var chipFind: TextView
+
+    private lateinit var swipeRefresh: SwipeRefreshLayout
+    private lateinit var findBar: LinearLayout
+    private lateinit var findInput: EditText
+    private lateinit var findCount: TextView
+    private lateinit var findPrev: ImageView
+    private lateinit var findNext: ImageView
+    private lateinit var findClose: ImageView
+    private lateinit var urlSuggestions: RecyclerView
+    private var isReaderMode = false
+    private var isFindVisible = false
 
     private var tabId: String = ""
     private val webView get() = _webView!!
@@ -94,10 +117,8 @@ class BrowserFragment : Fragment() {
         bottomBar = view.findViewById(R.id.bottom_bar)
         btnBack = view.findViewById(R.id.btn_back)
         btnForward = view.findViewById(R.id.btn_forward)
-        btnReload = view.findViewById(R.id.btn_reload)
         btnShare = view.findViewById(R.id.btn_share)
         btnBookmark = view.findViewById(R.id.btn_bookmark)
-        btnHistory = view.findViewById(R.id.btn_history)
         btnTabs = view.findViewById(R.id.btn_tabs)
         btnSettings = view.findViewById(R.id.btn_settings)
         tabCountBadge = view.findViewById(R.id.tab_count_badge)
@@ -107,12 +128,30 @@ class BrowserFragment : Fragment() {
         chipPaste = view.findViewById(R.id.chip_paste)
         chipPasteGo = view.findViewById(R.id.chip_paste_go)
         chipShareLink = view.findViewById(R.id.chip_share_link)
+        chipBack = view.findViewById(R.id.chip_back)
+        chipForward = view.findViewById(R.id.chip_forward)
+        chipDate = view.findViewById(R.id.chip_date)
+        chipTime = view.findViewById(R.id.chip_time)
+        chipReload = view.findViewById(R.id.chip_reload)
+        chipHistory = view.findViewById(R.id.chip_history)
+        chipFind = view.findViewById(R.id.chip_find)
+        swipeRefresh = view.findViewById(R.id.swipe_refresh)
+        findBar = view.findViewById(R.id.find_bar)
+        findInput = view.findViewById(R.id.find_input)
+        findCount = view.findViewById(R.id.find_count)
+        findPrev = view.findViewById(R.id.find_prev)
+        findNext = view.findViewById(R.id.find_next)
+        findClose = view.findViewById(R.id.find_close)
+        urlSuggestions = view.findViewById(R.id.url_suggestions)
+        urlSuggestions.layoutManager = LinearLayoutManager(requireContext())
 
         setupWebView()
         setupUrlBar()
         setupUrlActions()
         setupNavigation()
         setupBottomBar()
+        setupSwipeRefresh()
+        setupFindInPage()
         refreshTabCount()
 
         val urlToLoad = if (initialUrl.isBlank() || initialUrl == "about:blank") NEW_TAB_URL else initialUrl
@@ -176,7 +215,7 @@ class BrowserFragment : Fragment() {
                 }
                 progressBar.visibility = View.VISIBLE
                 progressBar.progress = 0
-                btnReload.setImageResource(R.drawable.ic_stop)
+                chipReload.text = "Stop"
                 updateNavState()
             }
 
@@ -184,7 +223,20 @@ class BrowserFragment : Fragment() {
                 super.onPageFinished(view, url)
                 progressBar.visibility = View.GONE
                 progressBar.progress = 0
-                btnReload.setImageResource(R.drawable.ic_reload)
+                chipReload.text = if (isReaderMode) "Reader" else "Reload"
+                url?.let { url ->
+                    if (isNewTabPage) {
+                        isReaderMode = false
+                        updateReaderIcon()
+                    }
+                }.also {
+                    val tab = activity.tabManager.getTabById(tabId)
+                    if (tab?.readerModeOn == true && !isReaderMode && !isNewTabPage) {
+                        isReaderMode = true
+                        chipReload.text = "Reader"
+                        reapplyReaderMode()
+                    }
+                }
                 url?.let {
                     if (!isNewTabPage) {
                         val title = view?.title?.takeIf { t -> t.isNotBlank() } ?: it
@@ -229,12 +281,19 @@ class BrowserFragment : Fragment() {
             override fun onReceivedTitle(view: WebView?, title: String?) {
                 if (!isNewTabPage) title?.let { activity.tabManager.updateTab(tabId, title = it) }
             }
+            override fun onFindResultReceived(
+                activeMatchOrdinal: Int, numberOfMatches: Int, isDone: Boolean
+            ) {
+                if (isDone && isFindVisible) {
+                    if (numberOfMatches > 0) {
+                        findCount.text = "${activeMatchOrdinal + 1}/$numberOfMatches"
+                    } else {
+                        findCount.text = "0/0"
+                    }
+                }
+            }
         }
 
-        webView.setOnScrollChangeListener { _, _, scrollY, _, oldScrollY ->
-            val delta = scrollY - oldScrollY
-            if (!isNewTabPage && abs(delta) > 6) updateBottomBarTint(currentUrl())
-        }
     }
 
     private fun showFavoriteDialog() {
@@ -272,15 +331,35 @@ class BrowserFragment : Fragment() {
         urlEditText.setOnFocusChangeListener { _, hasFocus ->
             if (hasFocus) {
                 val tab = (requireActivity() as MainActivity).tabManager.getTabById(tabId)
-                if (!isNewTabPage) tab?.let { urlEditText.setText(it.url) }
+                if (!isNewTabPage) urlEditText.setText(tab?.url ?: "")
                 urlEditText.selectAll()
                 showActionsStrip()
+                showUrlSuggestions()
             } else {
                 if (isNewTabPage) { urlEditText.setText(""); return@setOnFocusChangeListener }
                 val tab = (requireActivity() as MainActivity).tabManager.getTabById(tabId)
                 tab?.let { urlEditText.setText(UrlUtils.formatUrl(it.url)) }
                 hideActionsStrip()
+                hideUrlSuggestions()
             }
+        }
+        urlEditText.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+            override fun afterTextChanged(s: Editable?) {
+                if (urlEditText.isFocused) showUrlSuggestions()
+            }
+        })
+        urlEditText.setOnTouchListener { _, event ->
+            if (event.action == MotionEvent.ACTION_UP) {
+                val drawableEnd = urlEditText.compoundDrawables[2] ?: return@setOnTouchListener false
+                val isTouchingEnd = event.rawX >= (urlEditText.right - drawableEnd.bounds.width() - urlEditText.totalPaddingEnd)
+                if (isTouchingEnd && !isNewTabPage) {
+                    toggleReaderMode()
+                    return@setOnTouchListener true
+                }
+            }
+            false
         }
     }
 
@@ -320,18 +399,247 @@ class BrowserFragment : Fragment() {
                 }, "Share Link"
             ))
         }
+        chipBack.setOnClickListener {
+            if (!isNewTabPage && webView.canGoBack()) { webView.goBack(); hideKeyboardAndStrip() }
+        }
+        chipForward.setOnClickListener {
+            if (webView.canGoForward()) { webView.goForward(); hideKeyboardAndStrip() }
+        }
+        chipShareLink.setOnLongClickListener { showFavoriteDialog(); true }
+        chipDate.setOnClickListener { showDatePicker() }
+        chipTime.setOnClickListener { showTimePicker() }
+        chipReload.setOnClickListener {
+            if (isNewTabPage) return@setOnClickListener
+            if (webView.progress in 1..99) {
+                webView.stopLoading()
+            } else if (isReaderMode) {
+                toggleReaderMode() // toggles off
+            } else {
+                webView.reload()
+            }
+            hideKeyboardAndStrip()
+        }
+        chipHistory.setOnClickListener {
+            (requireActivity() as MainActivity).showHistory()
+            hideKeyboardAndStrip()
+        }
+        chipFind.setOnClickListener {
+            hideKeyboardAndStrip()
+            showFindInPage()
+        }
     }
 
     private fun showActionsStrip() {
         if (urlActionsStrip.visibility == View.VISIBLE) return
         urlActionsStrip.visibility = View.VISIBLE
         urlActionsStrip.startAnimation(
-            TranslateAnimation(0f, 0f, -urlActionsStrip.height.toFloat().coerceAtLeast(40f), 0f).apply { duration = 180 }
+            TranslateAnimation(0f, 0f, urlActionsStrip.height.toFloat().coerceAtLeast(40f), 0f).apply { duration = 180 }
         )
     }
 
     private fun hideActionsStrip() {
         urlActionsStrip.visibility = View.GONE
+    }
+
+    private fun reapplyReaderMode() {
+        webView.evaluateJavascript("""
+            (function(){
+                var s = document.getElementById('savanna-reader');
+                if (s) return;
+                s = document.createElement('style');
+                s.id = 'savanna-reader';
+                s.textContent = 'body * { background: transparent !important; border-color: transparent !important; box-shadow: none !important; } ' +
+                    'body { background: #000 !important; color: #ddd !important; } ' +
+                    'nav, header, footer, aside, .sidebar, .ad, .popup, .modal, iframe, .comments, .share, .related { display: none !important; } ' +
+                    'article, main, .content, [role="main"], .post, .entry, .article-body { display: block !important; max-width: 680px !important; margin: 0 auto !important; padding: 20px 16px !important; font-size: 17px !important; line-height: 1.7 !important; } ' +
+                    'p, li, blockquote { font-size: 17px !important; line-height: 1.7 !important; margin-bottom: 14px !important; } ' +
+                    'h1, h2, h3 { font-weight: 600 !important; margin-top: 20px !important; margin-bottom: 8px !important; } ' +
+                    'img { max-width: 100% !important; height: auto !important; border-radius: 8px !important; }';
+                document.head.appendChild(s);
+            })();
+        """.trimIndent(), null)
+        updateReaderIcon()
+    }
+
+    private fun toggleReaderMode() {
+        isReaderMode = !isReaderMode
+        val tab = (requireActivity() as MainActivity).tabManager.getTabById(tabId) ?: return
+        tab.readerModeOn = isReaderMode
+
+        val js = if (isReaderMode) """
+            (function(){
+                var s = document.createElement('style');
+                s.id = 'savanna-reader';
+                s.textContent = 'body * { background: transparent !important; border-color: transparent !important; box-shadow: none !important; } ' +
+                    'body { background: #000 !important; color: #ddd !important; } ' +
+                    'nav, header, footer, aside, .sidebar, .ad, .popup, .modal, iframe, .comments, .share, .related { display: none !important; } ' +
+                    'article, main, .content, [role="main"], .post, .entry, .article-body { display: block !important; max-width: 680px !important; margin: 0 auto !important; padding: 20px 16px !important; font-size: 17px !important; line-height: 1.7 !important; } ' +
+                    'p, li, blockquote { font-size: 17px !important; line-height: 1.7 !important; margin-bottom: 14px !important; } ' +
+                    'h1, h2, h3 { font-weight: 600 !important; margin-top: 20px !important; margin-bottom: 8px !important; } ' +
+                    'img { max-width: 100% !important; height: auto !important; border-radius: 8px !important; }';
+                document.head.appendChild(s);
+            })();
+        """.trimIndent() else """
+            (function(){
+                var s = document.getElementById('savanna-reader');
+                if (s) s.remove();
+            })();
+        """.trimIndent()
+
+        webView.evaluateJavascript(js, null)
+        updateReaderIcon()
+        chipReload.text = if (isReaderMode) "Reader" else "Reload"
+    }
+
+    private fun updateReaderIcon() {
+        if (isNewTabPage) {
+            urlEditText.setCompoundDrawablesRelativeWithIntrinsicBounds(
+                R.drawable.ic_lock, 0, 0, 0
+            )
+            return
+        }
+        urlEditText.setCompoundDrawablesRelativeWithIntrinsicBounds(
+            R.drawable.ic_lock, 0,
+            if (isReaderMode) R.drawable.ic_reader_active else R.drawable.ic_reader,
+            0
+        )
+    }
+
+    private fun setupSwipeRefresh() {
+        swipeRefresh.setColorSchemeResources(android.R.color.white)
+        swipeRefresh.setProgressBackgroundColorSchemeColor(Color.parseColor("#FF1C1C1E"))
+        swipeRefresh.setOnRefreshListener {
+            if (!isNewTabPage) webView.reload()
+            swipeRefresh.isRefreshing = false
+        }
+        webView.setOnScrollChangeListener { _, _, scrollY, _, oldScrollY ->
+            swipeRefresh.isEnabled = scrollY == 0
+            val delta = scrollY - oldScrollY
+            if (!isNewTabPage && abs(delta) > 6) updateBottomBarTint(currentUrl())
+        }
+    }
+
+    private fun setupFindInPage() {
+        findClose.setOnClickListener { hideFindInPage() }
+        findInput.setOnEditorActionListener { _, actionId, _ ->
+            if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+                performFind(findInput.text.toString())
+                true
+            } else false
+        }
+        findInput.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+            override fun afterTextChanged(s: Editable?) {
+                performFind(s?.toString() ?: "")
+            }
+        })
+        findNext.setOnClickListener { webView.findNext(true) }
+        findPrev.setOnClickListener { webView.findNext(false) }
+    }
+
+    private fun performFind(query: String) {
+        if (query.isBlank()) {
+            webView.clearMatches()
+            findCount.text = ""
+            return
+        }
+        webView.findAllAsync(query)
+        findCount.text = "0/0"
+    }
+
+    private fun showFindInPage() {
+        isFindVisible = true
+        findBar.visibility = View.VISIBLE
+        findInput.requestFocus()
+        val imm = requireContext().getSystemService(InputMethodManager::class.java)
+        imm.showSoftInput(findInput, InputMethodManager.SHOW_IMPLICIT)
+    }
+
+    private fun hideFindInPage() {
+        isFindVisible = false
+        findBar.visibility = View.GONE
+        findInput.setText("")
+        webView.clearMatches()
+        findCount.text = ""
+        val imm = requireContext().getSystemService(InputMethodManager::class.java)
+        imm.hideSoftInputFromWindow(findInput.windowToken, 0)
+    }
+
+    private fun showUrlSuggestions() {
+        val activity = requireActivity() as MainActivity
+        val query = urlEditText.text.toString().trim()
+
+        val suggestions = mutableListOf<Map<String, String>>()
+
+        // Add search suggestion for the typed text
+        if (query.isNotBlank()) {
+            suggestions.add(mapOf(
+                "label" to "Search for \"$query\"",
+                "url" to activity.settingsManager.getSearchUrl(query),
+                "type" to "search"
+            ))
+        }
+
+        // Add matching bookmarks
+        if (query.isNotBlank()) {
+            activity.bookmarkManager.search(query).take(3).forEach { bm ->
+                suggestions.add(mapOf(
+                    "label" to bm.title,
+                    "url" to bm.url,
+                    "type" to "bookmark"
+                ))
+            }
+        }
+
+        // Add matching history
+        if (query.isNotBlank()) {
+            activity.historyManager.search(query).take(5).forEach { h ->
+                suggestions.add(mapOf(
+                    "label" to "${h.title} — ${UrlUtils.extractDomain(h.url)}",
+                    "url" to h.url,
+                    "type" to "history"
+                ))
+            }
+        }
+
+        if (suggestions.isEmpty()) {
+            hideUrlSuggestions()
+            return
+        }
+
+        urlSuggestions.adapter = object : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+            override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+                val tv = TextView(requireContext()).apply {
+                    layoutParams = ViewGroup.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT,
+                        ViewGroup.LayoutParams.WRAP_CONTENT
+                    )
+                    setPadding(16, 12, 16, 12)
+                    textSize = 14f
+                    setTextColor(Color.WHITE)
+                    maxLines = 1
+                    ellipsize = android.text.TextUtils.TruncateAt.END
+                }
+                return object : RecyclerView.ViewHolder(tv) {}
+            }
+            override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+                (holder.itemView as TextView).apply {
+                    text = suggestions[position]["label"]
+                    setOnClickListener {
+                        val item = suggestions[position]
+                        loadUrl(item["url"] ?: "")
+                        hideKeyboardAndStrip()
+                    }
+                }
+            }
+            override fun getItemCount() = suggestions.size
+        }
+        urlSuggestions.visibility = View.VISIBLE
+    }
+
+    private fun hideUrlSuggestions() {
+        urlSuggestions.visibility = View.GONE
     }
 
     private fun currentUrl(): String {
@@ -365,20 +673,54 @@ class BrowserFragment : Fragment() {
     private fun setupNavigation() {
         btnBack.setOnClickListener { if (!isNewTabPage && webView.canGoBack()) webView.goBack() }
         btnForward.setOnClickListener { if (webView.canGoForward()) webView.goForward() }
-        btnReload.setOnClickListener {
-            if (isNewTabPage) return@setOnClickListener
-            if (webView.progress in 1..99) webView.stopLoading() else webView.reload()
+        btnBack.setOnLongClickListener { showHistoryPopUp(); true }
+        btnForward.setOnLongClickListener { showForwardPopUp(); true }
+        chipBack.setOnLongClickListener { showHistoryPopUp(); true }
+        chipForward.setOnLongClickListener { showForwardPopUp(); true }
+    }
+
+    private fun showHistoryPopUp() {
+        val activity = requireActivity() as MainActivity
+        val backHistory = activity.tabManager.getBackHistory(tabId)
+        if (backHistory.isEmpty()) {
+            Toast.makeText(requireContext(), "No back history", Toast.LENGTH_SHORT).show()
+            return
         }
+        val titles = backHistory.map { UrlUtils.extractDomain(it) }.toTypedArray()
+        AlertDialog.Builder(requireContext(), com.google.android.material.R.style.ThemeOverlay_Material3_MaterialAlertDialog)
+            .setTitle("Back")
+            .setItems(titles) { _, which ->
+                val url = backHistory[which]
+                loadUrl(url)
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
+    }
+
+    private fun showForwardPopUp() {
+        val tab = (requireActivity() as MainActivity).tabManager.getTabById(tabId) ?: return
+        val fwd = tab.forwardStack.toList().reversed()
+        if (fwd.isEmpty()) {
+            Toast.makeText(requireContext(), "No forward history", Toast.LENGTH_SHORT).show()
+            return
+        }
+        val titles = fwd.map { UrlUtils.extractDomain(it) }.toTypedArray()
+        AlertDialog.Builder(requireContext(), com.google.android.material.R.style.ThemeOverlay_Material3_MaterialAlertDialog)
+            .setTitle("Forward")
+            .setItems(titles) { _, which ->
+                loadUrl(fwd[which])
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
     }
 
     private fun setupBottomBar() {
         btnBookmark.setOnClickListener { toggleBookmark() }
         btnBookmark.setOnLongClickListener { (requireActivity() as MainActivity).showBookmarks(); true }
-        btnHistory.setOnClickListener { (requireActivity() as MainActivity).showHistory() }
         btnTabs.setOnClickListener { (requireActivity() as MainActivity).showTabSwitcher() }
         btnSettings.setOnClickListener { (requireActivity() as MainActivity).showSettings() }
         btnShare.setOnClickListener { shareCurrentPage() }
-        chipShareLink.setOnLongClickListener { showFavoriteDialog(); true }
+        btnShare.setOnLongClickListener { showFavoriteDialog(); true }
     }
 
     private fun toggleBookmark() {
@@ -404,8 +746,8 @@ class BrowserFragment : Fragment() {
         btnForward.alpha = if (canForward) 1.0f else 0.28f
         btnBack.isEnabled = canBack
         btnForward.isEnabled = canForward
-        btnReload.alpha = if (isNewTabPage) 0.28f else 1.0f
-        btnReload.isEnabled = !isNewTabPage
+        chipBack.alpha = if (canBack) 1.0f else 0.28f
+        chipForward.alpha = if (canForward) 1.0f else 0.28f
     }
 
     fun refreshTabCount() {
@@ -431,6 +773,8 @@ class BrowserFragment : Fragment() {
         imm.hideSoftInputFromWindow(urlEditText.windowToken, 0)
         urlEditText.clearFocus()
         hideActionsStrip()
+        hideUrlSuggestions()
+        if (isFindVisible) hideFindInPage()
     }
 
     fun canGoBack(): Boolean = !isNewTabPage && (_webView?.canGoBack() ?: false)
@@ -473,5 +817,20 @@ class BrowserFragment : Fragment() {
         val g = 16 + (hash shr 8 and 0x3F)
         val b = 16 + (hash and 0x3F)
         return Color.argb(242, r, g, b)
+    }
+
+    private fun showDatePicker() {
+        IOSDatePickerFragment { y, m, d ->
+            val months = arrayOf("Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec")
+            Toast.makeText(requireContext(), "${months[m]} ${d}, ${y}", Toast.LENGTH_SHORT).show()
+        }.show(parentFragmentManager, "date_picker")
+    }
+
+    private fun showTimePicker() {
+        IOSTimePickerFragment { h, m ->
+            val amPm = if (h < 12) "AM" else "PM"
+            val hour = if (h == 0) 12 else if (h > 12) h - 12 else h
+            Toast.makeText(requireContext(), "${hour}:${"%02d".format(m)} $amPm", Toast.LENGTH_SHORT).show()
+        }.show(parentFragmentManager, "time_picker")
     }
 }

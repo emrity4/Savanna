@@ -1,31 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
-  iOS Safari Layout — Mirror of native Safari browser chrome
-  ============================================================
-  - WebView fills the entire screen; content scrolls under bars
-  - Minimal top bar: progress line only
-  - Bottom bar: edge-to-edge, material blur, hairline, nested URL capsule
--->
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/bg_primary">
 
-    <!--
-      CONTENT CANVAS
-      The WebView fills the entire screen. Content scrolls under
-      the top progress bar and the bottom tab bar.
-    -->
-    <android.webkit.WebView
-        android:id="@+id/web_view"
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/swipe_refresh"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent">
 
-    <!--
-      TOP PROGRESS LINE
-      iOS Safari shows a thin loading progress line at the very top.
-      It sits above the content, not inside a chrome bar.
-    -->
+        <android.webkit.WebView
+            android:id="@+id/web_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+    <include layout="@layout/find_in_page_bar" />
+
     <ProgressBar
         android:id="@+id/progress_bar"
         style="@android:style/Widget.ProgressBar.Horizontal"
@@ -38,72 +29,6 @@
         android:indeterminate="false"
         android:visibility="gone" />
 
-    <!--
-      TOP CHROME — Minimal
-      Only back / forward / reload. The URL bar lives at the bottom.
-    -->
-    <LinearLayout
-        android:id="@+id/top_chrome"
-        android:layout_width="match_parent"
-        android:layout_height="48dp"
-        android:layout_gravity="top"
-        android:orientation="horizontal"
-        android:gravity="center_vertical"
-        android:paddingStart="12dp"
-        android:paddingEnd="12dp"
-        android:background="#E6000000">
-
-        <ImageView
-            android:id="@+id/btn_back"
-            android:layout_width="36dp"
-            android:layout_height="36dp"
-            android:src="@drawable/ic_back"
-            android:padding="8dp"
-            android:scaleType="centerInside"
-            android:contentDescription="@string/go_back"
-            android:alpha="0.5" />
-
-        <ImageView
-            android:id="@+id/btn_forward"
-            android:layout_width="36dp"
-            android:layout_height="36dp"
-            android:src="@drawable/ic_forward"
-            android:padding="8dp"
-            android:scaleType="centerInside"
-            android:contentDescription="@string/go_forward"
-            android:alpha="0.5"
-            android:layout_marginStart="4dp" />
-
-        <View
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1" />
-
-        <ImageView
-            android:id="@+id/btn_reload"
-            android:layout_width="36dp"
-            android:layout_height="36dp"
-            android:src="@drawable/ic_reload"
-            android:padding="8dp"
-            android:scaleType="centerInside"
-            android:contentDescription="@string/reload" />
-
-        <ImageView
-            android:id="@+id/btn_share"
-            android:layout_width="36dp"
-            android:layout_height="36dp"
-            android:src="@drawable/ic_share"
-            android:padding="8dp"
-            android:scaleType="centerInside"
-            android:contentDescription="Share"
-            android:layout_marginStart="4dp" />
-    </LinearLayout>
-
-    <!--
-      BOTTOM SYSTEM TAB BAR
-      Edge-to-edge, material blur, hairline separator.
-      Nests the URL capsule perfectly in the center row.
-    -->
     <LinearLayout
         android:id="@+id/bottom_bar"
         android:layout_width="match_parent"
@@ -111,58 +36,57 @@
         android:layout_gravity="bottom"
         android:orientation="vertical"
         android:background="@drawable/safari_bottom_bar"
-        android:paddingBottom="12dp"
-        android:elevation="8dp">
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginBottom="10dp"
+        android:elevation="12dp">
 
-        <!-- 0.5dp hairline separator at top edge of bar -->
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="0.5dp"
-            android:background="#55FFFFFF" />
-
-        <!-- Main bottom bar row -->
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="56dp"
+            android:layout_height="52dp"
             android:orientation="horizontal"
             android:gravity="center_vertical"
-            android:paddingStart="12dp"
-            android:paddingEnd="12dp"
-            android:paddingTop="6dp">
+            android:paddingStart="6dp"
+            android:paddingEnd="6dp">
 
-            <!-- Left: Bookmarks -->
             <ImageView
-                android:id="@+id/btn_bookmark"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:src="@drawable/ic_bookmark"
-                android:padding="9dp"
+                android:id="@+id/btn_back"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:src="@drawable/ic_back"
+                android:padding="8dp"
                 android:scaleType="centerInside"
-                android:contentDescription="@string/bookmarks" />
+                android:contentDescription="@string/go_back"
+                android:alpha="0.5" />
 
-            <!-- Left: History -->
             <ImageView
-                android:id="@+id/btn_history"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:src="@drawable/ic_history"
-                android:padding="9dp"
+                android:id="@+id/btn_forward"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:src="@drawable/ic_forward"
+                android:padding="8dp"
                 android:scaleType="centerInside"
-                android:contentDescription="@string/history"
-                android:layout_marginStart="4dp" />
+                android:contentDescription="@string/go_forward"
+                android:alpha="0.5"
+                android:layout_marginStart="2dp" />
 
-            <!--
-              CENTER: URL CAPSULE
-              Fixed height 44dp, full rounded ends (capsule),
-              flat gray adaptive tint, nested within the bar row.
-            -->
+            <ImageView
+                android:id="@+id/btn_share"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:src="@drawable/ic_share"
+                android:padding="8dp"
+                android:scaleType="centerInside"
+                android:contentDescription="@string/share"
+                android:layout_marginStart="2dp" />
+
             <EditText
                 android:id="@+id/url_edit_text"
                 android:layout_width="0dp"
                 android:layout_height="44dp"
                 android:layout_weight="1"
-                android:layout_marginStart="10dp"
-                android:layout_marginEnd="10dp"
+                android:layout_marginStart="6dp"
+                android:layout_marginEnd="6dp"
                 android:background="@drawable/safari_url_capsule"
                 android:hint="@string/search_hint"
                 android:textColor="@color/text_primary"
@@ -170,69 +94,91 @@
                 android:textSize="14sp"
                 android:gravity="center"
                 android:paddingStart="16dp"
-                android:paddingEnd="16dp"
+                android:paddingEnd="38dp"
                 android:drawableStart="@drawable/ic_lock"
                 android:drawablePadding="8dp"
+                android:drawableEnd="@drawable/ic_reader"
                 android:importantForAutofill="no"
-                android:inputType="textUri"
+                android:inputType="textNoSuggestions"
                 android:maxLines="1"
                 android:ellipsize="end" />
 
-            <!-- Right: Tabs with badge -->
             <FrameLayout
                 android:id="@+id/btn_tabs_container"
-                android:layout_width="40dp"
-                android:layout_height="40dp">
+                android:layout_width="36dp"
+                android:layout_height="36dp">
 
                 <ImageView
                     android:id="@+id/btn_tabs"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:src="@drawable/ic_tabs"
-                    android:padding="9dp"
+                    android:padding="7dp"
                     android:scaleType="centerInside"
                     android:contentDescription="@string/tabs" />
 
                 <TextView
                     android:id="@+id/tab_count_badge"
-                    android:layout_width="16dp"
-                    android:layout_height="16dp"
+                    android:layout_width="14dp"
+                    android:layout_height="14dp"
                     android:layout_gravity="top|end"
-                    android:layout_marginTop="1dp"
-                    android:layout_marginEnd="2dp"
+                    android:layout_marginTop="0dp"
+                    android:layout_marginEnd="1dp"
                     android:background="@drawable/badge_background"
                     android:gravity="center"
                     android:textColor="@color/text_primary"
-                    android:textSize="8sp"
+                    android:textSize="7sp"
                     android:textStyle="bold"
                     android:text="1" />
             </FrameLayout>
 
-            <!-- Right: Settings -->
+            <ImageView
+                android:id="@+id/btn_bookmark"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:src="@drawable/ic_bookmark"
+                android:padding="7dp"
+                android:scaleType="centerInside"
+                android:contentDescription="@string/bookmarks"
+                android:layout_marginStart="2dp" />
+
             <ImageView
                 android:id="@+id/btn_settings"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
                 android:src="@drawable/ic_settings"
-                android:padding="9dp"
+                android:padding="7dp"
                 android:scaleType="centerInside"
                 android:contentDescription="@string/settings"
-                android:layout_marginStart="4dp" />
+                android:layout_marginStart="2dp" />
 
         </LinearLayout>
     </LinearLayout>
 
-    <!--
-      URL ACTIONS STRIP
-      Shown when the URL capsule is focused. Slides down from the top chrome.
-    -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/url_suggestions"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:layout_marginBottom="64dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
+        android:background="@drawable/safari_bottom_bar"
+        android:elevation="10dp"
+        android:clipToPadding="true"
+        android:paddingVertical="8dp"
+        android:visibility="gone"
+        android:overScrollMode="never"
+        android:nestedScrollingEnabled="false" />
+
     <HorizontalScrollView
         android:id="@+id/url_actions_strip"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="top"
-        android:layout_marginTop="48dp"
+        android:layout_gravity="bottom"
+        android:layout_marginBottom="64dp"
         android:background="#E8000000"
+        android:clipToPadding="false"
         android:scrollbars="none"
         android:paddingStart="12dp"
         android:paddingEnd="12dp"
@@ -304,6 +250,97 @@
                 android:layout_width="wrap_content"
                 android:layout_height="34dp"
                 android:text="Share Link"
+                android:gravity="center"
+                android:paddingStart="14dp"
+                android:paddingEnd="14dp"
+                android:textColor="@color/text_primary"
+                android:textSize="13sp"
+                android:background="@drawable/action_chip_background"
+                android:layout_marginEnd="8dp" />
+
+            <TextView
+                android:id="@+id/chip_find"
+                android:layout_width="wrap_content"
+                android:layout_height="34dp"
+                android:text="Find"
+                android:gravity="center"
+                android:paddingStart="14dp"
+                android:paddingEnd="14dp"
+                android:textColor="@color/text_primary"
+                android:textSize="13sp"
+                android:background="@drawable/action_chip_background"
+                android:layout_marginEnd="8dp" />
+
+            <TextView
+                android:id="@+id/chip_reload"
+                android:layout_width="wrap_content"
+                android:layout_height="34dp"
+                android:text="Reload"
+                android:gravity="center"
+                android:paddingStart="14dp"
+                android:paddingEnd="14dp"
+                android:textColor="@color/text_primary"
+                android:textSize="13sp"
+                android:background="@drawable/action_chip_background"
+                android:layout_marginEnd="8dp" />
+
+            <TextView
+                android:id="@+id/chip_history"
+                android:layout_width="wrap_content"
+                android:layout_height="34dp"
+                android:text="@string/history"
+                android:gravity="center"
+                android:paddingStart="14dp"
+                android:paddingEnd="14dp"
+                android:textColor="@color/text_primary"
+                android:textSize="13sp"
+                android:background="@drawable/action_chip_background"
+                android:layout_marginEnd="8dp" />
+
+            <TextView
+                android:id="@+id/chip_back"
+                android:layout_width="wrap_content"
+                android:layout_height="34dp"
+                android:text="@string/nav_back"
+                android:gravity="center"
+                android:paddingStart="14dp"
+                android:paddingEnd="14dp"
+                android:textColor="@color/text_primary"
+                android:textSize="13sp"
+                android:background="@drawable/action_chip_background"
+                android:layout_marginEnd="8dp" />
+
+            <TextView
+                android:id="@+id/chip_forward"
+                android:layout_width="wrap_content"
+                android:layout_height="34dp"
+                android:text="@string/nav_forward"
+                android:gravity="center"
+                android:paddingStart="14dp"
+                android:paddingEnd="14dp"
+                android:textColor="@color/text_primary"
+                android:textSize="13sp"
+                android:background="@drawable/action_chip_background"
+                android:layout_marginEnd="8dp" />
+
+            <TextView
+                android:id="@+id/chip_date"
+                android:layout_width="wrap_content"
+                android:layout_height="34dp"
+                android:text="@string/pick_date"
+                android:gravity="center"
+                android:paddingStart="14dp"
+                android:paddingEnd="14dp"
+                android:textColor="@color/text_primary"
+                android:textSize="13sp"
+                android:background="@drawable/action_chip_background"
+                android:layout_marginEnd="8dp" />
+
+            <TextView
+                android:id="@+id/chip_time"
+                android:layout_width="wrap_content"
+                android:layout_height="34dp"
+                android:text="@string/pick_time"
                 android:gravity="center"
                 android:paddingStart="14dp"
                 android:paddingEnd="14dp"

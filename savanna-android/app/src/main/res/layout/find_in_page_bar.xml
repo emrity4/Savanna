@@ -1,0 +1,68 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/find_bar"
+    android:layout_width="match_parent"
+    android:layout_height="52dp"
+    android:layout_gravity="top"
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
+    android:background="@drawable/safari_bottom_bar"
+    android:paddingStart="10dp"
+    android:paddingEnd="10dp"
+    android:elevation="8dp"
+    android:visibility="gone">
+
+    <EditText
+        android:id="@+id/find_input"
+        android:layout_width="0dp"
+        android:layout_height="36dp"
+        android:layout_weight="1"
+        android:background="@drawable/safari_url_capsule"
+        android:hint="Find in page"
+        android:textColor="@color/text_primary"
+        android:textColorHint="@color/text_secondary"
+        android:textSize="13sp"
+        android:gravity="center_vertical"
+        android:paddingStart="12dp"
+        android:paddingEnd="12dp"
+        android:inputType="text"
+        android:maxLines="1"
+        android:imeOptions="actionSearch" />
+
+    <TextView
+        android:id="@+id/find_count"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/text_secondary"
+        android:textSize="12sp"
+        android:layout_marginStart="8dp"
+        android:minWidth="40dp"
+        android:gravity="center" />
+
+    <ImageView
+        android:id="@+id/find_prev"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:src="@drawable/ic_chevron_up"
+        android:padding="6dp"
+        android:scaleType="centerInside"
+        android:contentDescription="Previous match" />
+
+    <ImageView
+        android:id="@+id/find_next"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:src="@drawable/ic_chevron_down"
+        android:padding="6dp"
+        android:scaleType="centerInside"
+        android:contentDescription="Next match" />
+
+    <ImageView
+        android:id="@+id/find_close"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:src="@drawable/ic_close"
+        android:padding="7dp"
+        android:scaleType="centerInside"
+        android:contentDescription="Done" />
+
+</LinearLayout>

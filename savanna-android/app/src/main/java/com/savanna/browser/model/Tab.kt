@@ -9,5 +9,8 @@ data class Tab(
     var isLoading: Boolean = false,
     var progress: Int = 0,
     var canGoBack: Boolean = false,
-    var canGoForward: Boolean = false
+    var canGoForward: Boolean = false,
+    var readerModeOn: Boolean = false,
+    val pageHistory: MutableList<String> = mutableListOf(),
+    var forwardStack: MutableList<String> = mutableListOf()
 )

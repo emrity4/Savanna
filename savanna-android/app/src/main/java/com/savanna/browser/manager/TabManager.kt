@@ -48,13 +48,34 @@ class TabManager {
                   isLoading: Boolean? = null, progress: Int? = null,
                   canGoBack: Boolean? = null, canGoForward: Boolean? = null) {
         tabs.find { it.id == tabId }?.apply {
+            val prevUrl = this.url
             url?.let { this.url = it }
             title?.let { this.title = it }
             isLoading?.let { this.isLoading = it }
             progress?.let { this.progress = it }
             canGoBack?.let { this.canGoBack = it }
             canGoForward?.let { this.canGoForward = it }
+            if (url != null && url != prevUrl && url.startsWith("http")) {
+                if (prevUrl.isNotBlank() && prevUrl.startsWith("http")) {
+                    pageHistory.add(prevUrl)
+                }
+                forwardStack.clear()
+            }
         }
+    }
+
+    fun getBackHistory(tabId: String): List<String> {
+        val tab = getTabById(tabId) ?: return emptyList()
+        return tab.pageHistory.toList().reversed()
+    }
+
+    fun goBackInHistory(tabId: String): String? {
+        val tab = getTabById(tabId) ?: return null
+        if (tab.pageHistory.isEmpty()) return null
+        val prevUrl = tab.pageHistory.removeAt(tab.pageHistory.size - 1)
+        tab.forwardStack.add(tab.url)
+        tab.url = prevUrl
+        return prevUrl
     }
 
     fun getTabById(tabId: String): Tab? = tabs.find { it.id == tabId }
