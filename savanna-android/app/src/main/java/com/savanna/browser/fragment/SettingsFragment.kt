@@ -25,7 +25,7 @@ class SettingsFragment : Fragment() {
         val activity = requireActivity() as MainActivity
         val settings = activity.settingsManager
         val theme = activity.themeManager
-        view.setBackgroundColor(theme.activePreset.bgColor)
+        view.setBackgroundColor(theme.bgColor)
 
         val btnClose = view.findViewById<ImageView>(R.id.btn_close_settings)
         val themeValue = view.findViewById<TextView>(R.id.theme_value)
@@ -43,7 +43,7 @@ class SettingsFragment : Fragment() {
         val passwordsCount = view.findViewById<TextView>(R.id.passwords_count)
         val siteSettingsCount = view.findViewById<TextView>(R.id.site_settings_count)
 
-        themeValue.text = theme.activePreset.name
+        themeValue.text = if (theme.isDarkMode) "Dark" else "Light"
         searchEngineValue.text = getSearchEngineName(settings.searchEngine)
         tabModeValue.text = getTabModeName(settings.tabMode)
         switchJs.isChecked = settings.javascriptEnabled

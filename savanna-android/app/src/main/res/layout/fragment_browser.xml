@@ -15,7 +15,7 @@
             android:layout_height="match_parent" />
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
-    <include layout="@layout/find_in_page_bar" />
+    <include layout="@layout/find_in_page_bar" android:layout_marginTop="24dp" />
 
     <FrameLayout
         android:id="@+id/tabs_mode_c"
@@ -279,12 +279,14 @@
         <Space android:layout_width="0dp" android:layout_height="48dp" android:layout_weight="1" />
         <ImageView android:id="@+id/compact_btn_bookmark" android:layout_width="24dp" android:layout_height="48dp" android:src="@drawable/ic_bookmark" android:scaleType="centerInside" />
         <Space android:layout_width="0dp" android:layout_height="48dp" android:layout_weight="1" />
+        <ImageView android:id="@+id/compact_btn_settings" android:layout_width="24dp" android:layout_height="48dp" android:src="@drawable/ic_settings" android:scaleType="centerInside" />
+        <Space android:layout_width="0dp" android:layout_height="48dp" android:layout_weight="1" />
     </LinearLayout>
 
     <FrameLayout
         android:id="@+id/url_scroll_pill"
-        android:layout_width="98dp"
-        android:layout_height="32dp"
+        android:layout_width="142dp"
+        android:layout_height="46dp"
         android:layout_gravity="center_horizontal|bottom"
         android:layout_marginBottom="16dp"
         android:background="@drawable/tabs_mode_c_button"
@@ -298,7 +300,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:textColor="@color/text_primary"
-            android:textSize="12sp"
+            android:textSize="14sp"
             android:maxLines="1"
             android:ellipsize="end" />
     </FrameLayout>

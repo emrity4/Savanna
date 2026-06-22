@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Advanced Theme / Appearance sheet -->
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
@@ -62,59 +61,59 @@
             android:padding="16dp"
             android:paddingBottom="56dp">
 
-            <!-- ── COLOR THEME ── -->
+            <!-- ── APPEARANCE ── -->
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="COLOR THEME"
+                android:text="APPEARANCE"
                 android:textColor="@color/purple_primary"
                 android:textSize="11sp"
                 android:textStyle="bold"
                 android:letterSpacing="0.12"
-                android:layout_marginBottom="12dp"
+                android:layout_marginBottom="10dp"
                 android:layout_marginStart="4dp" />
 
-            <HorizontalScrollView
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="28dp"
-                android:scrollbars="none">
+                android:background="@drawable/glass_background"
+                android:orientation="vertical"
+                android:padding="2dp"
+                android:layout_marginBottom="28dp">
 
-                <LinearLayout
-                    android:id="@+id/theme_presets_container"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:paddingEnd="8dp" />
-            </HorizontalScrollView>
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="54dp"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="16dp">
 
-            <!-- ── ACCENT COLOR ── -->
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="ACCENT COLOR"
-                android:textColor="@color/purple_primary"
-                android:textSize="11sp"
-                android:textStyle="bold"
-                android:letterSpacing="0.12"
-                android:layout_marginBottom="12dp"
-                android:layout_marginStart="4dp" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:text="Dark Mode"
+                        android:textColor="@color/text_primary"
+                        android:textSize="15sp" />
 
-            <HorizontalScrollView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="28dp"
-                android:scrollbars="none">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@android:id/title"
+                        android:layout_centerVertical="true"
+                        android:layout_alignParentStart="true"
+                        android:layout_marginTop="18dp"
+                        android:text="OLED black background"
+                        android:textColor="@color/text_secondary"
+                        android:textSize="12sp" />
 
-                <LinearLayout
-                    android:id="@+id/accent_colors_container"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:paddingStart="4dp"
-                    android:paddingEnd="8dp"
-                    android:gravity="center_vertical" />
-            </HorizontalScrollView>
+                    <com.google.android.material.materialswitch.MaterialSwitch
+                        android:id="@+id/switch_dark_mode"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerVertical="true" />
+                </RelativeLayout>
+            </LinearLayout>
 
             <!-- ── URL BAR STYLE ── -->
             <TextView

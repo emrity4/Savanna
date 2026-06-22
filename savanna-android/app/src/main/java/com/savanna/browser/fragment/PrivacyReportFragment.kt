@@ -21,7 +21,7 @@ class PrivacyReportFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         val activity = requireActivity() as MainActivity
-        view.setBackgroundColor(activity.themeManager.activePreset.bgColor)
+        view.setBackgroundColor(activity.themeManager.bgColor)
         val report = activity.trackerBlocker.getPrivacyReport()
 
         val btnClose: ImageView = view.findViewById(R.id.btn_close_privacy)

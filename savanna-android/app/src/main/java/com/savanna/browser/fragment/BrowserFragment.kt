@@ -176,6 +176,8 @@ class BrowserFragment : Fragment() {
         setupSwipeRefresh()
         setupFindInPage()
         refreshTabCount()
+        applyThemeColors()
+        applyTabMode()
 
         val urlToLoad = if (initialUrl.isBlank() || initialUrl == "about:blank") NEW_TAB_URL else initialUrl
         loadUrl(urlToLoad)
@@ -373,7 +375,7 @@ class BrowserFragment : Fragment() {
             })
             items.add("Share" to { shareCurrentPage() })
             val labels = items.map { it.first }.toTypedArray()
-            android.app.AlertDialog.Builder(requireContext())
+            android.app.AlertDialog.Builder(requireContext(), com.google.android.material.R.style.ThemeOverlay_Material3_MaterialAlertDialog)
                 .setItems(labels) { _, i -> items[i].second() }
                 .show()
             true
@@ -644,7 +646,7 @@ class BrowserFragment : Fragment() {
         }
         webView.setOnScrollChangeListener { _, _, scrollY, _, oldScrollY ->
             swipeRefresh.isEnabled = scrollY == 0
-            if (isNewTabPage) return@setOnScrollChangeListener
+            if (isNewTabPage || isCompactMode) return@setOnScrollChangeListener
             val delta = scrollY - oldScrollY
             val url = currentUrl()
             if (abs(delta) > 6) updateBottomBarTint(url)
@@ -870,6 +872,7 @@ class BrowserFragment : Fragment() {
         view?.findViewById<android.widget.ImageView>(R.id.compact_btn_share)?.setOnClickListener { shareCurrentPage() }
         view?.findViewById<android.widget.TextView>(R.id.compact_btn_tabs)?.setOnClickListener { (requireActivity() as MainActivity).showTabSwitcher() }
         view?.findViewById<android.widget.ImageView>(R.id.compact_btn_bookmark)?.setOnClickListener { toggleBookmark() }
+        view?.findViewById<android.widget.ImageView>(R.id.compact_btn_settings)?.setOnClickListener { (requireActivity() as MainActivity).showSettings() }
         view?.findViewById<android.widget.EditText>(R.id.compact_url_text)?.setOnClickListener { focusUrlBar() }
     }
 
@@ -909,7 +912,7 @@ class BrowserFragment : Fragment() {
     private fun applyThemeColors() {
         val activity = requireActivity() as? MainActivity ?: return
         val tm = activity.themeManager
-        val newBg = tm.activePreset.bgColor
+        val newBg = tm.bgColor
         val style = tm.urlBarStyle
         val bgChanged = newBg != themeBgColor
         val styleChanged = style != lastUrlBarStyle
@@ -932,7 +935,7 @@ class BrowserFragment : Fragment() {
         val topBorderRounded = GradientDrawable().apply {
             shape = GradientDrawable.RECTANGLE
             cornerRadius = 22f * density
-            setColor(fillColor)
+            setColor(if (isDark) 0x30FFFFFF.toInt() else 0x30000000.toInt())
             setStroke((2 * density).toInt(), borderColor)
         }
         topSearchBar.background = topBorderRounded
@@ -958,7 +961,7 @@ class BrowserFragment : Fragment() {
                 urlBarContainer.background.alpha = 120
             }
             else -> {
-                if (tm.themeId == "oled") {
+                if (tm.isDarkMode) {
                     urlBarContainer.setBackgroundResource(R.drawable.tabs_mode_b)
                     urlBarContainer.background.alpha = 255
                 } else {
@@ -976,7 +979,7 @@ class BrowserFragment : Fragment() {
 
         swipeRefresh.setProgressBackgroundColorSchemeColor(newBg)
 
-        if (tm.themeId != "oled") {
+        if (!tm.isDarkMode) {
             findBar.setBackgroundColor(newBg)
             val fi = GradientDrawable().apply {
                 shape = GradientDrawable.RECTANGLE
@@ -991,7 +994,7 @@ class BrowserFragment : Fragment() {
 
         val showingDefault = currentToolbarTint == lastDefaultBg || currentToolbarTint == Color.TRANSPARENT
         if (showingDefault || bgChanged) {
-            if (tm.themeId == "oled") {
+            if (tm.isDarkMode) {
                 currentToolbarTint = Color.TRANSPARENT
                 bottomBar.setBackgroundResource(R.drawable.safari_bottom_bar)
             } else {
@@ -1108,7 +1111,7 @@ class BrowserFragment : Fragment() {
 
     private fun resetBottomBarTint() {
         val activity = requireActivity() as? MainActivity ?: return
-        if (activity.themeManager.themeId == "oled") {
+        if (activity.themeManager.isDarkMode) {
             currentToolbarTint = Color.TRANSPARENT
             bottomBar.setBackgroundResource(R.drawable.safari_bottom_bar)
         } else {

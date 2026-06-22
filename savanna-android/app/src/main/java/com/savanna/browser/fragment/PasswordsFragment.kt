@@ -34,7 +34,7 @@ class PasswordsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val activity = requireActivity() as MainActivity
-        view.setBackgroundColor(activity.themeManager.activePreset.bgColor)
+        view.setBackgroundColor(activity.themeManager.bgColor)
 
         recyclerView = view.findViewById(R.id.passwords_recycler)
         emptyText = view.findViewById(R.id.empty_text)
@@ -111,7 +111,7 @@ class PasswordsFragment : Fragment() {
         val urlInput = TextInputEditText(requireContext()).apply {
             hint = "Website URL"
             setText(entry?.url ?: "https://")
-            setTextColor(activity.themeManager.activePreset.bgColor.inv())
+            setTextColor(activity.themeManager.bgColor.inv())
             setSingleLine()
         }
         val userInput = TextInputEditText(requireContext()).apply {
