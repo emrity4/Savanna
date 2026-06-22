@@ -178,6 +178,7 @@ class BrowserFragment : Fragment() {
 
         liquidGlassView = LiquidGlassView(requireContext()).apply {
             id = View.generateViewId()
+            visibility = View.GONE
             layoutParams = FrameLayout.LayoutParams(
                 FrameLayout.LayoutParams.MATCH_PARENT,
                 FrameLayout.LayoutParams.MATCH_PARENT
@@ -991,11 +992,16 @@ class BrowserFragment : Fragment() {
             }
         }
 
-        liquidGlassView?.updateParams(
-            opacity = 0.85f,
-            radius = 30f * density
-        )
-        view?.postDelayed({ liquidGlassView?.snap() }, 50)
+        if (style == ThemeManager.STYLE_GLASS) {
+            liquidGlassView?.visibility = View.VISIBLE
+            liquidGlassView?.updateParams(
+                opacity = 0.85f,
+                radius = 30f * density
+            )
+            view?.postDelayed({ liquidGlassView?.snap() }, 50)
+        } else {
+            liquidGlassView?.visibility = View.GONE
+        }
 
         urlScrollPill.background = GradientDrawable().apply {
             shape = GradientDrawable.RECTANGLE

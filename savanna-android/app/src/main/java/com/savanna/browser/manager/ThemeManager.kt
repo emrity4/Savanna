@@ -29,7 +29,7 @@ class ThemeManager(private val context: Context) {
         set(v) { prefs.edit().putBoolean("dark_mode", v).apply() }
 
     var urlBarStyle: String
-        get() = prefs.getString("url_bar_style", STYLE_GLASS) ?: STYLE_GLASS
+        get() = prefs.getString("url_bar_style", STYLE_SOLID) ?: STYLE_SOLID
         set(v) { prefs.edit().putString("url_bar_style", v).apply() }
 
     var textSize: String
