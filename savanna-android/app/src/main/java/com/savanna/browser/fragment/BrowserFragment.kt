@@ -1198,22 +1198,31 @@ class BrowserFragment : Fragment() {
 
     private fun displayPptx(file: java.io.File) {
         try {
-            val bytes = file.readBytes()
-            val b64 = android.util.Base64.encodeToString(bytes, android.util.Base64.DEFAULT)
-            isNewTabPage = false
-            _webView?.addJavascriptInterface(PptxBridge(b64), "PptxBridge")
-            _webView?.loadUrl("file:///android_asset/pptx/pptx_renderer.html")
+            val parser = org.apache.tika.parser.AutoDetectParser()
+            val handler = org.apache.tika.sax.ToXMLContentHandler()
+            val metadata = org.apache.tika.metadata.Metadata()
+            val input = java.io.FileInputStream(file)
+            parser.parse(input, handler, metadata, org.apache.tika.parser.ParseContext())
+            input.close()
+            val html = handler.toString()
+            // wrap in responsive styling
+            val styled = """<!DOCTYPE html>
+<html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+body{font-family:-apple-system,Helvetica,Arial,sans-serif;margin:0;padding:16px;background:#f0f0f0;color:#333}
+.slide-page{background:#fff;border-radius:10px;padding:32px 24px;margin-bottom:16px;box-shadow:0 2px 12px rgba(0,0,0,0.12);min-height:300px;page-break-after:always}
+h1{font-size:28px;margin-bottom:16px}
+h2{font-size:22px;margin-bottom:12px}
+p{font-size:16px;line-height:1.5;margin:8px 0}
+img{max-width:100%;height:auto;display:block;margin:12px 0}
+ul,ol{padding-left:24px;margin:8px 0}
+li{margin:4px 0;font-size:15px;line-height:1.4}
+</style></head><body>$html</body></html>"""
+            _webView?.loadDataWithBaseURL(null, styled, "text/html", "UTF-8", null)
         } catch (e: Exception) {
             Toast.makeText(requireContext(), "Cannot render PPTX", Toast.LENGTH_SHORT).show()
         }
     }
-
-    private class PptxBridge(private val data: String) {
-        @android.webkit.JavascriptInterface
-        fun getPptxData(): String = data
-    }
-
-    private fun openExternal(file: java.io.File, mime: String) {
         val fileUri = Uri.fromFile(file)
         startActivity(Intent(Intent.ACTION_VIEW).apply {
             setDataAndType(fileUri, mime)

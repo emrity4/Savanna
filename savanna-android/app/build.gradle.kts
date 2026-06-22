@@ -65,4 +65,9 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.7.0")
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.7.0")
     implementation("androidx.biometric:biometric:1.1.0")
+    implementation("org.apache.tika:tika-core:2.9.2")
+    implementation("org.apache.tika:tika-parsers-standard-package:2.9.2") {
+        exclude(group = "com.google.guava", module = "guava")
+        exclude(group = "com.google.guava", module = "listenablefuture")
+    }
 }
