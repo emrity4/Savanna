@@ -100,10 +100,7 @@ class BrowserFragment : Fragment() {
     private lateinit var urlBarContainer: View
     private val density get() = resources.displayMetrics.density
 
-    private val SAFARI_UA =
-        "Mozilla/5.0 (iPhone; CPU iPhone OS 17_4 like Mac OS X) " +
-        "AppleWebKit/605.1.15 (KHTML, like Gecko) " +
-        "Version/17.4 Mobile/15E148 Safari/604.1"
+    private val CHROME_UA by lazy { WebSettings.getDefaultUserAgent(requireContext()) }
 
     companion object {
         private const val ARG_TAB_ID = "tab_id"
@@ -202,7 +199,7 @@ class BrowserFragment : Fragment() {
             mixedContentMode = WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE
             mediaPlaybackRequiresUserGesture = true
             databaseEnabled = true
-            userAgentString = SAFARI_UA
+            userAgentString = CHROME_UA
         }
 
         webView.addJavascriptInterface(
@@ -216,7 +213,7 @@ class BrowserFragment : Fragment() {
 
         webView.setDownloadListener { url, _, contentDisposition, mimetype, _ ->
             try {
-                activity.downloadManager.enqueue(url, SAFARI_UA, contentDisposition, mimetype)
+                activity.downloadManager.enqueue(url, CHROME_UA, contentDisposition, mimetype)
                 Toast.makeText(requireContext(), "Download started", Toast.LENGTH_SHORT).show()
             } catch (e: Exception) {
                 try { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url))) }
