@@ -41,6 +41,7 @@ class SettingsFragment : Fragment() {
         val historyCount = view.findViewById<TextView>(R.id.history_count)
         val downloadsCount = view.findViewById<TextView>(R.id.downloads_count)
         val passwordsCount = view.findViewById<TextView>(R.id.passwords_count)
+        val siteSettingsCount = view.findViewById<TextView>(R.id.site_settings_count)
 
         themeValue.text = theme.activePreset.name
         searchEngineValue.text = getSearchEngineName(settings.searchEngine)
@@ -54,6 +55,7 @@ class SettingsFragment : Fragment() {
         historyCount.text = "${activity.historyManager.allHistory.size} items"
         downloadsCount.text = "${activity.downloadManager.getAll().size} items"
         passwordsCount.text = "${activity.passwordManager.load().size} saved"
+        siteSettingsCount.text = "${activity.sitePermissionsManager.getAll().size} sites"
 
         view.findViewById<View>(R.id.setting_theme).setOnClickListener {
             activity.closeOverlay()
@@ -81,6 +83,11 @@ class SettingsFragment : Fragment() {
         view.findViewById<View>(R.id.setting_passwords).setOnClickListener {
             activity.closeOverlay()
             activity.showPasswords()
+        }
+
+        view.findViewById<View>(R.id.setting_site_settings).setOnClickListener {
+            activity.closeOverlay()
+            activity.showSiteSettings()
         }
 
         switchJs.setOnCheckedChangeListener { _, v ->

@@ -1,10 +1,12 @@
 package com.savanna.browser.fragment
 
 import android.annotation.SuppressLint
+import android.Manifest
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.drawable.GradientDrawable
@@ -28,7 +30,9 @@ import android.widget.LinearLayout
 import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -38,6 +42,7 @@ import com.savanna.browser.MainActivity
 import com.savanna.browser.NewTabBridge
 import com.savanna.browser.R
 import com.savanna.browser.manager.ThemeManager
+import com.savanna.browser.model.SitePermission
 import com.savanna.browser.util.UrlUtils
 import kotlin.math.abs
 
@@ -90,6 +95,7 @@ class BrowserFragment : Fragment() {
     private var scrollPillAlpha = 0f
     private var isReaderMode = false
     private var isFindVisible = false
+    private val requestPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) { }
 
     private var tabId: String = ""
     private val webView get() = _webView!!
@@ -311,6 +317,27 @@ class BrowserFragment : Fragment() {
             }
             override fun onReceivedTitle(view: WebView?, title: String?) {
                 if (!isNewTabPage) title?.let { activity.tabManager.updateTab(tabId, title = it) }
+            }
+            override fun onPermissionRequest(request: PermissionRequest?) {
+                val origin = request?.origin?.host ?: run { request?.deny(); return }
+                val pm = activity.sitePermissionsManager
+                val perms = pm.get(origin)
+                val granted = mutableListOf<String>()
+                val denied = mutableListOf<String>()
+                for (r in request.resources) {
+                    val state = when (r) {
+                        PermissionRequest.RESOURCE_VIDEO_CAPTURE -> perms.camera
+                        PermissionRequest.RESOURCE_AUDIO_CAPTURE -> perms.microphone
+                        else -> SitePermission.ASK
+                    }
+                    when (state) {
+                        SitePermission.ALLOW -> granted.add(r)
+                        SitePermission.DENY -> denied.add(r)
+                        else -> askPermission(request, origin, r, granted, denied)
+                    }
+                }
+                if (granted.isNotEmpty()) request.grant(granted.toTypedArray())
+                if (denied.isNotEmpty()) request.deny()
             }
         }
 
@@ -632,6 +659,44 @@ class BrowserFragment : Fragment() {
                 bar.alpha = 0f
                 bar.animate().alpha(1f).setDuration(200).start()
             }
+        }
+    }
+
+    private fun askPermission(request: PermissionRequest, origin: String, resource: String, granted: MutableList<String>, denied: MutableList<String>) {
+        if (granted.isNotEmpty() || denied.isNotEmpty()) return
+        val label = when (resource) {
+            PermissionRequest.RESOURCE_VIDEO_CAPTURE -> "Camera"
+            PermissionRequest.RESOURCE_AUDIO_CAPTURE -> "Microphone"
+            else -> resource
+        }
+        val androidPerm = when (resource) {
+            PermissionRequest.RESOURCE_VIDEO_CAPTURE -> Manifest.permission.CAMERA
+            PermissionRequest.RESOURCE_AUDIO_CAPTURE -> Manifest.permission.RECORD_AUDIO
+            else -> null
+        }
+        if (androidPerm != null && ContextCompat.checkSelfPermission(requireContext(), androidPerm) != PackageManager.PERMISSION_GRANTED) {
+            requestPermissionLauncher.launch(androidPerm)
+            request.deny()
+            return
+        }
+        requireActivity().runOnUiThread {
+            android.app.AlertDialog.Builder(requireContext())
+                .setTitle("$label access requested")
+                .setMessage("$origin wants to use your $label")
+                .setNegativeButton("Deny") { _, _ ->
+                    denied.add(resource)
+                    request.deny()
+                }
+                .setNeutralButton("Allow once") { _, _ ->
+                    granted.add(resource)
+                    request.grant(arrayOf(resource))
+                }
+                .setPositiveButton("Always allow") { _, _ ->
+                    val pm = (requireActivity() as MainActivity).sitePermissionsManager
+                    pm.set(origin) { it.copy(camera = if (resource == PermissionRequest.RESOURCE_VIDEO_CAPTURE) SitePermission.ALLOW else it.camera, microphone = if (resource == PermissionRequest.RESOURCE_AUDIO_CAPTURE) SitePermission.ALLOW else it.microphone) }
+                    granted.add(resource)
+                    request.grant(arrayOf(resource))
+                }.show()
         }
     }
 

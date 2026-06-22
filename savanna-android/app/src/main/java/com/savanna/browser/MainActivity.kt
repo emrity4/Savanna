@@ -21,6 +21,7 @@ class MainActivity : AppCompatActivity() {
     lateinit var downloadManager: AppDownloadManager
     lateinit var themeManager: ThemeManager
     lateinit var passwordManager: PasswordManager
+    lateinit var sitePermissionsManager: SitePermissionsManager
 
     var currentBrowserFragment: BrowserFragment? = null
         private set
@@ -41,6 +42,7 @@ class MainActivity : AppCompatActivity() {
         trackerBlocker  = TrackerBlocker(this)
         downloadManager = AppDownloadManager(this)
         passwordManager = PasswordManager(this)
+        sitePermissionsManager = SitePermissionsManager(this)
 
         requestPermissions()
 
@@ -91,6 +93,7 @@ class MainActivity : AppCompatActivity() {
     fun showSettings()      = showOverlayFragment(SettingsFragment(),       "settings",
                                   R.anim.slide_in_right, R.anim.slide_out_left)
     fun showPasswords()     = showOverlayFragment(PasswordsFragment(),      "passwords")
+    fun showSiteSettings()  = showOverlayFragment(SiteSettingsFragment(),   "site_settings")
 
     private fun requestPermissions() {
         val needed = mutableListOf<String>()
