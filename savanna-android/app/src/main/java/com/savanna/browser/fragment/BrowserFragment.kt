@@ -21,6 +21,7 @@ import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.webkit.*
 import android.widget.EditText
+import android.widget.FrameLayout
 import android.widget.HorizontalScrollView
 import android.widget.ImageView
 import android.widget.LinearLayout
@@ -75,7 +76,8 @@ class BrowserFragment : Fragment() {
     private lateinit var findClose: ImageView
     private lateinit var urlSuggestions: RecyclerView
     private lateinit var urlLock: ImageView
-    private lateinit var urlReader: ImageView
+    private lateinit var urlReload: ImageView
+    private lateinit var urlBarSearch: FrameLayout
     private var isReaderMode = false
     private var isFindVisible = false
 
@@ -127,7 +129,7 @@ class BrowserFragment : Fragment() {
         btnBookmark = view.findViewById(R.id.btn_bookmark)
         btnTabs = view.findViewById(R.id.btn_tabs)
         btnSettings = view.findViewById(R.id.btn_settings)
-        urlBarContainer = view.findViewById(R.id.url_bar_container)
+        urlBarContainer = view.findViewById(R.id.tabs_mode_c)
         urlActionsStrip = view.findViewById(R.id.url_actions_strip)
         chipClear = view.findViewById(R.id.chip_clear)
         chipCopy = view.findViewById(R.id.chip_copy)
@@ -151,7 +153,8 @@ class BrowserFragment : Fragment() {
         urlSuggestions = view.findViewById(R.id.url_suggestions)
         urlSuggestions.layoutManager = LinearLayoutManager(requireContext())
         urlLock = view.findViewById(R.id.url_lock)
-        urlReader = view.findViewById(R.id.url_reader)
+        urlBarSearch = view.findViewById(R.id.url_bar_search)
+        urlReload = view.findViewById(R.id.url_reload)
 
         setupWebView()
         setupUrlBar()
@@ -224,7 +227,7 @@ class BrowserFragment : Fragment() {
                 progressBar.visibility = View.VISIBLE
                 progressBar.progress = 0
                 chipReload.text = "Stop"
-                if (!isNewTabPage) updateReaderIcon()
+                if (!isNewTabPage) updateUrlBarIcons()
                 updateNavState()
             }
 
@@ -236,7 +239,7 @@ class BrowserFragment : Fragment() {
                 url?.let { url ->
                     if (isNewTabPage) {
                         isReaderMode = false
-                        updateReaderIcon()
+                        updateUrlBarIcons()
                     }
                 }.also {
                     val tab = activity.tabManager.getTabById(tabId)
@@ -355,7 +358,14 @@ class BrowserFragment : Fragment() {
                 if (urlEditText.isFocused) showUrlSuggestions()
             }
         })
-        urlReader.setOnClickListener { if (!isNewTabPage) toggleReaderMode() }
+        urlReload.setOnClickListener {
+            if (isNewTabPage) return@setOnClickListener
+            if (webView.progress in 1..99) {
+                webView.stopLoading()
+            } else {
+                webView.reload()
+            }
+        }
     }
 
     private fun setupUrlActions() {
@@ -453,7 +463,7 @@ class BrowserFragment : Fragment() {
                 document.head.appendChild(s);
             })();
         """.trimIndent(), null)
-        updateReaderIcon()
+        updateUrlBarIcons()
     }
 
     private fun toggleReaderMode() {
@@ -482,20 +492,22 @@ class BrowserFragment : Fragment() {
         """.trimIndent()
 
         webView.evaluateJavascript(js, null)
-        updateReaderIcon()
+        updateUrlBarIcons()
         chipReload.text = if (isReaderMode) "Reader" else "Reload"
     }
 
-    private fun updateReaderIcon() {
+    private fun updateUrlBarIcons() {
         if (isNewTabPage) {
             urlLock.visibility = View.GONE
-            urlReader.visibility = View.GONE
+            urlReload.visibility = View.GONE
             return
         }
         val url = currentUrl()
         urlLock.visibility = if (url.startsWith("https")) View.VISIBLE else View.GONE
-        urlReader.setImageResource(if (isReaderMode) R.drawable.ic_reader_active else R.drawable.ic_reader)
-        urlReader.visibility = View.VISIBLE
+        urlReload.visibility = View.VISIBLE
+        urlReload.setImageResource(
+            if (webView.progress in 1..99) R.drawable.ic_stop else R.drawable.ic_reload
+        )
     }
 
     private fun setupSwipeRefresh() {
@@ -899,17 +911,19 @@ class BrowserFragment : Fragment() {
     }
 
     private fun showDatePicker() {
-        IOSDatePickerFragment { y, m, d ->
+        IOSDatePickerFragment { y, m, d, h, mi ->
             val months = arrayOf("Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec")
-            Toast.makeText(requireContext(), "${months[m]} ${d}, ${y}", Toast.LENGTH_SHORT).show()
+            val amPm = if (h < 12) "AM" else "PM"
+            val hr = if (h == 0) 12 else if (h > 12) h - 12 else h
+            Toast.makeText(requireContext(), "${months[m]} ${d}, ${y} · ${hr}:${"%02d".format(mi)} $amPm", Toast.LENGTH_SHORT).show()
         }.show(parentFragmentManager, "date_picker")
     }
 
     private fun showTimePicker() {
-        IOSTimePickerFragment { h, m ->
+        IOSDatePickerFragment { y, m, d, h, mi ->
             val amPm = if (h < 12) "AM" else "PM"
-            val hour = if (h == 0) 12 else if (h > 12) h - 12 else h
-            Toast.makeText(requireContext(), "${hour}:${"%02d".format(m)} $amPm", Toast.LENGTH_SHORT).show()
+            val hr = if (h == 0) 12 else if (h > 12) h - 12 else h
+            Toast.makeText(requireContext(), "${hr}:${"%02d".format(mi)} $amPm", Toast.LENGTH_SHORT).show()
         }.show(parentFragmentManager, "time_picker")
     }
 }

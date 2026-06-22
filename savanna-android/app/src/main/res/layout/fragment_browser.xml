@@ -17,66 +17,39 @@
 
     <include layout="@layout/find_in_page_bar" />
 
-    <LinearLayout
-        android:id="@+id/bottom_bar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom"
-        android:orientation="vertical"
-        android:background="@drawable/safari_bottom_bar"
-        android:layout_marginStart="10dp"
-        android:layout_marginEnd="10dp"
+    <FrameLayout
+        android:id="@+id/tabs_mode_c"
+        android:layout_width="346dp"
+        android:layout_height="114dp"
+        android:layout_gravity="center_horizontal|bottom"
         android:layout_marginBottom="10dp"
-        android:elevation="12dp">
+        android:background="@drawable/tabs_mode_c_button"
+        android:elevation="12dp"
+        android:clipToOutline="true">
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="52dp"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:paddingStart="6dp"
-            android:paddingEnd="6dp">
-
-            <ImageView
-                android:id="@+id/btn_back"
-                android:layout_width="36dp"
-                android:layout_height="36dp"
-                android:src="@drawable/ic_back"
-                android:padding="8dp"
-                android:scaleType="centerInside"
-                android:contentDescription="@string/go_back"
-                android:alpha="0.5" />
-
-            <ImageView
-                android:id="@+id/btn_forward"
-                android:layout_width="36dp"
-                android:layout_height="36dp"
-                android:src="@drawable/ic_forward"
-                android:padding="8dp"
-                android:scaleType="centerInside"
-                android:contentDescription="@string/go_forward"
-                android:alpha="0.5"
-                android:layout_marginStart="2dp" />
-
-            <ImageView
-                android:id="@+id/btn_share"
-                android:layout_width="36dp"
-                android:layout_height="36dp"
-                android:src="@drawable/ic_share"
-                android:padding="8dp"
-                android:scaleType="centerInside"
-                android:contentDescription="@string/share"
-                android:layout_marginStart="2dp" />
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:gravity="center_horizontal">
 
             <FrameLayout
-                android:id="@+id/url_bar_container"
-                android:layout_width="0dp"
+                android:id="@+id/url_bar_search"
+                android:layout_width="326dp"
                 android:layout_height="44dp"
-                android:layout_weight="1"
-                android:layout_marginStart="6dp"
-                android:layout_marginEnd="6dp"
-                android:background="@drawable/tabs_mode_b"
+                android:layout_marginTop="9dp"
+                android:background="#14FFFFFF"
                 android:clipToOutline="true">
+
+                <ImageView
+                    android:id="@+id/url_lock"
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:layout_gravity="start|center_vertical"
+                    android:layout_marginStart="14dp"
+                    android:src="@drawable/ic_lock"
+                    android:scaleType="fitCenter"
+                    android:visibility="gone" />
 
                 <EditText
                     android:id="@+id/url_edit_text"
@@ -97,84 +70,150 @@
                     android:ellipsize="end" />
 
                 <ImageView
-                    android:id="@+id/url_lock"
+                    android:id="@+id/url_reload"
                     android:layout_width="16dp"
                     android:layout_height="16dp"
-                    android:layout_gravity="start|center_vertical"
-                    android:layout_marginStart="12dp"
-                    android:src="@drawable/ic_lock"
+                    android:layout_gravity="end|center_vertical"
+                    android:layout_marginEnd="14dp"
+                    android:src="@drawable/ic_reload"
                     android:scaleType="fitCenter"
                     android:visibility="gone" />
+            </FrameLayout>
+
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1" />
+
+            <ProgressBar
+                android:id="@+id/progress_bar"
+                style="@android:style/Widget.ProgressBar.Horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:progressDrawable="@drawable/progress_bar_drawable"
+                android:max="100"
+                android:progress="0"
+                android:indeterminate="false"
+                android:visibility="gone" />
+
+            <LinearLayout
+                android:id="@+id/bottom_bar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp"
+                android:paddingTop="9dp"
+                android:paddingBottom="9dp">
+
+                <Space
+                    android:layout_width="0dp"
+                    android:layout_height="48dp"
+                    android:layout_weight="1" />
 
                 <ImageView
-                    android:id="@+id/url_reader"
-                    android:layout_width="18dp"
-                    android:layout_height="18dp"
-                    android:layout_gravity="end|center_vertical"
-                    android:layout_marginEnd="10dp"
-                    android:src="@drawable/ic_reader"
-                    android:scaleType="fitCenter"
-                    android:visibility="gone" />
-            </FrameLayout>
+                    android:id="@+id/btn_back"
+                    android:layout_width="24dp"
+                    android:layout_height="48dp"
+                    android:src="@drawable/ic_back"
+                    android:scaleType="centerInside"
+                    android:contentDescription="@string/go_back"
+                    android:alpha="0.5" />
 
-            <FrameLayout
-                android:id="@+id/btn_tabs_container"
-                android:layout_width="36dp"
-                android:layout_height="36dp">
+                <Space
+                    android:layout_width="0dp"
+                    android:layout_height="48dp"
+                    android:layout_weight="1" />
 
-                <TextView
-                    android:id="@+id/btn_tabs"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:gravity="center"
-                    android:textColor="@color/text_primary"
-                    android:textSize="13sp"
-                    android:textStyle="bold"
-                    android:text="1"
-                    android:background="@drawable/ic_tab_count_bg"
-                    android:contentDescription="@string/tabs" />
-            </FrameLayout>
+                <ImageView
+                    android:id="@+id/btn_forward"
+                    android:layout_width="24dp"
+                    android:layout_height="48dp"
+                    android:src="@drawable/ic_forward"
+                    android:scaleType="centerInside"
+                    android:contentDescription="@string/go_forward"
+                    android:alpha="0.5" />
 
-            <ImageView
-                android:id="@+id/btn_bookmark"
-                android:layout_width="36dp"
-                android:layout_height="36dp"
-                android:src="@drawable/ic_bookmark"
-                android:padding="7dp"
-                android:scaleType="centerInside"
-                android:contentDescription="@string/bookmarks"
-                android:layout_marginStart="2dp" />
+                <Space
+                    android:layout_width="0dp"
+                    android:layout_height="48dp"
+                    android:layout_weight="1" />
 
-            <ImageView
-                android:id="@+id/btn_settings"
-                android:layout_width="36dp"
-                android:layout_height="36dp"
-                android:src="@drawable/ic_settings"
-                android:padding="7dp"
-                android:scaleType="centerInside"
-                android:contentDescription="@string/settings"
-                android:layout_marginStart="2dp" />
+                <ImageView
+                    android:id="@+id/btn_share"
+                    android:layout_width="24dp"
+                    android:layout_height="48dp"
+                    android:src="@drawable/ic_share"
+                    android:scaleType="centerInside"
+                    android:contentDescription="@string/share" />
+
+                <Space
+                    android:layout_width="0dp"
+                    android:layout_height="48dp"
+                    android:layout_weight="1" />
+
+                <FrameLayout
+                    android:id="@+id/btn_tabs_container"
+                    android:layout_width="24dp"
+                    android:layout_height="48dp"
+                    android:gravity="center">
+
+                    <TextView
+                        android:id="@+id/btn_tabs"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:gravity="center"
+                        android:textColor="@color/text_primary"
+                        android:textSize="13sp"
+                        android:textStyle="bold"
+                        android:text="1"
+                        android:contentDescription="@string/tabs" />
+                </FrameLayout>
+
+                <Space
+                    android:layout_width="0dp"
+                    android:layout_height="48dp"
+                    android:layout_weight="1" />
+
+                <ImageView
+                    android:id="@+id/btn_bookmark"
+                    android:layout_width="24dp"
+                    android:layout_height="48dp"
+                    android:src="@drawable/ic_bookmark"
+                    android:scaleType="centerInside"
+                    android:contentDescription="@string/bookmarks" />
+
+                <Space
+                    android:layout_width="0dp"
+                    android:layout_height="48dp"
+                    android:layout_weight="1" />
+
+                <ImageView
+                    android:id="@+id/btn_settings"
+                    android:layout_width="24dp"
+                    android:layout_height="48dp"
+                    android:src="@drawable/ic_settings"
+                    android:scaleType="centerInside"
+                    android:contentDescription="@string/settings" />
+
+                <Space
+                    android:layout_width="0dp"
+                    android:layout_height="48dp"
+                    android:layout_weight="1" />
+
+            </LinearLayout>
 
         </LinearLayout>
 
-        <ProgressBar
-            android:id="@+id/progress_bar"
-            style="@android:style/Widget.ProgressBar.Horizontal"
-            android:layout_width="match_parent"
-            android:layout_height="2dp"
-            android:progressDrawable="@drawable/progress_bar_drawable"
-            android:max="100"
-            android:progress="0"
-            android:indeterminate="false"
-            android:visibility="gone" />
-    </LinearLayout>
+    </FrameLayout>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/url_suggestions"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
-        android:layout_marginBottom="64dp"
+        android:layout_marginBottom="128dp"
         android:layout_marginStart="10dp"
         android:layout_marginEnd="10dp"
         android:background="@drawable/safari_bottom_bar"
@@ -190,7 +229,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
-        android:layout_marginBottom="64dp"
+        android:layout_marginBottom="128dp"
         android:background="#E8000000"
         android:clipToPadding="false"
         android:scrollbars="none"
@@ -364,5 +403,7 @@
 
         </LinearLayout>
     </HorizontalScrollView>
+
+
 
 </FrameLayout>

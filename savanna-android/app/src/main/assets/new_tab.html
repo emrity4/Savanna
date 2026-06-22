@@ -2,11 +2,13 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#1C1C1E">
 <title>New Tab</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;-webkit-user-select:none}
-body{background:#000;color:#fff;font-family:-apple-system,'SF Pro Display','SF Pro Text',Helvetica,Arial,sans-serif;min-height:100%;padding:0 20px 120px;overflow-x:hidden}
+html{background:#1C1C1E;color:#fff}
+body{background:#1C1C1E;color:#fff;font-family:-apple-system,'SF Pro Display','SF Pro Text',Helvetica,Arial,sans-serif;min-height:100vh;min-height:-webkit-fill-available;padding:0 20px 120px;overflow-x:hidden;padding-bottom:calc(120px + env(safe-area-inset-bottom,0px))}
 .hero{padding-top:48px;padding-bottom:28px;text-align:center}
 .greeting{font-size:34px;font-weight:700;letter-spacing:-0.5px;color:#fff}
 .date-line{margin-top:6px;font-size:14px;color:#8E8E93}
