@@ -106,6 +106,7 @@ class BrowserFragment : Fragment() {
         private const val ARG_TAB_ID = "tab_id"
         private const val ARG_URL = "url"
         const val NEW_TAB_URL = "file:///android_asset/new_tab.html"
+        private const val FILE_PICKER_REQUEST_CODE = 1001
 
         fun newInstance(tabId: String, url: String = "") = BrowserFragment().apply {
             arguments = Bundle().apply {
@@ -221,7 +222,8 @@ class BrowserFragment : Fragment() {
             NewTabBridge(
                 historyManager = activity.historyManager,
                 onNavigate = { url -> requireActivity().runOnUiThread { loadUrl(url) } },
-                onFocusUrlBar = { requireActivity().runOnUiThread { focusUrlBar() } }
+                onFocusUrlBar = { requireActivity().runOnUiThread { focusUrlBar() } },
+                onOpenFile = { requireActivity().runOnUiThread { openFilePicker() } }
             ),
             "Android"
         )
@@ -1145,6 +1147,51 @@ class BrowserFragment : Fragment() {
         }
     }
 
+    private fun openFilePicker() {
+        val intent = Intent(Intent.ACTION_GET_CONTENT).apply {
+            type = "*/*"
+            putExtra(Intent.EXTRA_MIME_TYPES, arrayOf("application/pdf", "application/vnd.openxmlformats-officedocument.presentationml.presentation", "application/vnd.ms-powerpoint"))
+            addCategory(Intent.CATEGORY_OPENABLE)
+        }
+        try {
+            startActivityForResult(Intent.createChooser(intent, "Open File"), FILE_PICKER_REQUEST_CODE)
+        } catch (e: Exception) {
+            Toast.makeText(requireContext(), "File picker not available", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == FILE_PICKER_REQUEST_CODE && resultCode == android.app.Activity.RESULT_OK) {
+            data?.data?.let { uri -> displayFile(uri) }
+        }
+    }
+
+    private fun displayFile(uri: Uri) {
+        val mime = requireContext().contentResolver.getType(uri) ?: ""
+        isNewTabPage = false
+        when {
+            mime.contains("pdf") -> {
+                _webView?.loadUrl(uri.toString())
+            }
+            mime.contains("presentation") || mime.contains("powerpoint") -> {
+                // Try loading in WebView if supported, else open in external app
+                try {
+                    _webView?.loadUrl("https://docs.google.com/gview?embedded=true&url=${Uri.encode(uri.toString())}")
+                } catch (_: Exception) {
+                    startActivity(Intent(Intent.ACTION_VIEW).apply {
+                        setDataAndType(uri, mime)
+                        addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                    })
+                }
+            }
+            else -> {
+                // Try loading the URI directly in WebView for unknown types too
+                _webView?.loadUrl(uri.toString())
+            }
+        }
+    }
+
     override fun onDestroyView() {
         _webView?.stopLoading()
         _webView?.destroy()
@@ -1156,7 +1203,6 @@ class BrowserFragment : Fragment() {
         liquidGlassView = null
         super.onDestroyView()
     }
-
 
     private fun showDatePicker() {
         IOSDatePickerFragment { y, m, d, h, mi ->

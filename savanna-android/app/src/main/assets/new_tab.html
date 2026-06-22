@@ -13,8 +13,10 @@ body{background:#000;color:#fff;font-family:-apple-system,'SF Pro Display','SF P
 .hero{padding-top:40px;padding-bottom:24px;text-align:center}
 .greeting{font-size:32px;font-weight:700;letter-spacing:-0.5px;color:#fff;transition:color .3s}
 .date-line{margin-top:4px;font-size:13px;color:#8E8E93}
-.search-hint{text-align:center;padding:14px;margin-bottom:24px;border-radius:22px;background:rgba(255,255,255,0.08);color:#636366;font-size:15px;cursor:pointer;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);border:1px solid rgba(255,255,255,0.06);transition:all .25s ease}
-.search-hint:active{transform:scale(.97);background:rgba(255,255,255,0.12)}
+  .search-hint{text-align:center;padding:14px;margin-bottom:24px;border-radius:22px;background:rgba(255,255,255,0.08);color:#636366;font-size:15px;cursor:pointer;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);border:1px solid rgba(255,255,255,0.06);transition:all .25s ease}
+  .search-hint:active{transform:scale(.97);background:rgba(255,255,255,0.12)}
+  .file-hint{text-align:center;padding:14px;margin-bottom:24px;border-radius:22px;background:rgba(0,122,255,0.12);color:#007AFF;font-size:15px;cursor:pointer;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);border:1px solid rgba(0,122,255,0.2);transition:all .25s ease}
+  .file-hint:active{transform:scale(.97);background:rgba(0,122,255,0.18)}
 .section-label{font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#48484A;margin-bottom:10px;padding-left:4px;transition:color .3s}
 .sites-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px 8px;margin-bottom:24px}
 .site-item{display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;transition:transform .2s ease}
@@ -50,7 +52,8 @@ html,body{background:#fff;color:#000}
   <div class="date-line" id="dateLine"></div>
 </div>
 <div class="search-hint" onclick="Android.focusUrlBar()">Search or enter address</div>
-<div class="section-label" id="favLabel">Favorites</div>
+  <div class="file-hint" onclick="Android.openFile()">📁 Open PDF or PPTX file</div>
+  <div class="section-label" id="favLabel">Favorites</div>
 <div class="sites-grid" id="favGrid"></div>
 <div id="recentWrap" style="display:none">
   <div class="section-label">Recently Visited</div>
@@ -63,7 +66,8 @@ function domainColor(d){let h=0;for(let i=0;i<d.length;i++)h=d.charCodeAt(i)+((h
 function getDomain(url){try{return new URL(url).hostname.replace(/^www\./,'')}catch{return url}}
 function getInitial(title,url){return((title||getDomain(url)||'?')[0]).toUpperCase()}
 function navigate(url){try{Android.navigate(url)}catch(e){window.location.href=url}}
-const DEFAULTS=[{url:'https://google.com',title:'Google'},{url:'https://youtube.com',title:'YouTube'},{url:'https://reddit.com',title:'Reddit'},{url:'https://x.com',title:'X'},{url:'https://github.com',title:'GitHub'},{url:'https://wikipedia.org',title:'Wikipedia'},{url:'https://amazon.com',title:'Amazon'},{url:'https://netflix.com',title:'Netflix'}];
+  function openFile(){try{Android.openFile()}catch(e){}}
+  const DEFAULTS=[{url:'https://google.com',title:'Google'},{url:'https://youtube.com',title:'YouTube'},{url:'https://reddit.com',title:'Reddit'},{url:'https://x.com',title:'X'},{url:'https://github.com',title:'GitHub'},{url:'https://wikipedia.org',title:'Wikipedia'},{url:'https://amazon.com',title:'Amazon'},{url:'https://netflix.com',title:'Netflix'}];
 function buildIcon(site,delay){const dom=getDomain(site.url);const c=domainColor(dom);const el=document.createElement('div');el.className='site-item';el.style.animationDelay=delay+'s';el.innerHTML='<div class="site-icon" style="background:'+c+'"><span>'+getInitial(site.title,site.url)+'</span></div><div class="site-name">'+(site.title.length<18?site.title:dom.charAt(0).toUpperCase()+dom.slice(1))+'</div>';el.addEventListener('click',function(){navigate(site.url)});return el}
 function buildRecentRow(item){const dom=getDomain(item.url);const c=domainColor(dom);const el=document.createElement('div');el.className='recent-row';el.innerHTML='<div class="recent-favicon" style="background:'+c+'"><span>'+getInitial(item.title,item.url)+'</span></div><div class="recent-info"><div class="recent-title">'+(item.title||dom)+'</div><div class="recent-url">'+dom+'</div></div>';el.addEventListener('click',function(){navigate(item.url)});return el}
 function init(histJson){var g=document.getElementById('favGrid');DEFAULTS.forEach(function(s,i){g.appendChild(buildIcon(s,i*0.04))});try{var h=JSON.parse(histJson||'[]');if(!h.length)return;var seen={},unique=[];for(var i=0;i<h.length;i++){var d=getDomain(h[i].url);if(!seen[d]&&h[i].url&&h[i].url!=='about:blank'){seen[d]=true;unique.push(h[i]);if(unique.length>=8)break}}if(unique.length<2)return;document.getElementById('recentWrap').style.display='block';var l=document.getElementById('recentList');unique.forEach(function(item){l.appendChild(buildRecentRow(item))})}catch(e){}}

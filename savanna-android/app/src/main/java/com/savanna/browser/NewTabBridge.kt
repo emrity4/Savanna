@@ -11,7 +11,8 @@ import com.savanna.browser.manager.HistoryManager
 class NewTabBridge(
     private val historyManager: HistoryManager,
     private val onNavigate: (String) -> Unit,
-    private val onFocusUrlBar: () -> Unit
+    private val onFocusUrlBar: () -> Unit,
+    private val onOpenFile: () -> Unit
 ) {
 
     private val gson = Gson()
@@ -37,5 +38,11 @@ class NewTabBridge(
     @JavascriptInterface
     fun focusUrlBar() {
         onFocusUrlBar()
+    }
+
+    /** Open a file — called when user taps the file open button. */
+    @JavascriptInterface
+    fun openFile() {
+        onOpenFile()
     }
 }
