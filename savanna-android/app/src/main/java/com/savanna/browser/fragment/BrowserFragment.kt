@@ -868,7 +868,7 @@ class BrowserFragment : Fragment() {
         view?.findViewById<android.widget.ImageView>(R.id.compact_btn_back)?.setOnClickListener { webView.goBack() }
         view?.findViewById<android.widget.ImageView>(R.id.compact_btn_forward)?.setOnClickListener { webView.goForward() }
         view?.findViewById<android.widget.ImageView>(R.id.compact_btn_share)?.setOnClickListener { shareCurrentPage() }
-        view?.findViewById<android.widget.ImageView>(R.id.compact_btn_tabs)?.setOnClickListener { (requireActivity() as MainActivity).showTabSwitcher() }
+        view?.findViewById<android.widget.TextView>(R.id.compact_btn_tabs)?.setOnClickListener { (requireActivity() as MainActivity).showTabSwitcher() }
         view?.findViewById<android.widget.ImageView>(R.id.compact_btn_bookmark)?.setOnClickListener { toggleBookmark() }
         view?.findViewById<android.widget.EditText>(R.id.compact_url_text)?.setOnClickListener { focusUrlBar() }
     }
