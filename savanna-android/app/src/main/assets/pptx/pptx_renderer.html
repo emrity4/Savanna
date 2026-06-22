@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#e8e8e8;font-family:sans-serif;padding:10px}
+#result{margin:0 auto;max-width:100%}
+.slide-wrap{background:#fff;border-radius:8px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,0.15);margin-bottom:16px}
+</style>
+<link rel="stylesheet" href="pptxjs.css">
+</head>
+<body>
+<div id="result"></div>
+<script src="jquery.min.js"></script>
+<script src="jszip.min.js"></script>
+<script src="filereader.js"></script>
+<script src="dingbat.js"></script>
+<script src="pptxjs.js"></script>
+<script src="divs2slides.js"></script>
+<script>
+function renderPptx(base64data) {
+  var binary = atob(base64data);
+  var len = binary.length;
+  var bytes = new Uint8Array(len);
+  for (var i = 0; i < len; i++) {
+    bytes[i] = binary.charCodeAt(i);
+  }
+  var blob = new Blob([bytes], {type: "application/vnd.openxmlformats-officedocument.presentationml.presentation"});
+  var url = URL.createObjectURL(blob);
+  $("#result").pptxToHtml({
+    pptxFileUrl: url,
+    slidesScale: "100%",
+    slideMode: false,
+    mediaProcess: false,
+    themeProcess: true
+  });
+}
+</script>
+</body>
+</html>

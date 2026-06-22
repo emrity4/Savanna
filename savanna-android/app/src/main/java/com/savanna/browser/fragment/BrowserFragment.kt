@@ -1183,7 +1183,7 @@ class BrowserFragment : Fragment() {
 
             when {
                 mime.contains("pdf") -> displayPdf(temp)
-                mime.contains("presentation") || mime.contains("powerpoint") -> openExternal(temp, mime)
+                mime.contains("presentation") || mime.contains("powerpoint") -> displayPptx(temp)
                 else -> openExternal(temp, mime)
             }
         } catch (e: Exception) {
@@ -1208,6 +1208,20 @@ class BrowserFragment : Fragment() {
             setDataAndType(uri, mime)
             addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         })
+    }
+
+    private fun displayPptx(file: java.io.File) {
+        try {
+            val bytes = file.readBytes()
+            val b64 = android.util.Base64.encodeToString(bytes, android.util.Base64.DEFAULT)
+            val safe = b64.replace("\\", "\\\\").replace("'", "\\'").replace("\n", "\\n")
+            _webView?.loadUrl("file:///android_asset/pptx/pptx_renderer.html")
+            _webView?.postDelayed({
+                _webView?.evaluateJavascript("renderPptx('$safe')", null)
+            }, 600)
+        } catch (e: Exception) {
+            Toast.makeText(requireContext(), "Cannot render PPTX", Toast.LENGTH_SHORT).show()
+        }
     }
 
     private fun displayPdf(file: java.io.File) {
