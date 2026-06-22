@@ -39,6 +39,8 @@ html,body{background:#fff;color:#000}
 .greeting{color:#000}
 .search-hint{background:rgba(0,0,0,0.04);border-color:rgba(0,0,0,0.06);color:#8E8E93}
 .search-hint:active{background:rgba(0,0,0,0.08)}
+.file-hint{background:rgba(0,122,255,0.08);border-color:rgba(0,122,255,0.15);color:#0066CC}
+.file-hint:active{background:rgba(0,122,255,0.14)}
 .recent-row{background:rgba(0,0,0,0.04)}
 .recent-row:active{background:rgba(0,0,0,0.08)}
 .recent-title{color:#000}
@@ -52,7 +54,7 @@ html,body{background:#fff;color:#000}
   <div class="date-line" id="dateLine"></div>
 </div>
 <div class="search-hint" onclick="Android.focusUrlBar()">Search or enter address</div>
-  <div class="file-hint" onclick="Android.openFile()">📁 Open PDF or PPTX file</div>
+  <div class="file-hint" onclick="Android.openFile()">Open PDF or PPTX file</div>
   <div class="section-label" id="favLabel">Favorites</div>
 <div class="sites-grid" id="favGrid"></div>
 <div id="recentWrap" style="display:none">

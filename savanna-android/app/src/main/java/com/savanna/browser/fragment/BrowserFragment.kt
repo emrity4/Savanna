@@ -1180,9 +1180,13 @@ class BrowserFragment : Fragment() {
             val temp = java.io.File(requireContext().cacheDir, "open_${System.nanoTime()}$ext")
             temp.outputStream().use { out -> input.copyTo(out) }
             input.close()
-            _webView?.loadUrl(Uri.fromFile(temp).toString())
+
+            when {
+                mime.contains("pdf") -> displayPdf(temp)
+                mime.contains("presentation") || mime.contains("powerpoint") -> displayPptx(temp)
+                else -> _webView?.loadUrl(Uri.fromFile(temp).toString())
+            }
         } catch (e: Exception) {
-            // Fallback: open externally
             try {
                 startActivity(Intent(Intent.ACTION_VIEW).apply {
                     setDataAndType(uri, mime)
@@ -1191,6 +1195,56 @@ class BrowserFragment : Fragment() {
             } catch (_: Exception) {
                 Toast.makeText(requireContext(), "Cannot open file", Toast.LENGTH_SHORT).show()
             }
+        }
+    }
+
+    private fun displayPdf(file: java.io.File) {
+        try {
+            val fd = android.os.ParcelFileDescriptor.open(file, android.os.ParcelFileDescriptor.MODE_READ_ONLY)
+            val doc = android.graphics.pdf.PdfRenderer(fd)
+            val html = StringBuilder("<html><body style='margin:0;background:#525659;padding:0'>")
+            for (i in 0 until doc.pageCount) {
+                val page = doc.openPage(i)
+                val bmp = Bitmap.createBitmap(page.width, page.height, Bitmap.Config.ARGB_8888)
+                page.render(bmp, null, null, android.graphics.pdf.PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY)
+                page.close()
+                val stream = java.io.ByteArrayOutputStream()
+                bmp.compress(Bitmap.CompressFormat.PNG, 100, stream)
+                val b64 = android.util.Base64.encodeToString(stream.toByteArray(), android.util.Base64.DEFAULT)
+                html.append("<img src='data:image/png;base64,$b64' style='width:100%;display:block;margin-bottom:4px'>")
+                bmp.recycle()
+            }
+            html.append("</body></html>")
+            doc.close()
+            fd.close()
+            _webView?.loadDataWithBaseURL(null, html.toString(), "text/html", "UTF-8", null)
+        } catch (e: Exception) {
+            Toast.makeText(requireContext(), "Cannot render PDF", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun displayPptx(file: java.io.File) {
+        try {
+            val zip = java.util.zip.ZipFile(file)
+            val slides = mutableListOf<String>()
+            val entries = zip.entries().asSequence()
+                .filter { it.name.startsWith("ppt/slides/slide") && it.name.endsWith(".xml") }
+                .sortedBy { it.name }.toList()
+            for (entry in entries) {
+                val xml = zip.getInputStream(entry).bufferedReader().readText()
+                val text = xml.replace(Regex("<[^>]+>"), " ").replace(Regex("\\s+"), " ").trim()
+                if (text.isNotBlank()) {
+                    slides.add("<div style='page-break-after:always;padding:24px;background:#fff;min-height:400px;box-shadow:0 1px 8px rgba(0,0,0,0.12);border-radius:10px;margin:12px'><p style='font-size:15px;line-height:1.6;color:#333'>${text.replace("\n", "<br>")}</p></div>")
+                }
+            }
+            zip.close()
+            if (slides.isEmpty()) {
+                Toast.makeText(requireContext(), "No slides found in PPTX", Toast.LENGTH_SHORT).show()
+                return
+            }
+            _webView?.loadDataWithBaseURL(null, "<html><head><style>body{margin:0;background:#e8e8e8;padding:10px}</style></head><body>${slides.joinToString("")}</body></html>", "text/html", "UTF-8", null)
+        } catch (e: Exception) {
+            Toast.makeText(requireContext(), "Cannot render PPTX", Toast.LENGTH_SHORT).show()
         }
     }
 
