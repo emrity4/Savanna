@@ -49,6 +49,11 @@ android {
     buildFeatures {
         viewBinding = true
     }
+    packaging {
+        resources {
+            excludes += setOf("META-INF/DEPENDENCIES", "META-INF/LICENSE*", "META-INF/NOTICE*", "META-INF/INDEX.LIST")
+        }
+    }
 }
 
 dependencies {
@@ -66,9 +71,10 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.7.0")
     implementation("androidx.biometric:biometric:1.1.0")
     implementation("org.apache.tika:tika-core:2.9.2")
-    implementation("org.apache.tika:tika-parsers-standard-package:2.9.2") {
+    implementation("org.apache.tika:tika-parser-microsoft-module:2.9.2") {
         exclude(group = "com.google.guava", module = "guava")
         exclude(group = "com.google.guava", module = "listenablefuture")
         exclude(group = "commons-logging", module = "commons-logging")
     }
+}
 }
