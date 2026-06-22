@@ -15,6 +15,10 @@ import com.savanna.browser.adapter.SiteSettingsAdapter
 
 class SiteSettingsFragment : Fragment() {
 
+    private lateinit var recyclerView: RecyclerView
+    private lateinit var emptyText: TextView
+    private lateinit var adapter: SiteSettingsAdapter
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
         inflater.inflate(R.layout.fragment_site_settings, container, false)
 
@@ -23,23 +27,23 @@ class SiteSettingsFragment : Fragment() {
         val activity = requireActivity() as MainActivity
         view.setBackgroundColor(activity.themeManager.activePreset.bgColor)
 
-        val recyclerView = view.findViewById<RecyclerView>(R.id.site_list)
-        val emptyText = view.findViewById<TextView>(R.id.empty_text)
+        recyclerView = view.findViewById(R.id.site_list)
+        emptyText = view.findViewById(R.id.empty_text)
         view.findViewById<ImageView>(R.id.btn_close_site_settings).setOnClickListener { activity.closeOverlay() }
 
         val pm = activity.sitePermissionsManager
-        val adapter = SiteSettingsAdapter(pm.getAll(), pm) {
+        adapter = SiteSettingsAdapter(pm.getAll(), pm) {
             adapter.updateItems(pm.getAll())
             updateEmpty()
         }
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
         recyclerView.adapter = adapter
-
-        fun updateEmpty() {
-            val empty = adapter.itemCount == 0
-            emptyText.visibility = if (empty) View.VISIBLE else View.GONE
-            recyclerView.visibility = if (empty) View.GONE else View.VISIBLE
-        }
         updateEmpty()
+    }
+
+    private fun updateEmpty() {
+        val empty = adapter.itemCount == 0
+        emptyText.visibility = if (empty) View.VISIBLE else View.GONE
+        recyclerView.visibility = if (empty) View.GONE else View.VISIBLE
     }
 }

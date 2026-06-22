@@ -31,13 +31,14 @@ class SiteSettingsAdapter(
         val item = items[position]
         holder.host.text = item.host
         holder.container.removeAllViews()
+        val density = holder.itemView.resources.displayMetrics.density
 
         fun addToggle(label: String, current: Int, onSet: (Int) -> Unit) {
             val row = LinearLayout(holder.itemView.context).apply {
                 orientation = LinearLayout.HORIZONTAL
                 layoutParams = LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.MATCH_PARENT, 42.dp
-                ).also { it.setMargins(0, 2.dp, 0, 0) }
+                    LinearLayout.LayoutParams.MATCH_PARENT, (42 * density).toInt()
+                ).also { it.setMargins(0, (2 * density).toInt(), 0, 0) }
                 gravity = android.view.Gravity.CENTER_VERTICAL
             }
             val tv = TextView(holder.itemView.context).apply {
@@ -72,5 +73,3 @@ class SiteSettingsAdapter(
         notifyDataSetChanged()
     }
 }
-
-private val Int.dp: Int get() = (this * android.content.res.Resources.getSystem().displayMetrics.density).toInt()

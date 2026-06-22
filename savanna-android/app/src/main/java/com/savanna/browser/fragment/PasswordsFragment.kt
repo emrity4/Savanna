@@ -1,17 +1,16 @@
 package com.savanna.browser.fragment
 
-import android.app.Activity
-import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.EditText
 import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.Space
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
+import androidx.biometric.BiometricManager
 import androidx.biometric.BiometricPrompt
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -89,15 +88,15 @@ class PasswordsFragment : Fragment() {
         val info = BiometricPrompt.PromptInfo.Builder()
             .setTitle("Unlock Passwords")
             .setSubtitle("Authenticate to view saved passwords")
-            .setAllowedAuthenticators(BiometricPrompt.AUTHENTICATOR_BIOMETRIC_STRONG or BiometricPrompt.AUTHENTICATOR_DEVICE_CREDENTIAL)
+            .setAllowedAuthenticators(BiometricManager.Authenticators.BIOMETRIC_STRONG or BiometricManager.Authenticators.DEVICE_CREDENTIAL)
             .build()
         prompt.authenticate(info)
     }
 
     private fun refresh() {
         if (!authenticated) return
-        val activity = activity as? MainActivity ?: return
-        val items = activity.passwordManager.load()
+        val a = activity as? MainActivity ?: return
+        val items = a.passwordManager.load()
         adapter.updateItems(items)
         emptyText.visibility = if (items.isEmpty()) View.VISIBLE else View.GONE
         recyclerView.visibility = if (items.isEmpty()) View.GONE else View.VISIBLE
@@ -106,7 +105,7 @@ class PasswordsFragment : Fragment() {
     private fun showEditDialog(activity: MainActivity, entry: PasswordEntry?) {
         val isNew = entry == null
         val layout = LinearLayout(requireContext()).apply {
-            orientation = android.widget.LinearLayout.VERTICAL
+            orientation = LinearLayout.VERTICAL
             setPadding(40, 24, 40, 16)
         }
         val urlInput = TextInputEditText(requireContext()).apply {
@@ -126,17 +125,13 @@ class PasswordsFragment : Fragment() {
             setSingleLine()
         }
         layout.addView(urlInput)
-        val sp1 = android.widget.Space(requireContext())
-        sp1.layoutParams = android.widget.LinearLayout.LayoutParams(
-            android.widget.LinearLayout.LayoutParams.MATCH_PARENT, 12
-        )
-        layout.addView(sp1)
+        layout.addView(Space(requireContext()).apply {
+            layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 12)
+        })
         layout.addView(userInput)
-        val sp2 = android.widget.Space(requireContext())
-        sp2.layoutParams = android.widget.LinearLayout.LayoutParams(
-            android.widget.LinearLayout.LayoutParams.MATCH_PARENT, 12
-        )
-        layout.addView(sp2)
+        layout.addView(Space(requireContext()).apply {
+            layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 12)
+        })
         layout.addView(passInput)
 
         AlertDialog.Builder(requireContext())
@@ -151,7 +146,7 @@ class PasswordsFragment : Fragment() {
                 if (isNew) {
                     activity.passwordManager.add(PasswordEntry(url = url, username = username, password = password))
                 } else {
-                    activity.passwordManager.update(entry.copy(url = url, username = username, password = password))
+                    activity.passwordManager.update(entry!!.copy(url = url, username = username, password = password))
                 }
                 refresh()
             }.show()
