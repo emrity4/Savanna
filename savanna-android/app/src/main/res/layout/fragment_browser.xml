@@ -70,11 +70,21 @@
                     android:ellipsize="end" />
 
                 <ImageView
-                    android:id="@+id/url_reload"
+                    android:id="@+id/url_reader"
                     android:layout_width="16dp"
                     android:layout_height="16dp"
                     android:layout_gravity="end|center_vertical"
-                    android:layout_marginEnd="14dp"
+                    android:layout_marginEnd="32dp"
+                    android:src="@drawable/ic_reader"
+                    android:scaleType="fitCenter"
+                    android:visibility="gone" />
+
+                <ImageView
+                    android:id="@+id/url_reload"
+                    android:layout_width="15dp"
+                    android:layout_height="18dp"
+                    android:layout_gravity="end|center_vertical"
+                    android:layout_marginEnd="12dp"
                     android:src="@drawable/ic_reload"
                     android:scaleType="fitCenter"
                     android:visibility="gone" />
@@ -153,23 +163,17 @@
                     android:layout_height="48dp"
                     android:layout_weight="1" />
 
-                <FrameLayout
-                    android:id="@+id/btn_tabs_container"
+                <TextView
+                    android:id="@+id/btn_tabs"
                     android:layout_width="24dp"
                     android:layout_height="48dp"
-                    android:gravity="center">
-
-                    <TextView
-                        android:id="@+id/btn_tabs"
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:gravity="center"
-                        android:textColor="@color/text_primary"
-                        android:textSize="13sp"
-                        android:textStyle="bold"
-                        android:text="1"
-                        android:contentDescription="@string/tabs" />
-                </FrameLayout>
+                    android:gravity="top|center_horizontal"
+                    android:paddingTop="4dp"
+                    android:textColor="@color/text_primary"
+                    android:textSize="11sp"
+                    android:textStyle="bold"
+                    android:text="1"
+                    android:contentDescription="@string/tabs" />
 
                 <Space
                     android:layout_width="0dp"
@@ -206,6 +210,100 @@
 
         </LinearLayout>
 
+    </FrameLayout>
+
+    <!-- Compact Mode: top search bar -->
+    <FrameLayout
+        android:id="@+id/top_search_bar"
+        android:layout_width="370dp"
+        android:layout_height="44dp"
+        android:layout_gravity="center_horizontal|top"
+        android:layout_marginTop="62dp"
+        android:background="#1AFFFFFF"
+        android:elevation="12dp"
+        android:clipToOutline="true"
+        android:visibility="gone">
+
+        <EditText
+            android:id="@+id/compact_url_text"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@null"
+            android:gravity="center"
+            android:textColor="@color/text_primary"
+            android:textSize="17sp"
+            android:paddingStart="40dp"
+            android:paddingEnd="40dp"
+            android:importantForAutofill="no"
+            android:inputType="textNoSuggestions"
+            android:maxLines="1"
+            android:ellipsize="end" />
+
+        <ImageView
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:layout_gravity="start|center_vertical"
+            android:layout_marginStart="14dp"
+            android:src="@drawable/ic_lock"
+            android:scaleType="fitCenter"
+            android:visibility="gone" />
+
+        <ImageView
+            android:layout_width="15dp"
+            android:layout_height="18dp"
+            android:layout_gravity="end|center_vertical"
+            android:layout_marginEnd="12dp"
+            android:src="@drawable/ic_reload"
+            android:scaleType="fitCenter" />
+    </FrameLayout>
+
+    <!-- Compact Mode: bottom toolbar -->
+    <LinearLayout
+        android:id="@+id/compact_bottom_bar"
+        android:layout_width="346dp"
+        android:layout_height="48dp"
+        android:layout_gravity="center_horizontal|bottom"
+        android:layout_marginBottom="16dp"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:background="#99FAFAFA"
+        android:elevation="12dp"
+        android:clipToOutline="true"
+        android:visibility="gone">
+
+        <Space android:layout_width="0dp" android:layout_height="48dp" android:layout_weight="1" />
+        <ImageView android:id="@+id/compact_btn_back" android:layout_width="24dp" android:layout_height="48dp" android:src="@drawable/ic_back" android:scaleType="centerInside" android:alpha="0.5" />
+        <Space android:layout_width="0dp" android:layout_height="48dp" android:layout_weight="1" />
+        <ImageView android:id="@+id/compact_btn_forward" android:layout_width="24dp" android:layout_height="48dp" android:src="@drawable/ic_forward" android:scaleType="centerInside" android:alpha="0.5" />
+        <Space android:layout_width="0dp" android:layout_height="48dp" android:layout_weight="1" />
+        <ImageView android:id="@+id/compact_btn_share" android:layout_width="24dp" android:layout_height="48dp" android:src="@drawable/ic_share" android:scaleType="centerInside" />
+        <Space android:layout_width="0dp" android:layout_height="48dp" android:layout_weight="1" />
+        <ImageView android:id="@+id/compact_btn_tabs" android:layout_width="24dp" android:layout_height="48dp" android:src="@drawable/ic_tab_count_bg" android:scaleType="centerInside" android:padding="6dp" />
+        <Space android:layout_width="0dp" android:layout_height="48dp" android:layout_weight="1" />
+        <ImageView android:id="@+id/compact_btn_bookmark" android:layout_width="24dp" android:layout_height="48dp" android:src="@drawable/ic_bookmark" android:scaleType="centerInside" />
+        <Space android:layout_width="0dp" android:layout_height="48dp" android:layout_weight="1" />
+    </LinearLayout>
+
+    <FrameLayout
+        android:id="@+id/url_scroll_pill"
+        android:layout_width="98dp"
+        android:layout_height="32dp"
+        android:layout_gravity="center_horizontal|bottom"
+        android:layout_marginBottom="16dp"
+        android:background="@drawable/tabs_mode_c_button"
+        android:elevation="12dp"
+        android:clipToOutline="true"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/url_domain_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:textColor="@color/text_primary"
+            android:textSize="12sp"
+            android:maxLines="1"
+            android:ellipsize="end" />
     </FrameLayout>
 
     <androidx.recyclerview.widget.RecyclerView

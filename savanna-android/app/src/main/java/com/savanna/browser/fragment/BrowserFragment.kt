@@ -77,7 +77,16 @@ class BrowserFragment : Fragment() {
     private lateinit var urlSuggestions: RecyclerView
     private lateinit var urlLock: ImageView
     private lateinit var urlReload: ImageView
+    private lateinit var urlReader: ImageView
     private lateinit var urlBarSearch: FrameLayout
+    private lateinit var urlScrollPill: FrameLayout
+    private lateinit var urlDomainText: TextView
+    private lateinit var topSearchBar: FrameLayout
+    private lateinit var compactBottomBar: LinearLayout
+
+    private var isCompactMode = false
+    private var isScrolledDown = false
+    private var lastScrollY = 0
     private var isReaderMode = false
     private var isFindVisible = false
 
@@ -155,6 +164,11 @@ class BrowserFragment : Fragment() {
         urlLock = view.findViewById(R.id.url_lock)
         urlBarSearch = view.findViewById(R.id.url_bar_search)
         urlReload = view.findViewById(R.id.url_reload)
+        urlReader = view.findViewById(R.id.url_reader)
+        urlScrollPill = view.findViewById(R.id.url_scroll_pill)
+        urlDomainText = view.findViewById(R.id.url_domain_text)
+        topSearchBar = view.findViewById(R.id.top_search_bar)
+        compactBottomBar = view.findViewById(R.id.compact_bottom_bar)
 
         setupWebView()
         setupUrlBar()
@@ -366,6 +380,7 @@ class BrowserFragment : Fragment() {
                 webView.reload()
             }
         }
+        urlReader.setOnClickListener { if (!isNewTabPage) toggleReaderMode() }
     }
 
     private fun setupUrlActions() {
@@ -500,6 +515,7 @@ class BrowserFragment : Fragment() {
         if (isNewTabPage) {
             urlLock.visibility = View.GONE
             urlReload.visibility = View.GONE
+            urlReader.visibility = View.GONE
             return
         }
         val url = currentUrl()
@@ -508,6 +524,32 @@ class BrowserFragment : Fragment() {
         urlReload.setImageResource(
             if (webView.progress in 1..99) R.drawable.ic_stop else R.drawable.ic_reload
         )
+        urlReader.setImageResource(if (isReaderMode) R.drawable.ic_reader_active else R.drawable.ic_reader)
+        urlReader.visibility = View.VISIBLE
+    }
+
+    private fun toggleScrollPill(collapsed: Boolean) {
+        val url = currentUrl()
+        if (url.isBlank()) return
+        val domain = try { android.net.Uri.parse(url).host?.removePrefix("www.") ?: url } catch (e: Exception) { url }
+        urlDomainText.text = domain
+        if (collapsed) {
+            urlScrollPill.visibility = View.VISIBLE
+            urlScrollPill.alpha = 0f
+            urlScrollPill.animate().alpha(1f).setDuration(200).start()
+            if (!isCompactMode) urlBarContainer.animate().alpha(0f).setDuration(150).withEndAction {
+                urlBarContainer.visibility = View.GONE
+            }.start()
+        } else {
+            urlScrollPill.animate().alpha(0f).setDuration(150).withEndAction {
+                urlScrollPill.visibility = View.GONE
+            }.start()
+            if (!isCompactMode) {
+                urlBarContainer.visibility = View.VISIBLE
+                urlBarContainer.alpha = 0f
+                urlBarContainer.animate().alpha(1f).setDuration(200).start()
+            }
+        }
     }
 
     private fun setupSwipeRefresh() {
@@ -521,6 +563,16 @@ class BrowserFragment : Fragment() {
             swipeRefresh.isEnabled = scrollY == 0
             val delta = scrollY - oldScrollY
             if (!isNewTabPage && abs(delta) > 6) updateBottomBarTint(currentUrl())
+            if (!isNewTabPage && abs(scrollY - lastScrollY) > 10) {
+                lastScrollY = scrollY
+                if (scrollY > 50 && !isScrolledDown) {
+                    isScrolledDown = true
+                    toggleScrollPill(true)
+                } else if (scrollY <= 10 && isScrolledDown) {
+                    isScrolledDown = false
+                    toggleScrollPill(false)
+                }
+            }
         }
     }
 
