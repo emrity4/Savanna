@@ -1170,24 +1170,26 @@ class BrowserFragment : Fragment() {
     private fun displayFile(uri: Uri) {
         val mime = requireContext().contentResolver.getType(uri) ?: ""
         isNewTabPage = false
-        when {
-            mime.contains("pdf") -> {
-                _webView?.loadUrl(uri.toString())
+        try {
+            val input = requireContext().contentResolver.openInputStream(uri) ?: return
+            val ext = when {
+                mime.contains("pdf") -> ".pdf"
+                mime.contains("presentation") || mime.contains("powerpoint") -> ".pptx"
+                else -> ".bin"
             }
-            mime.contains("presentation") || mime.contains("powerpoint") -> {
-                // Try loading in WebView if supported, else open in external app
-                try {
-                    _webView?.loadUrl("https://docs.google.com/gview?embedded=true&url=${Uri.encode(uri.toString())}")
-                } catch (_: Exception) {
-                    startActivity(Intent(Intent.ACTION_VIEW).apply {
-                        setDataAndType(uri, mime)
-                        addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                    })
-                }
-            }
-            else -> {
-                // Try loading the URI directly in WebView for unknown types too
-                _webView?.loadUrl(uri.toString())
+            val temp = java.io.File(requireContext().cacheDir, "open_${System.nanoTime()}$ext")
+            temp.outputStream().use { out -> input.copyTo(out) }
+            input.close()
+            _webView?.loadUrl(Uri.fromFile(temp).toString())
+        } catch (e: Exception) {
+            // Fallback: open externally
+            try {
+                startActivity(Intent(Intent.ACTION_VIEW).apply {
+                    setDataAndType(uri, mime)
+                    addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                })
+            } catch (_: Exception) {
+                Toast.makeText(requireContext(), "Cannot open file", Toast.LENGTH_SHORT).show()
             }
         }
     }
