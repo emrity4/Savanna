@@ -238,8 +238,12 @@ class BrowserFragment : Fragment() {
                         view?.findViewById<android.widget.EditText>(R.id.compact_url_text)?.setText(UrlUtils.formatUrl(it))
                     }
                 }
-                progressBar.visibility = View.VISIBLE
-                progressBar.progress = 0
+                progressBar.apply {
+                    visibility = View.VISIBLE
+                    alpha = 0f
+                    animate().alpha(1f).setDuration(200).start()
+                    progress = 0
+                }
                 chipReload.text = "Stop"
                 if (!isNewTabPage) updateUrlBarIcons()
                 updateNavState()
@@ -247,8 +251,10 @@ class BrowserFragment : Fragment() {
 
             override fun onPageFinished(view: WebView?, url: String?) {
                 super.onPageFinished(view, url)
-                progressBar.visibility = View.GONE
-                progressBar.progress = 0
+                progressBar.animate().alpha(0f).setDuration(200).withEndAction {
+                    progressBar.visibility = View.GONE
+                    progressBar.progress = 0
+                }.start()
                 chipReload.text = if (isReaderMode) "Reader" else "Reload"
                 url?.let { url ->
                     if (isNewTabPage) {
@@ -302,7 +308,15 @@ class BrowserFragment : Fragment() {
         webView.webChromeClient = object : WebChromeClient() {
             override fun onProgressChanged(view: WebView?, newProgress: Int) {
                 progressBar.progress = newProgress
-                progressBar.visibility = if (newProgress < 100 && !isNewTabPage) View.VISIBLE else View.GONE
+                if (newProgress < 100 && !isNewTabPage) {
+                    if (progressBar.visibility != View.VISIBLE) {
+                        progressBar.apply {
+                            visibility = View.VISIBLE
+                            alpha = 0f
+                            animate().alpha(1f).setDuration(200).start()
+                        }
+                    }
+                }
                 activity.tabManager.updateTab(tabId, progress = newProgress)
             }
             override fun onReceivedTitle(view: WebView?, title: String?) {
@@ -526,7 +540,7 @@ class BrowserFragment : Fragment() {
         if (urlActionsStrip.visibility == View.VISIBLE) return
         urlActionsStrip.visibility = View.VISIBLE
         urlActionsStrip.startAnimation(
-            TranslateAnimation(0f, 0f, urlActionsStrip.height.toFloat().coerceAtLeast(40f), 0f).apply { duration = 180 }
+            TranslateAnimation(0f, 0f, urlActionsStrip.height.toFloat().coerceAtLeast(40f), 0f).apply { duration = 250 }
         )
     }
 
@@ -610,23 +624,23 @@ class BrowserFragment : Fragment() {
         if (collapsed) {
             scrollPillAlpha = 1f
             urlScrollPill.visibility = View.VISIBLE
-            urlScrollPill.animate().alpha(1f).setDuration(200).start()
+            urlScrollPill.animate().alpha(1f).setDuration(250).start()
             if (!isCompactMode && bar.visibility != View.GONE) {
-                bar.animate().alpha(0f).setDuration(150).withEndAction {
+                bar.animate().alpha(0f).setDuration(200).withEndAction {
                     bar.visibility = View.GONE
                 }.start()
             }
             urlScrollPill.setOnClickListener { toggleScrollPill(false) }
         } else {
             scrollPillAlpha = 0f
-            urlScrollPill.animate().alpha(0f).setDuration(150).withEndAction {
+            urlScrollPill.animate().alpha(0f).setDuration(200).withEndAction {
                 urlScrollPill.visibility = View.GONE
             }.start()
             urlScrollPill.setOnClickListener(null)
             if (!isCompactMode && bar.visibility != View.VISIBLE) {
                 bar.visibility = View.VISIBLE
                 bar.alpha = 0f
-                bar.animate().alpha(1f).setDuration(200).start()
+                bar.animate().alpha(1f).setDuration(250).start()
             }
         }
     }
@@ -948,8 +962,9 @@ class BrowserFragment : Fragment() {
             ThemeManager.STYLE_FROSTED -> {
                 urlBarContainer.background = GradientDrawable().apply {
                     shape = GradientDrawable.RECTANGLE
-                    cornerRadius = 30f * density
-                    setColor(if (isDark) 0xCC1C1C1E.toInt() else 0xCCFFFFFF.toInt())
+                    cornerRadius = 16f * density
+                    setColor(if (isDark) 0x821C1C1E.toInt() else 0x82FFFFFF.toInt())
+                    setStroke((1 * density).toInt(), 0x87FFFFFF.toInt())
                 }
             }
             else -> {

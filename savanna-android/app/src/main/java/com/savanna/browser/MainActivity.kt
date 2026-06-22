@@ -46,7 +46,11 @@ class MainActivity : AppCompatActivity() {
         passwordManager = PasswordManager(this)
         sitePermissionsManager = SitePermissionsManager(this)
 
-        val initialUrl = intent?.data?.toString() ?: ""
+        val savedUrl = prefs.getString("restore_url", null)?.takeIf { it.isNotBlank() }
+        if (savedUrl != null) {
+            prefs.edit().remove("restore_url").apply()
+        }
+        val initialUrl = savedUrl ?: intent?.data?.toString() ?: ""
         val tab = tabManager.createTab(url = initialUrl, title = "New Tab")
         showBrowserForTab(tab.id, initialUrl)
     }

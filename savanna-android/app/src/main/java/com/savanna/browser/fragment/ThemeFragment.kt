@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.fragment.app.Fragment
 import com.savanna.browser.MainActivity
 import com.savanna.browser.R
@@ -44,7 +45,19 @@ class ThemeFragment : Fragment() {
         sw.isChecked = themeManager.isDarkMode
         sw.setOnCheckedChangeListener { _, checked ->
             themeManager.isDarkMode = checked
-            applyThemeNow()
+            val activity = requireActivity() as MainActivity
+            val tab = activity.tabManager.getActiveTab()
+            val url = tab?.url?.takeIf { it.isNotBlank() && it != BrowserFragment.NEW_TAB_URL } ?: ""
+            activity.getSharedPreferences("savanna_theme", android.content.Context.MODE_PRIVATE)
+                .edit().putString("restore_url", url).apply()
+            AppCompatDelegate.setDefaultNightMode(
+                if (checked) AppCompatDelegate.MODE_NIGHT_YES else AppCompatDelegate.MODE_NIGHT_NO
+            )
+            val intent = activity.packageManager.getLaunchIntentForPackage(activity.packageName)?.apply {
+                addFlags(android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK)
+            } ?: return@setOnCheckedChangeListener
+            activity.finishAffinity()
+            activity.startActivity(intent)
         }
     }
 
