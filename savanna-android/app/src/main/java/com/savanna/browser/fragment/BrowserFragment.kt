@@ -97,6 +97,7 @@ class BrowserFragment : Fragment() {
     private val webView get() = _webView!!
     private var isNewTabPage = false
     private lateinit var urlBarContainer: View
+    private var isFileViewer = false
     private var liquidGlassView: LiquidGlassView? = null
     private val density get() = resources.displayMetrics.density
 
@@ -1195,6 +1196,23 @@ class BrowserFragment : Fragment() {
         }
     }
 
+    private fun displayPptx(file: java.io.File) {
+        try {
+            val bytes = file.readBytes()
+            val b64 = android.util.Base64.encodeToString(bytes, android.util.Base64.DEFAULT)
+            isNewTabPage = false
+            _webView?.addJavascriptInterface(PptxBridge(b64), "PptxBridge")
+            _webView?.loadUrl("file:///android_asset/pptx/pptx_renderer.html")
+        } catch (e: Exception) {
+            Toast.makeText(requireContext(), "Cannot render PPTX", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private class PptxBridge(private val data: String) {
+        @android.webkit.JavascriptInterface
+        fun getPptxData(): String = data
+    }
+
     private fun openExternal(file: java.io.File, mime: String) {
         val fileUri = Uri.fromFile(file)
         startActivity(Intent(Intent.ACTION_VIEW).apply {
@@ -1208,20 +1226,6 @@ class BrowserFragment : Fragment() {
             setDataAndType(uri, mime)
             addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         })
-    }
-
-    private fun displayPptx(file: java.io.File) {
-        try {
-            val bytes = file.readBytes()
-            val b64 = android.util.Base64.encodeToString(bytes, android.util.Base64.DEFAULT)
-            val safe = b64.replace("\\", "\\\\").replace("'", "\\'").replace("\n", "\\n")
-            _webView?.loadUrl("file:///android_asset/pptx/pptx_renderer.html")
-            _webView?.postDelayed({
-                _webView?.evaluateJavascript("renderPptx('$safe')", null)
-            }, 600)
-        } catch (e: Exception) {
-            Toast.makeText(requireContext(), "Cannot render PPTX", Toast.LENGTH_SHORT).show()
-        }
     }
 
     private fun displayPdf(file: java.io.File) {
