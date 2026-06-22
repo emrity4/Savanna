@@ -9,6 +9,8 @@ import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.drawable.GradientDrawable
 import android.net.Uri
+import android.opengl.GLES20
+import android.view.ViewGroup
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -39,6 +41,7 @@ import com.savanna.browser.NewTabBridge
 import com.savanna.browser.R
 import com.savanna.browser.manager.ThemeManager
 import com.savanna.browser.util.UrlUtils
+import com.savanna.browser.view.LiquidGlassView
 import kotlin.math.abs
 
 class BrowserFragment : Fragment() {
@@ -95,6 +98,7 @@ class BrowserFragment : Fragment() {
     private val webView get() = _webView!!
     private var isNewTabPage = false
     private lateinit var urlBarContainer: View
+    private var liquidGlassView: LiquidGlassView? = null
     private val density get() = resources.displayMetrics.density
 
     private val CHROME_UA by lazy { WebSettings.getDefaultUserAgent(requireContext()) }
@@ -172,6 +176,16 @@ class BrowserFragment : Fragment() {
         setupSwipeRefresh()
         setupFindInPage()
         refreshTabCount()
+
+        liquidGlassView = LiquidGlassView(requireContext()).apply {
+            id = View.generateViewId()
+            layoutParams = FrameLayout.LayoutParams(
+                FrameLayout.LayoutParams.MATCH_PARENT,
+                FrameLayout.LayoutParams.MATCH_PARENT
+            )
+        }
+        (urlBarContainer as? FrameLayout)?.addView(liquidGlassView!!, 0)
+
         applyThemeColors()
         applyTabMode()
 
@@ -244,6 +258,7 @@ class BrowserFragment : Fragment() {
                     animate().alpha(1f).setDuration(200).start()
                     progress = 0
                 }
+                view?.postDelayed({ liquidGlassView?.snap() }, 100)
                 chipReload.text = "Stop"
                 if (!isNewTabPage) updateUrlBarIcons()
                 updateNavState()
@@ -977,6 +992,12 @@ class BrowserFragment : Fragment() {
             }
         }
 
+        liquidGlassView?.updateParams(
+            opacity = 0.85f,
+            radius = 30f * density
+        )
+        view?.postDelayed({ liquidGlassView?.snap() }, 50)
+
         urlScrollPill.background = GradientDrawable().apply {
             shape = GradientDrawable.RECTANGLE
             cornerRadius = 24f * density
@@ -1109,6 +1130,11 @@ class BrowserFragment : Fragment() {
         _webView?.stopLoading()
         _webView?.destroy()
         _webView = null
+        liquidGlassView?.let {
+            (it.parent as? ViewGroup)?.removeView(it)
+            it.queueEvent { GLES20.glDeleteTextures(1, intArrayOf(0), 0) }
+        }
+        liquidGlassView = null
         super.onDestroyView()
     }
 
