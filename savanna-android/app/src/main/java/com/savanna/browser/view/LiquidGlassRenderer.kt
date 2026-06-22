@@ -140,8 +140,8 @@ class LiquidGlassRenderer(private val view: LiquidGlassView) : GLSurfaceView.Ren
     }
 
     private fun createProgram(): Int {
-        val vSrc = readRaw(com.savanna.browser.R.raw.passthrough_vert)
-        val fSrc = readRaw(com.savanna.browser.R.raw.liquid_glass_frag)
+        val vSrc = readRaw(com.savanna.browser.R.raw.passthrough)
+        val fSrc = readRaw(com.savanna.browser.R.raw.liquid_glass)
         if (vSrc == null || fSrc == null) return 0
 
         val vs = compileShader(GLES20.GL_VERTEX_SHADER, vSrc) ?: return 0
