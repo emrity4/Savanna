@@ -923,57 +923,66 @@ class BrowserFragment : Fragment() {
         view?.setBackgroundColor(newBg)
 
         val isDark = isDarkColor(newBg)
-        val fillColor = if (isDark) 0x14FFFFFF.toInt() else 0x14000000.toInt()
         val borderColor = if (isDark) 0x44FFFFFF.toInt() else 0x44000000.toInt()
-        val borderRounded = GradientDrawable().apply {
+
+        // URL search bar — CSS: rgba(0,0,0,0.04) light / 8% white dark, radius 22dp
+        urlBarSearch.background = GradientDrawable().apply {
             shape = GradientDrawable.RECTANGLE
             cornerRadius = 22f * density
-            setColor(fillColor)
+            setColor(if (isDark) 0x14FFFFFF.toInt() else 0x0A000000.toInt())
             setStroke((2 * density).toInt(), borderColor)
         }
-        urlBarSearch.background = borderRounded
-        val topBorderRounded = GradientDrawable().apply {
+
+        // Compact top bar — 58% frosted glass, radius 22dp
+        val frostFill = if (isDark) 0x941C1C1E.toInt() else 0x94FFFFFF.toInt()
+        topSearchBar.background = GradientDrawable().apply {
             shape = GradientDrawable.RECTANGLE
             cornerRadius = 22f * density
-            setColor(if (isDark) 0x30FFFFFF.toInt() else 0x30000000.toInt())
+            setColor(frostFill)
             setStroke((2 * density).toInt(), borderColor)
         }
-        topSearchBar.background = topBorderRounded
-        val bottomBarBg = GradientDrawable().apply {
+
+        // Compact bottom bar — 58% frosted glass, radius 24dp
+        compactBottomBar.background = GradientDrawable().apply {
             shape = GradientDrawable.RECTANGLE
             cornerRadius = 24f * density
-            setColor(newBg)
+            setColor(frostFill)
             setStroke((2 * density).toInt(), borderColor)
         }
-        compactBottomBar.background = bottomBarBg
 
+        // Main address bar container — CSS: white frosted glass, radius 30dp
         when (style) {
             ThemeManager.STYLE_SOLID -> {
-                val d = GradientDrawable().apply {
+                urlBarContainer.background = GradientDrawable().apply {
                     shape = GradientDrawable.RECTANGLE
-                    cornerRadius = 24f * density
+                    cornerRadius = 30f * density
                     setColor(newBg)
                 }
-                urlBarContainer.background = d
             }
             ThemeManager.STYLE_FROSTED -> {
-                urlBarContainer.setBackgroundResource(R.drawable.tabs_mode_b)
-                urlBarContainer.background.alpha = 120
+                urlBarContainer.background = GradientDrawable().apply {
+                    shape = GradientDrawable.RECTANGLE
+                    cornerRadius = 30f * density
+                    setColor(if (isDark) 0xCC1C1C1E.toInt() else 0xCCFFFFFF.toInt())
+                }
             }
-            else -> {
-                if (tm.isDarkMode) {
-                    urlBarContainer.setBackgroundResource(R.drawable.tabs_mode_b)
-                    urlBarContainer.background.alpha = 255
-                } else {
-                    val d = GradientDrawable().apply {
-                        shape = GradientDrawable.RECTANGLE
-                        cornerRadius = 24f * density
-                        setColor(newBg)
-                    }
-                    urlBarContainer.background = d
+            else -> {  // GLASS — 58% frosted, 30dp radius
+                urlBarContainer.background = GradientDrawable().apply {
+                    shape = GradientDrawable.RECTANGLE
+                    cornerRadius = 30f * density
+                    setColor(frostFill)
+                    setStroke((1 * density).toInt(), borderColor)
                 }
             }
         }
+
+        // Scroll pill — 58% frosted (keep size 142x46dp from earlier)
+        urlScrollPill.background = GradientDrawable().apply {
+            shape = GradientDrawable.RECTANGLE
+            cornerRadius = 24f * density
+            setColor(frostFill)
+        }
+        urlDomainText.setTextColor(if (isDark) Color.WHITE else Color.parseColor("#1B1B1B"))
 
         _webView?.settings?.textZoom = (100 * tm.textSizeMultiplier).toInt()
 
@@ -999,11 +1008,10 @@ class BrowserFragment : Fragment() {
                 bottomBar.setBackgroundResource(R.drawable.safari_bottom_bar)
             } else {
                 currentToolbarTint = newBg
-                val d = GradientDrawable().apply {
+                bottomBar.background = GradientDrawable().apply {
                     shape = GradientDrawable.RECTANGLE
                     setColor(newBg)
                 }
-                bottomBar.background = d
             }
         }
         lastDefaultBg = newBg

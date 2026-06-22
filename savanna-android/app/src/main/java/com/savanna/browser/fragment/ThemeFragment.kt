@@ -7,7 +7,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
-import androidx.appcompat.app.AppCompatDelegate
 import androidx.fragment.app.Fragment
 import com.savanna.browser.MainActivity
 import com.savanna.browser.R
@@ -45,12 +44,16 @@ class ThemeFragment : Fragment() {
         sw.isChecked = themeManager.isDarkMode
         sw.setOnCheckedChangeListener { _, checked ->
             themeManager.isDarkMode = checked
-            // rebuild UI with new theme
-            AppCompatDelegate.setDefaultNightMode(
-                if (checked) AppCompatDelegate.MODE_NIGHT_YES else AppCompatDelegate.MODE_NIGHT_NO
-            )
-            requireActivity().recreate()
+            applyThemeNow()
         }
+    }
+
+    private fun applyThemeNow() {
+        val activity = requireActivity() as MainActivity
+        themeManager.applyToWindow(activity.window)
+        activity.currentBrowserFragment?.applyThemeColors()
+        activity.currentBrowserFragment?.applyTabMode()
+        view?.setBackgroundColor(themeManager.bgColor)
     }
 
     private fun setupUrlBarStyles(root: View) {

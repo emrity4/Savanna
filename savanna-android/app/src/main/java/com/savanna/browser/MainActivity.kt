@@ -2,6 +2,7 @@ package com.savanna.browser
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.fragment.app.FragmentManager
 import com.savanna.browser.fragment.*
 import com.savanna.browser.manager.*
@@ -23,6 +24,12 @@ class MainActivity : AppCompatActivity() {
     var isOverlayShowing = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        // Apply saved dark/light mode before any view creation
+        val prefs = getSharedPreferences("savanna_theme", MODE_PRIVATE)
+        AppCompatDelegate.setDefaultNightMode(
+            if (prefs.getBoolean("dark_mode", true)) AppCompatDelegate.MODE_NIGHT_YES
+            else AppCompatDelegate.MODE_NIGHT_NO
+        )
         super.onCreate(savedInstanceState)
 
         themeManager    = ThemeManager(this)
