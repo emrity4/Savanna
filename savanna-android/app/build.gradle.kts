@@ -15,7 +15,19 @@ android {
         versionName = "1.${System.getenv("GITHUB_RUN_NUMBER") ?: "0"}"
     }
 
+    signingConfigs {
+        create("consistent") {
+            storeFile = rootProject.file("debug.keystore")
+            storePassword = "android"
+            keyAlias = "androiddebugkey"
+            keyPassword = "android"
+        }
+    }
+
     buildTypes {
+        debug {
+            signingConfig = signingConfigs.getByName("consistent")
+        }
         release {
             isMinifyEnabled = true
             proguardFiles(
