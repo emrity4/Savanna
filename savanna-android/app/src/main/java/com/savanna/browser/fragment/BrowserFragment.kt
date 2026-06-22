@@ -926,7 +926,7 @@ class BrowserFragment : Fragment() {
         view?.setBackgroundColor(newBg)
 
         val borderColor = if (isDark) 0xFFFFFFFF.toInt() else 0xFF000000.toInt()
-        val frostFill = if (isDark) 0xBF1C1C1E.toInt() else 0xBFFFFFFF.toInt()
+        val frostFill = if (isDark) 0xD91C1C1E.toInt() else 0xD9FFFFFF.toInt()
         val textColor = if (isDark) Color.WHITE else Color.BLACK
         val iconTint = textColor
 
