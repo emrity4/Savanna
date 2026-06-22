@@ -86,7 +86,8 @@ class AppDownloadManager(private val context: Context) {
                         totalBytes      = lng(DownloadManager.COLUMN_TOTAL_SIZE_BYTES),
                         mimeType        = str(DownloadManager.COLUMN_MEDIA_TYPE),
                         localUri        = str(DownloadManager.COLUMN_LOCAL_URI),
-                        speedBps        = speedBps
+                        speedBps        = speedBps,
+                        timestamp       = lng(DownloadManager.COLUMN_LAST_MODIFIED_TIMESTAMP)
                     )
                 )
             }

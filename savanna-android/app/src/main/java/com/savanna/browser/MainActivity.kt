@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.FragmentManager
 import com.savanna.browser.fragment.*
 import com.savanna.browser.manager.*
+import com.savanna.browser.fragment.PasswordsFragment
 
 class MainActivity : AppCompatActivity() {
 
@@ -15,8 +16,10 @@ class MainActivity : AppCompatActivity() {
     lateinit var trackerBlocker: TrackerBlocker
     lateinit var downloadManager: AppDownloadManager
     lateinit var themeManager: ThemeManager
+    lateinit var passwordManager: PasswordManager
 
-    private var currentBrowserFragment: BrowserFragment? = null
+    var currentBrowserFragment: BrowserFragment? = null
+        private set
     var isOverlayShowing = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -33,6 +36,7 @@ class MainActivity : AppCompatActivity() {
         settingsManager = SettingsManager(this)
         trackerBlocker  = TrackerBlocker(this)
         downloadManager = AppDownloadManager(this)
+        passwordManager = PasswordManager(this)
 
         val initialUrl = intent?.data?.toString() ?: ""
         val tab = tabManager.createTab(url = initialUrl, title = "New Tab")
@@ -80,6 +84,7 @@ class MainActivity : AppCompatActivity() {
                                   R.anim.slide_in_right, R.anim.slide_out_left)
     fun showSettings()      = showOverlayFragment(SettingsFragment(),       "settings",
                                   R.anim.slide_in_right, R.anim.slide_out_left)
+    fun showPasswords()     = showOverlayFragment(PasswordsFragment(),      "passwords")
 
     fun closeOverlay() {
         isOverlayShowing = false

@@ -11,7 +11,8 @@ data class DownloadItem(
     val totalBytes: Long,
     val mimeType: String?,
     val localUri: String?,
-    val speedBps: Long = 0L        // bytes per second — computed by AppDownloadManager
+    val speedBps: Long = 0L,         // bytes per second — computed by AppDownloadManager
+    val timestamp: Long = System.currentTimeMillis()
 ) {
     val progress: Int
         get() = if (totalBytes > 0) ((bytesDownloaded * 100) / totalBytes).toInt() else -1

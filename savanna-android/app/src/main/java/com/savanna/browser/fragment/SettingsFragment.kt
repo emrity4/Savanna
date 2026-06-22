@@ -38,6 +38,9 @@ class SettingsFragment : Fragment() {
         val switchDnt = view.findViewById<MaterialSwitch>(R.id.switch_do_not_track)
         val switchClearOnExit = view.findViewById<MaterialSwitch>(R.id.switch_clear_on_exit)
         val btnFire = view.findViewById<TextView>(R.id.btn_fire)
+        val historyCount = view.findViewById<TextView>(R.id.history_count)
+        val downloadsCount = view.findViewById<TextView>(R.id.downloads_count)
+        val passwordsCount = view.findViewById<TextView>(R.id.passwords_count)
 
         themeValue.text = theme.activePreset.name
         searchEngineValue.text = getSearchEngineName(settings.searchEngine)
@@ -48,6 +51,9 @@ class SettingsFragment : Fragment() {
         switchPopups.isChecked = settings.blockPopups
         switchDnt.isChecked = settings.doNotTrack
         switchClearOnExit.isChecked = settings.clearOnExit
+        historyCount.text = "${activity.historyManager.allHistory.size} items"
+        downloadsCount.text = "${activity.downloadManager.getAll().size} items"
+        passwordsCount.text = "${activity.passwordManager.load().size} saved"
 
         view.findViewById<View>(R.id.setting_theme).setOnClickListener {
             activity.closeOverlay()
@@ -62,10 +68,31 @@ class SettingsFragment : Fragment() {
             showTabModeDialog(settings, tabModeValue)
         }
 
-        switchJs.setOnCheckedChangeListener { _, v -> settings.javascriptEnabled = v }
+        view.findViewById<View>(R.id.setting_history).setOnClickListener {
+            activity.closeOverlay()
+            activity.showHistory()
+        }
+
+        view.findViewById<View>(R.id.setting_downloads).setOnClickListener {
+            activity.closeOverlay()
+            activity.showDownloads()
+        }
+
+        view.findViewById<View>(R.id.setting_passwords).setOnClickListener {
+            activity.closeOverlay()
+            activity.showPasswords()
+        }
+
+        switchJs.setOnCheckedChangeListener { _, v ->
+            settings.javascriptEnabled = v
+            activity.currentBrowserFragment?.updateWebViewSettings()
+        }
         switchTrackers.setOnCheckedChangeListener { _, v -> settings.blockTrackers = v }
         switchAds.setOnCheckedChangeListener { _, v -> settings.blockAds = v }
-        switchPopups.setOnCheckedChangeListener { _, v -> settings.blockPopups = v }
+        switchPopups.setOnCheckedChangeListener { _, v ->
+            settings.blockPopups = v
+            activity.currentBrowserFragment?.updateWebViewSettings()
+        }
         switchDnt.setOnCheckedChangeListener { _, v -> settings.doNotTrack = v }
         switchClearOnExit.setOnCheckedChangeListener { _, v -> settings.clearOnExit = v }
 

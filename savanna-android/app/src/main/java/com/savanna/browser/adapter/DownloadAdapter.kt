@@ -24,6 +24,8 @@ class DownloadAdapter(
         val progress: ProgressBar = view.findViewById(R.id.download_progress)
         val btnOpen: ImageView    = view.findViewById(R.id.btn_open_download)
         val btnDelete: ImageView  = view.findViewById(R.id.btn_delete_download)
+        val sizeText: TextView    = view.findViewById(R.id.download_size)
+        val dateText: TextView    = view.findViewById(R.id.download_date)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder =
@@ -34,6 +36,9 @@ class DownloadAdapter(
 
         holder.title.text      = item.title
         holder.statusText.text = item.statusLabel   // includes speed e.g. "47% · 12.3 MB  1.2 MB/s"
+        holder.sizeText.text   = item.sizeLabel
+        val sdf = java.text.SimpleDateFormat("MMM dd, h:mm a", java.util.Locale.getDefault())
+        holder.dateText.text   = sdf.format(java.util.Date(item.timestamp))
 
         when {
             item.isComplete -> {

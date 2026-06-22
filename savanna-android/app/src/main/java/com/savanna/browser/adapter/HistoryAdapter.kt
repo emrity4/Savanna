@@ -68,7 +68,7 @@ class HistoryAdapter(
 
         holder.title.text = item.title.ifBlank { domain }
         holder.url.text   = UrlUtils.formatUrl(item.url)
-        holder.time.text  = UrlUtils.timeAgo(item.timestamp)
+        holder.time.text  = UrlUtils.formatTimestamp(item.timestamp)
         holder.itemView.setOnClickListener { onItemClick(item) }
     }
 

@@ -184,8 +184,9 @@ class BrowserFragment : Fragment() {
     private fun setupWebView() {
         val activity = requireActivity() as MainActivity
 
+        val s = activity.settingsManager
         webView.settings.apply {
-            javaScriptEnabled = true
+            javaScriptEnabled = s.javascriptEnabled
             domStorageEnabled = true
             loadWithOverviewMode = true
             useWideViewPort = true
@@ -194,7 +195,7 @@ class BrowserFragment : Fragment() {
             setSupportZoom(true)
             allowFileAccess = true
             allowContentAccess = true
-            setSupportMultipleWindows(false)
+            setSupportMultipleWindows(!s.blockPopups)
             cacheMode = WebSettings.LOAD_DEFAULT
             mixedContentMode = WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE
             mediaPlaybackRequiresUserGesture = true
@@ -234,6 +235,9 @@ class BrowserFragment : Fragment() {
                         urlEditText.hint = "Search or enter address"
                     }
                     activity.tabManager.updateTab(tabId, url = it, isLoading = true)
+                    if (isCompactMode) {
+                        view?.findViewById<android.widget.EditText>(R.id.compact_url_text)?.setText(UrlUtils.formatUrl(it))
+                    }
                 }
                 progressBar.visibility = View.VISIBLE
                 progressBar.progress = 0
@@ -269,9 +273,12 @@ class BrowserFragment : Fragment() {
                             isLoading = false, canGoBack = webView.canGoBack(),
                             canGoForward = webView.canGoForward()
                         )
-                        activity.historyManager.addEntry(it, title)
-                        updateBookmarkIcon()
-                        updateBottomBarTint(it)
+                                activity.historyManager.addEntry(it, title)
+                                updateBookmarkIcon()
+                                updateBottomBarTint(it)
+                                if (isCompactMode) {
+                                    view?.findViewById<android.widget.EditText>(R.id.compact_url_text)?.setText(UrlUtils.formatUrl(it))
+                                }
                     } else {
                         activity.tabManager.updateTab(tabId, title = "New Tab", isLoading = false, url = "")
                         resetBottomBarTint()
@@ -306,6 +313,59 @@ class BrowserFragment : Fragment() {
             }
         }
 
+        webView.setOnLongClickListener { v ->
+            val wv = v as? android.webkit.WebView ?: return@setOnLongClickListener false
+            val result = wv.hitTestResult
+            val url = currentUrl()
+            val items = mutableListOf<Pair<String, () -> Unit>>()
+            items.add("Find in Page" to { showFindInPage() })
+            if (result.type == android.webkit.WebView.HitTestResult.IMAGE_TYPE ||
+                result.type == android.webkit.WebView.HitTestResult.SRC_IMAGE_ANCHOR_TYPE) {
+                val imgUrl = result.extra ?: ""
+                items.add("Save Image" to { downloadUrl(imgUrl) })
+                items.add("Copy Image Link" to {
+                    requireContext().let { ctx ->
+                        val clip = android.content.ClipData.newPlainText("url", imgUrl)
+                        ctx.getSystemService(android.content.ClipboardManager::class.java)
+                            ?.setPrimaryClip(clip)
+                    }
+                })
+            }
+            if (result.type == android.webkit.WebView.HitTestResult.SRC_ANCHOR_TYPE ||
+                result.type == android.webkit.WebView.HitTestResult.SRC_IMAGE_ANCHOR_TYPE) {
+                val linkUrl = result.extra ?: ""
+                items.add("Copy Link" to {
+                    requireContext().let { ctx ->
+                        val clip = android.content.ClipData.newPlainText("url", linkUrl)
+                        ctx.getSystemService(android.content.ClipboardManager::class.java)
+                            ?.setPrimaryClip(clip)
+                    }
+                })
+            }
+            items.add("Copy URL" to {
+                requireContext().let { ctx ->
+                    val clip = android.content.ClipData.newPlainText("url", url)
+                    ctx.getSystemService(android.content.ClipboardManager::class.java)
+                        ?.setPrimaryClip(clip)
+                }
+            })
+            items.add("Print" to {
+                try {
+                    val printMgr = requireContext().getSystemService(android.print.PrintManager::class.java)
+                    printMgr?.print("Savanna", wv.createPrintDocumentAdapter(), null)
+                } catch (_: Exception) {}
+            })
+            items.add("Add to Home Screen" to {
+                addToHomeScreen()
+            })
+            items.add("Share" to { shareCurrentPage() })
+            val labels = items.map { it.first }.toTypedArray()
+            android.app.AlertDialog.Builder(requireContext())
+                .setItems(labels) { _, i -> items[i].second() }
+                .show()
+            true
+        }
+
         webView.setFindListener { activeMatchOrdinal, numberOfMatches, isDone ->
             if (isDone && isFindVisible) {
                 findCount.text = if (numberOfMatches > 0)
@@ -313,6 +373,13 @@ class BrowserFragment : Fragment() {
             }
         }
 
+    }
+
+    fun updateWebViewSettings() {
+        val wv = _webView ?: return
+        val s = (requireActivity() as? MainActivity)?.settingsManager ?: return
+        wv.settings.javaScriptEnabled = s.javascriptEnabled
+        wv.settings.setSupportMultipleWindows(!s.blockPopups)
     }
 
     private fun showFavoriteDialog() {
@@ -775,6 +842,13 @@ class BrowserFragment : Fragment() {
         btnSettings.setOnClickListener { (requireActivity() as MainActivity).showSettings() }
         btnShare.setOnClickListener { shareCurrentPage() }
         btnShare.setOnLongClickListener { showFavoriteDialog(); true }
+
+        view?.findViewById<android.widget.ImageView>(R.id.compact_btn_back)?.setOnClickListener { webView.goBack() }
+        view?.findViewById<android.widget.ImageView>(R.id.compact_btn_forward)?.setOnClickListener { webView.goForward() }
+        view?.findViewById<android.widget.ImageView>(R.id.compact_btn_share)?.setOnClickListener { shareCurrentPage() }
+        view?.findViewById<android.widget.ImageView>(R.id.compact_btn_tabs)?.setOnClickListener { (requireActivity() as MainActivity).showTabSwitcher() }
+        view?.findViewById<android.widget.ImageView>(R.id.compact_btn_bookmark)?.setOnClickListener { toggleBookmark() }
+        view?.findViewById<android.widget.EditText>(R.id.compact_url_text)?.setOnClickListener { focusUrlBar() }
     }
 
     private fun toggleBookmark() {
@@ -807,6 +881,7 @@ class BrowserFragment : Fragment() {
     fun refreshTabCount() {
         val count = (requireActivity() as? MainActivity)?.tabManager?.tabCount ?: 1
         btnTabs.text = count.toString()
+        view?.findViewById<android.widget.TextView>(R.id.compact_btn_tabs)?.text = count.toString()
     }
 
     private fun applyThemeColors() {
@@ -821,6 +896,29 @@ class BrowserFragment : Fragment() {
         themeBgColor = newBg
         lastUrlBarStyle = style
         view?.setBackgroundColor(newBg)
+
+        val borderColor = if (isDarkColor(newBg)) 0x22FFFFFF else 0x22000000
+        val borderRounded = GradientDrawable().apply {
+            shape = GradientDrawable.RECTANGLE
+            cornerRadius = 24f * density
+            setColor(android.graphics.Color.TRANSPARENT)
+            setStroke((2 * density).toInt(), borderColor)
+        }
+        urlBarSearch.background = borderRounded
+        val topBorderRounded = GradientDrawable().apply {
+            shape = GradientDrawable.RECTANGLE
+            cornerRadius = 22f * density
+            setColor(android.graphics.Color.TRANSPARENT)
+            setStroke((2 * density).toInt(), borderColor)
+        }
+        topSearchBar.background = topBorderRounded
+        val bottomBarBg = GradientDrawable().apply {
+            shape = GradientDrawable.RECTANGLE
+            cornerRadius = 24f * density
+            setColor(newBg)
+            setStroke((2 * density).toInt(), borderColor)
+        }
+        compactBottomBar.background = bottomBarBg
 
         when (style) {
             ThemeManager.STYLE_SOLID -> {
@@ -884,6 +982,37 @@ class BrowserFragment : Fragment() {
         lastDefaultBg = newBg
     }
 
+    private fun downloadUrl(url: String) {
+        try {
+            val activity = requireActivity() as MainActivity
+            activity.downloadManager.enqueue(url, CHROME_UA, null, null)
+        } catch (_: Exception) {}
+    }
+
+    private fun addToHomeScreen() {
+        val url = currentUrl()
+        if (url.isBlank()) return
+        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url)).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+        }
+        val shortcut = android.content.Intent(android.content.Intent.ACTION_CREATE_SHORTCUT).apply {
+            putExtra(android.content.Intent.EXTRA_SHORTCUT_INTENT, intent)
+            putExtra(android.content.Intent.EXTRA_SHORTCUT_NAME, webView.title ?: url)
+            putExtra(android.content.Intent.EXTRA_SHORTCUT_ICON_RESOURCE,
+                android.content.Intent.ShortcutIconResource.fromContext(requireContext(), R.drawable.ic_launcher_foreground))
+        }
+        try { startActivity(shortcut) } catch (_: Exception) {
+            Toast.makeText(requireContext(), "Add to Home Screen not available", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun isDarkColor(color: Int): Boolean {
+        val r = android.graphics.Color.red(color)
+        val g = android.graphics.Color.green(color)
+        val b = android.graphics.Color.blue(color)
+        return (0.299 * r + 0.587 * g + 0.114 * b) < 128
+    }
+
     private fun shareCurrentPage() {
         if (isNewTabPage) return
         val activity = requireActivity() as MainActivity
@@ -915,6 +1044,24 @@ class BrowserFragment : Fragment() {
         updateNavState()
         updateBookmarkIcon()
         applyThemeColors()
+        applyTabMode()
+    }
+
+    private fun applyTabMode() {
+        val s = (requireActivity() as? MainActivity)?.settingsManager ?: return
+        val compact = s.tabMode == com.savanna.browser.manager.SettingsManager.TAB_MODE_COMPACT
+        isCompactMode = compact
+        urlBarContainer.visibility = if (compact) View.GONE else View.VISIBLE
+        topSearchBar.visibility = if (compact) View.VISIBLE else View.GONE
+        compactBottomBar.visibility = if (compact) View.VISIBLE else View.GONE
+        if (compact) {
+            val url = currentUrl()
+            if (!isNewTabPage) {
+                view?.findViewById<android.widget.EditText>(R.id.compact_url_text)?.setText(
+                    com.savanna.browser.util.UrlUtils.formatUrl(url)
+                )
+            }
+        }
     }
 
     override fun onDestroyView() {

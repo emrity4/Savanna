@@ -36,6 +36,15 @@ object UrlUtils {
         }
     }
 
+    fun formatTimestamp(timestamp: Long): String {
+        val now = System.currentTimeMillis()
+        val diff = now - timestamp
+        val sdf = java.text.SimpleDateFormat("MMM dd", java.util.Locale.getDefault())
+        if (diff < 86400000L) return java.text.SimpleDateFormat("h:mm a", java.util.Locale.getDefault()).format(java.util.Date(timestamp))
+        if (diff < 604800000L) return sdf.format(java.util.Date(timestamp))
+        return java.text.SimpleDateFormat("MMM dd, yyyy", java.util.Locale.getDefault()).format(java.util.Date(timestamp))
+    }
+
     fun timeAgo(timestamp: Long): String {
         val now = System.currentTimeMillis()
         val diff = now - timestamp
