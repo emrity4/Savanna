@@ -69,5 +69,6 @@ dependencies {
     implementation("org.apache.tika:tika-parsers-standard-package:2.9.2") {
         exclude(group = "com.google.guava", module = "guava")
         exclude(group = "com.google.guava", module = "listenablefuture")
+        exclude(group = "commons-logging", module = "commons-logging")
     }
 }
