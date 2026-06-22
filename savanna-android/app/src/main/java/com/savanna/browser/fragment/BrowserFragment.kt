@@ -87,6 +87,7 @@ class BrowserFragment : Fragment() {
     private var isCompactMode = false
     private var isScrolledDown = false
     private var lastScrollY = 0
+    private var scrollPillAlpha = 0f
     private var isReaderMode = false
     private var isFindVisible = false
 
@@ -313,6 +314,18 @@ class BrowserFragment : Fragment() {
             }
         }
 
+        var touchStartY = 0f
+        webView.setOnTouchListener { _, event ->
+            when (event.action) {
+                android.view.MotionEvent.ACTION_DOWN -> touchStartY = event.y
+                android.view.MotionEvent.ACTION_UP -> {
+                    if (isScrolledDown && abs(event.y - touchStartY) < 15f) {
+                        toggleScrollPill(false)
+                    }
+                }
+            }
+            false
+        }
         webView.setOnLongClickListener { v ->
             val wv = v as? android.webkit.WebView ?: return@setOnLongClickListener false
             val result = wv.hitTestResult
@@ -597,21 +610,27 @@ class BrowserFragment : Fragment() {
         if (url.isBlank()) return
         val domain = try { android.net.Uri.parse(url).host?.removePrefix("www.") ?: url } catch (e: Exception) { url }
         urlDomainText.text = domain
+        val bar = urlBarContainer
         if (collapsed) {
+            scrollPillAlpha = 1f
             urlScrollPill.visibility = View.VISIBLE
-            urlScrollPill.alpha = 0f
             urlScrollPill.animate().alpha(1f).setDuration(200).start()
-            if (!isCompactMode) urlBarContainer.animate().alpha(0f).setDuration(150).withEndAction {
-                urlBarContainer.visibility = View.GONE
-            }.start()
+            if (!isCompactMode && bar.visibility != View.GONE) {
+                bar.animate().alpha(0f).setDuration(150).withEndAction {
+                    bar.visibility = View.GONE
+                }.start()
+            }
+            urlScrollPill.setOnClickListener { toggleScrollPill(false) }
         } else {
+            scrollPillAlpha = 0f
             urlScrollPill.animate().alpha(0f).setDuration(150).withEndAction {
                 urlScrollPill.visibility = View.GONE
             }.start()
-            if (!isCompactMode) {
-                urlBarContainer.visibility = View.VISIBLE
-                urlBarContainer.alpha = 0f
-                urlBarContainer.animate().alpha(1f).setDuration(200).start()
+            urlScrollPill.setOnClickListener(null)
+            if (!isCompactMode && bar.visibility != View.VISIBLE) {
+                bar.visibility = View.VISIBLE
+                bar.alpha = 0f
+                bar.animate().alpha(1f).setDuration(200).start()
             }
         }
     }
@@ -625,17 +644,20 @@ class BrowserFragment : Fragment() {
         }
         webView.setOnScrollChangeListener { _, _, scrollY, _, oldScrollY ->
             swipeRefresh.isEnabled = scrollY == 0
+            if (isNewTabPage) return@setOnScrollChangeListener
             val delta = scrollY - oldScrollY
-            if (!isNewTabPage && abs(delta) > 6) updateBottomBarTint(currentUrl())
-            if (!isNewTabPage && abs(scrollY - lastScrollY) > 10) {
-                lastScrollY = scrollY
-                if (scrollY > 50 && !isScrolledDown) {
-                    isScrolledDown = true
-                    toggleScrollPill(true)
-                } else if (scrollY <= 10 && isScrolledDown) {
-                    isScrolledDown = false
-                    toggleScrollPill(false)
-                }
+            val url = currentUrl()
+            if (abs(delta) > 6) updateBottomBarTint(url)
+            if (abs(delta) < 8) return@setOnScrollChangeListener
+            if (scrollY > 60 && delta > 0 && !isScrolledDown) {
+                isScrolledDown = true
+                toggleScrollPill(true)
+            } else if (scrollY <= 10 && isScrolledDown) {
+                isScrolledDown = false
+                toggleScrollPill(false)
+            } else if (isScrolledDown && delta < -20 && scrollY < 200) {
+                isScrolledDown = false
+                toggleScrollPill(false)
             }
         }
     }
@@ -897,18 +919,20 @@ class BrowserFragment : Fragment() {
         lastUrlBarStyle = style
         view?.setBackgroundColor(newBg)
 
-        val borderColor = if (isDarkColor(newBg)) 0x22FFFFFF else 0x22000000
+        val isDark = isDarkColor(newBg)
+        val fillColor = if (isDark) 0x14FFFFFF.toInt() else 0x14000000.toInt()
+        val borderColor = if (isDark) 0x44FFFFFF.toInt() else 0x44000000.toInt()
         val borderRounded = GradientDrawable().apply {
             shape = GradientDrawable.RECTANGLE
-            cornerRadius = 24f * density
-            setColor(android.graphics.Color.TRANSPARENT)
+            cornerRadius = 22f * density
+            setColor(fillColor)
             setStroke((2 * density).toInt(), borderColor)
         }
         urlBarSearch.background = borderRounded
         val topBorderRounded = GradientDrawable().apply {
             shape = GradientDrawable.RECTANGLE
             cornerRadius = 22f * density
-            setColor(android.graphics.Color.TRANSPARENT)
+            setColor(fillColor)
             setStroke((2 * density).toInt(), borderColor)
         }
         topSearchBar.background = topBorderRounded

@@ -1,11 +1,15 @@
 package com.savanna.browser
 
+import android.Manifest
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentManager
 import com.savanna.browser.fragment.*
 import com.savanna.browser.manager.*
-import com.savanna.browser.fragment.PasswordsFragment
 
 class MainActivity : AppCompatActivity() {
 
@@ -37,6 +41,8 @@ class MainActivity : AppCompatActivity() {
         trackerBlocker  = TrackerBlocker(this)
         downloadManager = AppDownloadManager(this)
         passwordManager = PasswordManager(this)
+
+        requestPermissions()
 
         val initialUrl = intent?.data?.toString() ?: ""
         val tab = tabManager.createTab(url = initialUrl, title = "New Tab")
@@ -85,6 +91,17 @@ class MainActivity : AppCompatActivity() {
     fun showSettings()      = showOverlayFragment(SettingsFragment(),       "settings",
                                   R.anim.slide_in_right, R.anim.slide_out_left)
     fun showPasswords()     = showOverlayFragment(PasswordsFragment(),      "passwords")
+
+    private fun requestPermissions() {
+        val needed = mutableListOf<String>()
+        if (Build.VERSION.SDK_INT >= 33) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
+                != PackageManager.PERMISSION_GRANTED) needed.add(Manifest.permission.POST_NOTIFICATIONS)
+        }
+        if (needed.isNotEmpty()) {
+            ActivityCompat.requestPermissions(this, needed.toTypedArray(), 100)
+        }
+    }
 
     fun closeOverlay() {
         isOverlayShowing = false
