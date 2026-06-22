@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- Light surfaces (day mode) -->
-    <color name="bg_primary">#FFF2F2F7</color>
+    <color name="bg_primary">#FFFFFFFF</color>
     <color name="bg_secondary">#FFE5E5EA</color>
     <color name="bg_tertiary">#FFD1D1D6</color>
     <color name="bg_card">#FFFFFFFF</color>

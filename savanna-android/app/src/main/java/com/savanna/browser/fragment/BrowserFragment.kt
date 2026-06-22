@@ -94,10 +94,6 @@ class BrowserFragment : Fragment() {
     private var tabId: String = ""
     private val webView get() = _webView!!
     private var isNewTabPage = false
-    private var currentToolbarTint = Color.TRANSPARENT
-    private var themeBgColor = Color.parseColor("#FF1C1C1E")
-    private var lastDefaultBg = Color.parseColor("#FF1C1C1E")
-    private var lastUrlBarStyle = ThemeManager.STYLE_GLASS
     private lateinit var urlBarContainer: View
     private val density get() = resources.displayMetrics.density
 
@@ -278,13 +274,11 @@ class BrowserFragment : Fragment() {
                         )
                                 activity.historyManager.addEntry(it, title)
                                 updateBookmarkIcon()
-                                updateBottomBarTint(it)
                                 if (isCompactMode) {
                                     view?.findViewById<android.widget.EditText>(R.id.compact_url_text)?.setText(UrlUtils.formatUrl(it))
                                 }
                     } else {
                         activity.tabManager.updateTab(tabId, title = "New Tab", isLoading = false, url = "")
-                        resetBottomBarTint()
                     }
                 }
                 updateNavState()
@@ -639,7 +633,7 @@ class BrowserFragment : Fragment() {
 
     private fun setupSwipeRefresh() {
         swipeRefresh.setColorSchemeResources(android.R.color.white)
-        swipeRefresh.setProgressBackgroundColorSchemeColor(Color.parseColor("#FF1C1C1E"))
+        swipeRefresh.setProgressBackgroundColorSchemeColor(0xFF000000.toInt())
         swipeRefresh.setOnRefreshListener {
             if (!isNewTabPage) webView.reload()
             swipeRefresh.isRefreshing = false
@@ -649,7 +643,6 @@ class BrowserFragment : Fragment() {
             if (isNewTabPage || isCompactMode) return@setOnScrollChangeListener
             val delta = scrollY - oldScrollY
             val url = currentUrl()
-            if (abs(delta) > 6) updateBottomBarTint(url)
             if (abs(delta) < 8) return@setOnScrollChangeListener
             if (scrollY > 60 && delta > 0 && !isScrolledDown) {
                 isScrolledDown = true
@@ -762,7 +755,7 @@ class BrowserFragment : Fragment() {
                     )
                     setPadding(16, 12, 16, 12)
                     textSize = 14f
-                    setTextColor(Color.WHITE)
+                    setTextColor(if ((requireActivity() as MainActivity).themeManager.isDarkMode) Color.WHITE else Color.BLACK)
                     maxLines = 1
                     ellipsize = android.text.TextUtils.TruncateAt.END
                 }
@@ -914,18 +907,15 @@ class BrowserFragment : Fragment() {
         val tm = activity.themeManager
         val newBg = tm.bgColor
         val style = tm.urlBarStyle
-        val bgChanged = newBg != themeBgColor
-        val styleChanged = style != lastUrlBarStyle
-        if (!bgChanged && !styleChanged) return
+        val isDark = tm.isDarkMode
 
-        themeBgColor = newBg
-        lastUrlBarStyle = style
         view?.setBackgroundColor(newBg)
 
-        val isDark = isDarkColor(newBg)
-        val borderColor = if (isDark) 0x44FFFFFF.toInt() else 0x44000000.toInt()
+        val borderColor = if (isDark) 0xFFFFFFFF.toInt() else 0xFF000000.toInt()
+        val frostFill = if (isDark) 0xBF1C1C1E.toInt() else 0xBFFFFFFF.toInt()
+        val textColor = if (isDark) Color.WHITE else Color.BLACK
+        val iconTint = textColor
 
-        // URL search bar — CSS: rgba(0,0,0,0.04) light / 8% white dark, radius 22dp
         urlBarSearch.background = GradientDrawable().apply {
             shape = GradientDrawable.RECTANGLE
             cornerRadius = 22f * density
@@ -933,8 +923,6 @@ class BrowserFragment : Fragment() {
             setStroke((2 * density).toInt(), borderColor)
         }
 
-        // Compact top bar — 58% frosted glass, radius 22dp
-        val frostFill = if (isDark) 0x941C1C1E.toInt() else 0x94FFFFFF.toInt()
         topSearchBar.background = GradientDrawable().apply {
             shape = GradientDrawable.RECTANGLE
             cornerRadius = 22f * density
@@ -942,7 +930,6 @@ class BrowserFragment : Fragment() {
             setStroke((2 * density).toInt(), borderColor)
         }
 
-        // Compact bottom bar — 58% frosted glass, radius 24dp
         compactBottomBar.background = GradientDrawable().apply {
             shape = GradientDrawable.RECTANGLE
             cornerRadius = 24f * density
@@ -950,7 +937,6 @@ class BrowserFragment : Fragment() {
             setStroke((2 * density).toInt(), borderColor)
         }
 
-        // Main address bar container — CSS: white frosted glass, radius 30dp
         when (style) {
             ThemeManager.STYLE_SOLID -> {
                 urlBarContainer.background = GradientDrawable().apply {
@@ -966,7 +952,7 @@ class BrowserFragment : Fragment() {
                     setColor(if (isDark) 0xCC1C1C1E.toInt() else 0xCCFFFFFF.toInt())
                 }
             }
-            else -> {  // GLASS — 58% frosted, 30dp radius
+            else -> {
                 urlBarContainer.background = GradientDrawable().apply {
                     shape = GradientDrawable.RECTANGLE
                     cornerRadius = 30f * density
@@ -976,45 +962,57 @@ class BrowserFragment : Fragment() {
             }
         }
 
-        // Scroll pill — 58% frosted (keep size 142x46dp from earlier)
         urlScrollPill.background = GradientDrawable().apply {
             shape = GradientDrawable.RECTANGLE
             cornerRadius = 24f * density
             setColor(frostFill)
         }
-        urlDomainText.setTextColor(if (isDark) Color.WHITE else Color.parseColor("#1B1B1B"))
+        urlDomainText.setTextColor(textColor)
 
         _webView?.settings?.textZoom = (100 * tm.textSizeMultiplier).toInt()
-
         swipeRefresh.setProgressBackgroundColorSchemeColor(newBg)
 
-        if (!tm.isDarkMode) {
-            findBar.setBackgroundColor(newBg)
-            val fi = GradientDrawable().apply {
-                shape = GradientDrawable.RECTANGLE
-                cornerRadius = 18f * density
-                setColor(newBg)
-            }
-            findInput.background = fi
-        } else {
-            findBar.setBackgroundResource(R.drawable.safari_bottom_bar)
-            findInput.setBackgroundResource(R.drawable.safari_url_capsule)
+        findBar.setBackgroundColor(newBg)
+        findInput.background = GradientDrawable().apply {
+            shape = GradientDrawable.RECTANGLE
+            cornerRadius = 18f * density
+            setColor(if (isDark) 0xFF1C1C1E.toInt() else 0xFFE5E5EA.toInt())
         }
 
-        val showingDefault = currentToolbarTint == lastDefaultBg || currentToolbarTint == Color.TRANSPARENT
-        if (showingDefault || bgChanged) {
-            if (tm.isDarkMode) {
-                currentToolbarTint = Color.TRANSPARENT
-                bottomBar.setBackgroundResource(R.drawable.safari_bottom_bar)
-            } else {
-                currentToolbarTint = newBg
-                bottomBar.background = GradientDrawable().apply {
-                    shape = GradientDrawable.RECTANGLE
-                    setColor(newBg)
-                }
-            }
+        urlEditText.setTextColor(textColor)
+        urlEditText.setHintTextColor(if (isDark) 0xFF636366.toInt() else 0xFF8E8E93.toInt())
+        view?.findViewById<EditText>(R.id.compact_url_text)?.setTextColor(textColor)
+
+        listOf(
+            chipClear, chipCopy, chipPaste, chipPasteGo, chipShareLink,
+            chipBack, chipForward, chipDate, chipTime, chipReload, chipHistory, chipFind
+        ).forEach { it.setTextColor(textColor) }
+
+        listOf(btnBack, btnForward, btnShare, btnBookmark, btnSettings).forEach {
+            it.setColorFilter(iconTint)
         }
-        lastDefaultBg = newBg
+        listOf(
+            view?.findViewById<ImageView>(R.id.compact_btn_back),
+            view?.findViewById<ImageView>(R.id.compact_btn_forward),
+            view?.findViewById<ImageView>(R.id.compact_btn_share),
+            view?.findViewById<ImageView>(R.id.compact_btn_bookmark),
+            view?.findViewById<ImageView>(R.id.compact_btn_settings)
+        ).forEach { it?.setColorFilter(iconTint) }
+
+        btnTabs.setTextColor(textColor)
+        view?.findViewById<TextView>(R.id.compact_btn_tabs)?.setTextColor(textColor)
+
+        bottomBar.background = GradientDrawable().apply {
+            shape = GradientDrawable.RECTANGLE
+            setColor(newBg)
+        }
+
+        urlActionsStrip.setBackgroundColor(if (isDark) 0xE6000000.toInt() else 0xE6FFFFFF.toInt())
+        urlSuggestions.background = GradientDrawable().apply {
+            shape = GradientDrawable.RECTANGLE
+            cornerRadius = 12f * density
+            setColor(newBg)
+        }
     }
 
     private fun downloadUrl(url: String) {
@@ -1039,13 +1037,6 @@ class BrowserFragment : Fragment() {
         try { startActivity(shortcut) } catch (_: Exception) {
             Toast.makeText(requireContext(), "Add to Home Screen not available", Toast.LENGTH_SHORT).show()
         }
-    }
-
-    private fun isDarkColor(color: Int): Boolean {
-        val r = android.graphics.Color.red(color)
-        val g = android.graphics.Color.green(color)
-        val b = android.graphics.Color.blue(color)
-        return (0.299 * r + 0.587 * g + 0.114 * b) < 128
     }
 
     private fun shareCurrentPage() {
@@ -1106,40 +1097,6 @@ class BrowserFragment : Fragment() {
         super.onDestroyView()
     }
 
-    private fun updateBottomBarTint(url: String) {
-        val color = websiteTint(url)
-        if (color == currentToolbarTint) return
-        currentToolbarTint = color
-        val drawable = GradientDrawable().apply {
-            shape = GradientDrawable.RECTANGLE
-            setColor(color)
-        }
-        bottomBar.background = drawable
-    }
-
-    private fun resetBottomBarTint() {
-        val activity = requireActivity() as? MainActivity ?: return
-        if (activity.themeManager.isDarkMode) {
-            currentToolbarTint = Color.TRANSPARENT
-            bottomBar.setBackgroundResource(R.drawable.safari_bottom_bar)
-        } else {
-            currentToolbarTint = themeBgColor
-            val d = GradientDrawable().apply {
-                shape = GradientDrawable.RECTANGLE
-                setColor(themeBgColor)
-            }
-            bottomBar.background = d
-        }
-    }
-
-    private fun websiteTint(url: String): Int {
-        val host = try { Uri.parse(url).host ?: "" } catch (_: Exception) { "" }
-        val hash = host.hashCode()
-        val r = 24 + (hash shr 16 and 0x3F)
-        val g = 16 + (hash shr 8 and 0x3F)
-        val b = 16 + (hash and 0x3F)
-        return Color.argb(242, r, g, b)
-    }
 
     private fun showDatePicker() {
         IOSDatePickerFragment { y, m, d, h, mi ->

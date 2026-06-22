@@ -110,7 +110,8 @@ class ThemeFragment : Fragment() {
         val accent = themeManager.accentColor
         chip.setBackgroundResource(R.drawable.action_chip_background)
         chip.text = chip.text
-        chip.setTextColor(if (selected) accent else Color.parseColor("#99FFFFFF"))
+        val unselectedColor = if (themeManager.isDarkMode) Color.parseColor("#99FFFFFF") else Color.parseColor("#99000000")
+        chip.setTextColor(if (selected) accent else unselectedColor)
         chip.backgroundTintList = if (selected) {
             ColorStateList.valueOf(Color.argb(34, Color.red(accent), Color.green(accent), Color.blue(accent)))
         } else {

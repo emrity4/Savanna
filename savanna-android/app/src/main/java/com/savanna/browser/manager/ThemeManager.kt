@@ -20,7 +20,7 @@ class ThemeManager(private val context: Context) {
         const val SIZE_LARGE  = "large"
 
         val DARK_BG  = 0xFF000000.toInt()
-        val LIGHT_BG = 0xFFF2F2F7.toInt()
+        val LIGHT_BG = 0xFFFFFFFF.toInt()
         val ACCENT   = 0xFFB6A8FF.toInt()
     }
 
