@@ -183,6 +183,7 @@ class BrowserFragment : Fragment() {
                 FrameLayout.LayoutParams.MATCH_PARENT,
                 FrameLayout.LayoutParams.MATCH_PARENT
             )
+            viewToHideDuringCapture = urlBarContainer
         }
         (urlBarContainer as? FrameLayout)?.addView(liquidGlassView!!, 0)
 
@@ -1040,8 +1041,20 @@ class BrowserFragment : Fragment() {
             view?.findViewById<ImageView>(R.id.compact_btn_settings)
         ).forEach { it?.setColorFilter(iconTint) }
 
-        btnTabs.setTextColor(textColor)
-        view?.findViewById<TextView>(R.id.compact_btn_tabs)?.setTextColor(textColor)
+        val tabsBadgeColor = if (isDark) Color.BLACK else Color.WHITE
+        btnTabs.setTextColor(tabsBadgeColor)
+        view?.findViewById<TextView>(R.id.compact_btn_tabs)?.setTextColor(tabsBadgeColor)
+        listOfNotNull(btnTabs, view?.findViewById<TextView>(R.id.compact_btn_tabs)).forEach { v ->
+            val badge = GradientDrawable().apply {
+                shape = GradientDrawable.RECTANGLE
+                cornerRadius = 4f * density
+                setColor(if (isDark) Color.WHITE else Color.BLACK)
+            }
+            val bsz = (22 * density).toInt()
+            val hi = ((v.width - bsz) / 2).coerceAtLeast(0)
+            val vi = ((v.height - bsz) / 2).coerceAtLeast(0)
+            v.background = android.graphics.drawable.InsetDrawable(badge, hi, vi, hi, vi)
+        }
 
         bottomBar.background = GradientDrawable().apply {
             shape = GradientDrawable.RECTANGLE
