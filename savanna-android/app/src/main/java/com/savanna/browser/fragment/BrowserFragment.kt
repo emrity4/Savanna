@@ -1205,7 +1205,6 @@ class BrowserFragment : Fragment() {
             parser.parse(input, handler, metadata, org.apache.tika.parser.ParseContext())
             input.close()
             val html = handler.toString()
-            // wrap in responsive styling
             val styled = """<!DOCTYPE html>
 <html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <style>
@@ -1223,6 +1222,8 @@ li{margin:4px 0;font-size:15px;line-height:1.4}
             Toast.makeText(requireContext(), "Cannot render PPTX", Toast.LENGTH_SHORT).show()
         }
     }
+
+    private fun openExternal(file: java.io.File, mime: String) {
         val fileUri = Uri.fromFile(file)
         startActivity(Intent(Intent.ACTION_VIEW).apply {
             setDataAndType(fileUri, mime)
