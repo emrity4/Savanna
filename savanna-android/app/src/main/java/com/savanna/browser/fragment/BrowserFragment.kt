@@ -993,7 +993,8 @@ class BrowserFragment : Fragment() {
             }
         }
 
-        if (style == ThemeManager.STYLE_GLASS) {
+        val isCompact = isCompactMode
+        if (style == ThemeManager.STYLE_GLASS && !isCompact) {
             liquidGlassView?.visibility = View.VISIBLE
             liquidGlassView?.updateParams(
                 opacity = 0.85f,
