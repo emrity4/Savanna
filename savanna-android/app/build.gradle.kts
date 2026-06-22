@@ -77,4 +77,3 @@ dependencies {
         exclude(group = "commons-logging", module = "commons-logging")
     }
 }
-}
