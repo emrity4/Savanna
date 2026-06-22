@@ -909,7 +909,7 @@ class BrowserFragment : Fragment() {
         view?.findViewById<android.widget.TextView>(R.id.compact_btn_tabs)?.text = count.toString()
     }
 
-    private fun applyThemeColors() {
+    fun applyThemeColors() {
         val activity = requireActivity() as? MainActivity ?: return
         val tm = activity.themeManager
         val newBg = tm.bgColor
@@ -1082,7 +1082,7 @@ class BrowserFragment : Fragment() {
         applyTabMode()
     }
 
-    private fun applyTabMode() {
+    fun applyTabMode() {
         val s = (requireActivity() as? MainActivity)?.settingsManager ?: return
         val compact = s.tabMode == com.savanna.browser.manager.SettingsManager.TAB_MODE_COMPACT
         isCompactMode = compact
